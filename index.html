@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A3 — Painel de Controle Gerencial | ADM</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4fa;color:#1a2540;font-size:14px;display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-height:100vh;background:#0d1b3e;color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid #1e3060}
+.sidebar-logo .brand{font-size:26px;font-weight:900;color:#f5a800;letter-spacing:2px}
+.sidebar-logo .sub{font-size:10px;color:#6a85b0;margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+.sidebar-menu{padding:16px 0;flex:1}
+.menu-label{font-size:10px;color:#4a6080;text-transform:uppercase;letter-spacing:1px;padding:16px 24px 6px}
+.menu-item{display:flex;align-items:center;gap:10px;padding:10px 24px;color:#8aa4c8;font-size:13px;cursor:pointer;transition:.2s;border-left:3px solid transparent}
+.menu-item:hover{background:#1e3060;color:#fff}
+.menu-item.active{background:#1e3060;color:#f5a800;border-left-color:#f5a800;font-weight:600}
+.menu-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:20px 24px;border-top:1px solid #1e3060}
+.user-info{display:flex;align-items:center;gap:10px}
+.user-avatar{width:36px;height:36px;background:#f5a800;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0d1b3e;font-size:14px}
+.user-name{font-size:13px;font-weight:600;color:#fff}
+.user-role{font-size:11px;color:#6a85b0}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:#fff;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e0e8f4;position:sticky;top:0;z-index:50}
+.topbar-title h1{font-size:20px;font-weight:700;color:#0d1b3e}
+.topbar-title p{font-size:12px;color:#8aa0c0;margin-top:2px}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;gap:6px}
+.btn-primary{background:#0d1b3e;color:#fff}
+.btn-primary:hover{background:#1e3060}
+.btn-outline{background:#fff;color:#0d1b3e;border:1.5px solid #c8d6e5}
+.btn-outline:hover{background:#f0f4fa}
+.badge-version{background:#fff3cd;color:#b45309;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid #f5c842}
+
+/* CONTENT */
+.content{padding:28px 32px;flex:1}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.kpi-card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 6px rgba(0,30,80,.07);border-top:4px solid #e0e8f4;transition:.2s}
+.kpi-card:hover{box-shadow:0 4px 18px rgba(0,30,80,.12);transform:translateY(-2px)}
+.kpi-card.gold{border-top-color:#f5a800}
+.kpi-card.blue{border-top-color:#0d61e8}
+.kpi-card.green{border-top-color:#0a7c42}
+.kpi-card.red{border-top-color:#b91c1c}
+.kpi-icon{font-size:22px;margin-bottom:8px}
+.kpi-value{font-size:26px;font-weight:800;color:#0d1b3e;line-height:1}
+.kpi-label{font-size:11px;color:#8aa0c0;text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+.kpi-sub{font-size:12px;color:#34a853;font-weight:600;margin-top:6px}
+
+/* STATUS BAR */
+.progress-bar{height:6px;background:#e0e8f4;border-radius:3px;margin-top:10px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:#0d61e8}
+
+/* SECTION CARDS */
+.section-card{background:#fff;border-radius:14px;padding:24px 28px;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,30,80,.07)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1.5px solid #f0f4fa}
+.section-number{width:32px;height:32px;border-radius:8px;background:#0d1b3e;color:#f5a800;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.section-title{font-size:16px;font-weight:700;color:#0d1b3e}
+.section-tag{margin-left:auto;background:#eef3ff;color:#0d61e8;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+
+/* TWO COLS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+
+/* TABLES */
+.section-card table{width:100%;border-collapse:collapse;font-size:13px}
+.section-card table thead tr{background:#0d1b3e;color:#fff}
+.section-card table thead th{padding:10px 14px;text-align:left;font-size:12px;font-weight:600;letter-spacing:.4px}
+.section-card table thead th:first-child{border-radius:8px 0 0 0}
+.section-card table thead th:last-child{border-radius:0 8px 0 0}
+.section-card table tbody tr:nth-child(even){background:#f7f9fd}
+.section-card table tbody tr:hover{background:#eef3ff}
+.section-card table td{padding:9px 14px;border-bottom:1px solid #f0f4fa;vertical-align:top}
+
+/* BADGES */
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.tag-green{background:#dcfce7;color:#0a7c42}
+.tag-yellow{background:#fef3c7;color:#b45309}
+.tag-red{background:#fee2e2;color:#b91c1c}
+.tag-blue{background:#dbeafe;color:#1d4ed8}
+.tag-gray{background:#f1f5f9;color:#64748b}
+
+/* WARN */
+.warn-text{color:#b45309;font-weight:600}
+
+/* CODE */
+pre{background:#1e2d3d;color:#e2eaf4;padding:16px 20px;border-radius:10px;font-size:12px;overflow-x:auto;margin:12px 0;border-left:4px solid #f5a800}
+code{background:#eef3ff;color:#0d61e8;padding:2px 6px;border-radius:4px;font-size:12px}
+pre code{background:transparent;color:inherit;padding:0}
+
+/* BLOCKQUOTE */
+blockquote{border-left:4px solid #f5a800;background:#fffbf0;padding:10px 16px;margin:12px 0;border-radius:0 8px 8px 0;color:#b45309;font-size:13px}
+
+/* CHECKLIST */
+ul{padding-left:20px;margin:8px 0}
+li{margin-bottom:5px}
+
+/* TIMELINE */
+.timeline{display:flex;gap:0;margin:16px 0}
+.timeline-step{flex:1;text-align:center;position:relative}
+.timeline-step:not(:last-child)::after{content:'';position:absolute;top:16px;left:50%;width:100%;height:2px;background:#e0e8f4;z-index:0}
+.timeline-dot{width:32px;height:32px;border-radius:50%;background:#0d1b3e;color:#f5a800;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;margin:0 auto 8px;position:relative;z-index:1}
+.timeline-label{font-size:11px;color:#8aa0c0;font-weight:600}
+.timeline-sublabel{font-size:10px;color:#b0bec5;margin-top:2px}
+
+/* H TAGS inside card */
+.section-card h1,.section-card h2{font-size:15px;color:#0d1b3e;margin:18px 0 10px;padding-left:10px;border-left:3px solid #f5a800}
+.section-card h3{font-size:13px;color:#8aa0c0;text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px}
+.section-card p{margin-bottom:8px;line-height:1.7}
+
+/* FOOTER */
+footer{background:#0d1b3e;color:#6a85b0;text-align:center;padding:16px;font-size:12px}
+footer strong{color:#f5a800}
+
+@media print{
+  .sidebar{display:none}
+  .main{margin-left:0}
+  .topbar{position:static}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">ADM</div>
+    <div class="sub">Performance Excellence</div>
+  </div>
+  <nav class="sidebar-menu">
+    <div class="menu-label">Projeto</div>
+    <div class="menu-item active"><span class="menu-icon">&#9646;</span> A3 — Painel IC</div>
+    <div class="menu-item"><span class="menu-icon">&#9654;</span> Plano de Acao</div>
+    <div class="menu-item"><span class="menu-icon">&#9632;</span> ICs por Nivel</div>
+    <div class="menu-item"><span class="menu-icon">&#9670;</span> Acompanhamento</div>
+    <div class="menu-label">Metodologia</div>
+    <div class="menu-item"><span class="menu-icon">&#9675;</span> Falconi GPD</div>
+    <div class="menu-item"><span class="menu-icon">&#9675;</span> SMS ADM</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">L</div>
+      <div>
+        <div class="user-name">Luiggi Melhoria</div>
+        <div class="user-role">Especialista OtP</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">
+      <h1>Painel de Controle Gerencial</h1>
+      <p>Esmagamento de Soja &mdash; ADM Campo Grande</p>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge-version">A3 &middot; v0.2</span>
+      <button class="btn btn-outline" onclick="window.print()">&#128424; Imprimir</button>
+      <button class="btn btn-primary">&#9654; Iniciar Projeto</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card gold">
+        <div class="kpi-icon">&#128200;</div>
+        <div class="kpi-value">R$21M</div>
+        <div class="kpi-label">Impacto anual estimado</div>
+        <div class="kpi-sub">&#8593; Potencial de melhoria</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:85%;background:#f5a800"></div></div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-icon">&#128203;</div>
+        <div class="kpi-value">20 ICs</div>
+        <div class="kpi-label">Itens de controle</div>
+        <div class="kpi-sub">4 niveis hierarquicos</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon">&#9201;</div>
+        <div class="kpi-value">6 meses</div>
+        <div class="kpi-label">Prazo do projeto</div>
+        <div class="kpi-sub">4 fases estruturadas</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#0a7c42"></div></div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-icon">&#128269;</div>
+        <div class="kpi-value">9</div>
+        <div class="kpi-label">Questoes em aberto</div>
+        <div class="kpi-sub">&#9888; Requer dados de campo</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:40%;background:#b91c1c"></div></div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="section-card" style="margin-bottom:20px">
+      <div class="section-header">
+        <div class="section-number">&#8594;</div>
+        <div class="section-title">Cronograma — 4 Fases em 6 Meses</div>
+        <span class="section-tag">Em planejamento</span>
+      </div>
+      <div class="timeline">
+        <div class="timeline-step">
+          <div class="timeline-dot">1</div>
+          <div class="timeline-label">Diagnostico</div>
+          <div class="timeline-sublabel">Sem. 1&ndash;4</div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot">2</div>
+          <div class="timeline-label">Sistema Visual</div>
+          <div class="timeline-sublabel">Sem. 5&ndash;8</div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot">3</div>
+          <div class="timeline-label">Capacitacao</div>
+          <div class="timeline-sublabel">Sem. 9&ndash;12</div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot" style="background:#f5a800;color:#0d1b3e">H1</div>
+          <div class="timeline-label">Hansei 1</div>
+          <div class="timeline-sublabel">Mes 4</div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot" style="background:#f5a800;color:#0d1b3e">H2</div>
+          <div class="timeline-label">Hansei 2</div>
+          <div class="timeline-sublabel">Mes 6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A3 CONTENT -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-number">A3</div>
+        <div class="section-title">Documento Completo — Painel de Controle Gerencial</div>
+        <span class="section-tag">Falconi GPD &middot; Cap. 4.4.4</span>
+      </div>
+<h1 id="a3-painel-de-controle-gerencial-adm-campo-grande-proteina-de-soja">A3 — Painel de Controle Gerencial: ADM Campo Grande — Proteína de Soja</h1>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Conteúdo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Projeto</strong></td>
+<td>Implantação do Sistema de Itens de Controle por Nível Hierárquico</td>
+</tr>
+<tr>
+<td><strong>Responsável</strong></td>
+<td>Luiggi Melhoria</td>
+</tr>
+<tr>
+<td><strong>Empresa / Unidade</strong></td>
+<td>Archer Daniels Midland (ADM) — Campo Grande, MS</td>
+</tr>
+<tr>
+<td><strong>Referência</strong></td>
+<td>Maior fábrica de Proteína Texturizada de Soja (PTS) da América Latina</td>
+</tr>
+<tr>
+<td><strong>Linhas de produto no escopo</strong></td>
+<td>PTS (Proteína Texturizada — extrusada, 50.000 ton/ano) + Produto S (Concentrado Funcional, ~75% proteína — spray dryer)</td>
+</tr>
+<tr>
+<td><strong>Capacidade PTS</strong></td>
+<td>50.000 ton PTS/ano (~147 ton/dia × 340 dias operacionais)</td>
+</tr>
+<tr>
+<td><strong>Volume Produto S (2024)</strong></td>
+<td>12.084 ton produzidas / 16.904 ton de matéria-prima consumida</td>
+</tr>
+<tr>
+<td><strong>Embalagem PTS</strong></td>
+<td>Sacos valvulados de 11,34 kg (25 lbs) — padrão internacional</td>
+</tr>
+<tr>
+<td><strong>Setores operacionais</strong></td>
+<td>MAIN (armazenagem MP + ensaque) e FC (planta produtiva)</td>
+</tr>
+<tr>
+<td><strong>Data de abertura</strong></td>
+<td><strong><em>/</em></strong>/2026</td>
+</tr>
+<tr>
+<td><strong>Revisão</strong></td>
+<td>v1.0 — incorpora dados reais dos TCCs (PROCESSAMENTO, PDCA_ADM, MELHORIA_FPY/UFMS)</td>
+</tr>
+<tr>
+<td><strong>Fontes documentais</strong></td>
+<td>TCC Vilalva/UFMS (processamento soja); TCC Santos/UFMS (PDCA selagem); TCC Soares/UFMS (DMAIC startup)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Nota sobre os projetos anteriores:</strong> Esta planta já executou dois projetos de melhoria documentados:
+(1) <strong>PDCA — Selagem de Sacarias</strong> (2025): resolveu falha de selagem por troca de polímero (plastômero), reduzindo NCs de 756 para 13 ocorrências (~98%). Investimento: R$ 74.404,32.
+(2) <strong>DMAIC — Perda no Startup</strong> (2024): eliminou o descarte de 1 tonelada por partida de produção via instalação de válvula diversora de recirculação. Economia: R$ 77.746,48/ano. Payback: ~11,5 meses.
+<strong>Este A3 não refaz o que já foi feito.</strong> Parte da maturidade conquistada nesses projetos e vai um nível acima: estrutura o sistema gerencial que monitora todos os indicadores continuamente — não apenas em projetos pontuais.</p>
+</blockquote>
+<hr />
+<h2 id="1-contexto-background">1. CONTEXTO (Background)</h2>
+<h3 id="por-que-este-projeto-existe-agora">Por que este projeto existe agora</h3>
+<p>A ADM Campo Grande é a maior produtora de PTS da América Latina, com capacidade de 50.000 ton/ano. Os dois projetos de melhoria realizados (PDCA de selagem e DMAIC de startup) demonstraram a capacidade da equipe de resolver problemas — e comprovaram que a organização tem domínio das ferramentas: PDCA, DMAIC, Ishikawa, SIPOC, VOC. Esse é o ponto de partida, não o ponto de chegada.</p>
+<p>O gap que persiste: <strong>os dois projetos produziram resultados como outputs de projeto, não como saída de um sistema de monitoramento contínuo.</strong> Quando o PDCA de selagem terminou, quem garante que a qualidade da embalagem está sendo monitorada turno a turno, com faixa de controle estatística e ação padronizada para desvios? Quando a válvula diversora foi instalada, quem verifica semanalmente se o rendimento do startup está sendo capturado? A ausência desse sistema significa que o próximo desvio exigirá um novo projeto, em vez de uma resposta padronizada dentro da rotina.</p>
+<p>O Gerenciamento pelas Diretrizes (Falconi) é preciso: <em>"o item de controle é utilizado para girar o PDCA, não apenas para cobrar resultados."</em> Sem Itens de Controle por nível hierárquico — do Gerente de Unidade ao Operador — cada anomalia volta ao ponto zero.</p>
+<h3 id="evidencia-do-gap-o-padrao-de-monitoramento-atual">Evidência do gap: o padrão de monitoramento atual</h3>
+<p>Os TCCs documentam o estado atual com clareza:</p>
+<ul>
+<li><strong>Rendimento do Produto S em 2024: 71,49%</strong> — medido anualmente no fechamento. Nenhum mecanismo de detecção intra-mensal ou intra-turno.</li>
+<li><strong>756 NCs de selagem</strong> acumuladas antes de qualquer ação gerencial — o sistema só respondeu quando o volume de reclamações tornou-se inaceitável.</li>
+<li><strong>23 startups em 2024 gerando R$ 77.746,48 de perda</strong> — o descarte era aceito como custo operacional normal até o projeto DMAIC identificar a causa raiz.</li>
+<li><strong>Causa raiz da selagem</strong> (janela térmica estreita do polímero) foi identificada por brainstorming e Ishikawa durante um projeto — não por um sistema de monitoramento que detectasse a variação antes do acúmulo de defeitos.</li>
+</ul>
+<p><strong>Padrão: desvios existem por meses antes de gerarem projeto. Um sistema de ICs os detecta no turno.</strong></p>
+<h3 id="posicionamento-estrategico-da-unidade">Posicionamento estratégico da unidade</h3>
+<table>
+<thead>
+<tr>
+<th>Dimensão</th>
+<th>Dado real ou estimado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capacidade PTS</td>
+<td>50.000 ton/ano — maior da América Latina no segmento</td>
+</tr>
+<tr>
+<td>Produto S (concentrado funcional ~75% proteína)</td>
+<td>12.084 ton produzidas em 2024</td>
+</tr>
+<tr>
+<td>Mercado</td>
+<td>Food service, indústria alimentícia, exportação América do Sul e Norte</td>
+</tr>
+<tr>
+<td>Embalagem</td>
+<td>Sacos valvulados 11,34 kg (25 lbs) — padrão internacional</td>
+</tr>
+<tr>
+<td>Custo de processamento MP</td>
+<td>R$ 2,40/kg (fonte: TCC Soares/UFMS, 2024)</td>
+</tr>
+<tr>
+<td>Meta estratégica 2026</td>
+<td>⚠️ Confirmar com Plano Anual da unidade</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-situacao-atual">2. SITUAÇÃO ATUAL</h2>
+<h3 id="21-fluxo-real-do-processo-adm-campo-grande">2.1 Fluxo real do processo — ADM Campo Grande</h3>
+<pre><code>═══════════════════════════════════════════════════════════
+                        SETOR MAIN
+           (Armazenagem de Matéria-Prima + Ensaque)
+═══════════════════════════════════════════════════════════
+FARELO BRANCO (farelo de soja desengordurado com hexano)
+    │  Controle de entrada: proteína ≥ 46% (b.s.), umidade ≤ 12%,
+    │  fibra ≤ 6%, atividade ureática 0,05–0,30 ΔpH,
+    │  solubilidade proteica (KOH) 70–85%
+    │  [Fonte: IN nº 11/2007 MAPA + TCC Vilalva]
+    ▼
+TANQUE DE ARMAZENAGEM MP
+    │  Capacidade: 120 toneladas
+    │  Balança de fluxo (Acrison): dosagem de 1 ton/batelada
+    ▼
+═══════════════════════════════════════════════════════════
+                        SETOR FC
+                    (Planta Produtiva)
+═══════════════════════════════════════════════════════════
+    ▼
+DOSAGEM DE INSUMOS
+    │  Perda potencial: variação na proporção → produto fora de spec
+    ▼
+DECANTAÇÃO (Decanter — centrífuga horizontal)
+    │  Separação de componentes ácidos do farelo branco
+    │  Perda potencial: eficiência de separação insuficiente
+    ▼
+JET COOKER (cozimento sob pressão/temperatura)
+    │  Perda potencial: temperatura e tempo fora de spec → desnaturação inadequada
+    ▼
+CENTRIFUGAÇÃO
+    │  Perda potencial: velocidade e tempo fora de spec → baixa recuperação proteica
+    ▼
+SPRAY DRYER (secagem por aspersão)
+    │  Perda potencial: temperatura e vazão fora de spec → umidade e proteína fora do range
+    │  *** Fase de startup (~1h): produto NÃO atende specs → descarte como resíduo proteico ***
+    │  *** Solução implantada: válvula diversora recircula produto de startup para tanque MP ***
+    ▼
+═══════════════════════════════════════════════════════════
+                   PRODUTO S (Concentrado ~75% proteína)
+═══════════════════════════════════════════════════════════
+    │  Retorna ao SETOR MAIN → Tanque final (120 ton)
+    ▼
+LINHAS DE ENVASE (valvulados 11,34 kg / sacos bobinas)
+    │  Perda potencial: falha de selagem → NC de embalagem
+    │  *** Solução implantada: plastômero na área de selagem ***
+    │  *** Resultado: NCs de selagem de 756 → 13 ocorrências (~98% redução) ***
+    ▼
+EXPEDIÇÃO
+
+═══════════════════════════════════════════════════════════
+          LINHA DE PTS (Proteína Texturizada — extrusão)
+         [Processo paralelo — dados específicos ⚠️ Q1/Q7]
+═══════════════════════════════════════════════════════════
+FARINHA DESENGORDURADA
+    ▼
+CONDICIONAMENTO (umidade 12–15%)
+    ▼
+EXTRUSÃO TERMOPLÁSTICA (temperatura, pressão, corrente do motor)
+    ▼
+SECAGEM
+    ▼
+CLASSIFICAÇÃO / GRANULAÇÃO
+    ▼
+ENVASE (valvulados 11,34 kg) → EXPEDIÇÃO
+</code></pre>
+<h3 id="22-diagnostico-do-sistema-de-controle-atual-o-que-os-tccs-revelam">2.2 Diagnóstico do sistema de controle atual — o que os TCCs revelam</h3>
+<table>
+<thead>
+<tr>
+<th>Indicador</th>
+<th>Como era monitorado (estado pré-projeto)</th>
+<th>O que acontecia no desvio</th>
+<th>Projeto que resolveu</th>
+<th>Estado atual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NC de selagem de sacarias</td>
+<td>Reportes de NC por e-mail — sem IC gerencial</td>
+<td>756 sacarias acumuladas antes de qualquer ação</td>
+<td>PDCA Santos/2025</td>
+<td><strong>Resolvido</strong> — plastômero implantado; 13 NCs pós-melhoria</td>
+</tr>
+<tr>
+<td>Descarte de produto no startup</td>
+<td>Aceito como custo normal — sem IC gerencial</td>
+<td>23 startups × 1 ton descartada em 2024</td>
+<td>DMAIC Soares/2024</td>
+<td><strong>Resolvido</strong> — válvula diversora implantada</td>
+</tr>
+<tr>
+<td>Rendimento anual do Produto S</td>
+<td>Fechamento anual (71,49% em 2024)</td>
+<td>Desvio só percebido no fechamento do ano</td>
+<td>Nenhum até agora</td>
+<td><strong>Gap ativo</strong> — sem IC de acompanhamento mensal/semanal</td>
+</tr>
+<tr>
+<td>Qualidade da MP (farelo branco)</td>
+<td>Análise pontual na entrada</td>
+<td>Variação de proteína, atividade ureática → produto fora de spec</td>
+<td>Nenhum até agora</td>
+<td><strong>Gap ativo</strong> — sem IC de verificação sistêmica</td>
+</tr>
+<tr>
+<td>OEE das linhas (Produto S + PTS)</td>
+<td>⚠️ Verificar se existe monitoramento formal</td>
+<td>⚠️</td>
+<td>Nenhum</td>
+<td><strong>Gap ativo</strong></td>
+</tr>
+<tr>
+<td>Parâmetros de extrusão (PTS)</td>
+<td>Alarmes de segurança do equipamento</td>
+<td>Operador age por experiência tácita</td>
+<td>Nenhum até agora</td>
+<td><strong>Gap ativo</strong></td>
+</tr>
+<tr>
+<td>Custo de processamento por tonelada</td>
+<td>Fechamento contábil mensal</td>
+<td>Desvio percebido com atraso de 30+ dias</td>
+<td>Nenhum</td>
+<td><strong>Gap ativo</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conclusão do diagnóstico:</strong> A planta tem domínio das ferramentas de melhoria (PDCA, DMAIC, Ishikawa, SIPOC). O que falta é o sistema que não depende de projetos para detectar desvios — um conjunto de Itens de Controle com faixa estatística, ação padronizada e ritual de verificação contínua.</p>
+<h3 id="23-diagnostico-de-maturidade-dos-itens-de-controle-gpd-cap-444">2.3 Diagnóstico de maturidade dos Itens de Controle (GPD Cap. 4.4.4)</h3>
+<table>
+<thead>
+<tr>
+<th>Componente do IC</th>
+<th>Estado atual na ADM Campo Grande</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Objetivo gerencial definido</td>
+<td>Parcial — existe em projetos (PDCA/DMAIC), não em rotina</td>
+</tr>
+<tr>
+<td>2. Nível numérico (meta)</td>
+<td>Existe para qualidade do produto (specs legais)</td>
+</tr>
+<tr>
+<td>3. Faixa de controle estatística</td>
+<td><strong>Ausente</strong> — os projetos usaram Ishikawa e análise de causa, mas não CEP contínuo</td>
+</tr>
+<tr>
+<td>4. Ciclo de verificação formalizado</td>
+<td><strong>Ausente</strong> — verificações acontecem por demanda, não por ritmo definido</td>
+</tr>
+<tr>
+<td>5. Ação gerencial padronizada para anomalia</td>
+<td><strong>Parcial</strong> — POPs existem para operação padrão; para desvios, depende do operador sênior</td>
+</tr>
+<tr>
+<td>6. Documento de gerenciamento (painel integrado)</td>
+<td><strong>Ausente</strong> — relatórios existem (Excel/SAP), mas não integrados em painel por nível hierárquico</td>
+</tr>
+<tr>
+<td>7. Responsável definido por nível hierárquico</td>
+<td><strong>Ausente</strong> — responsabilidade concentrada no especialista/CQ</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Nível de maturidade: 2/7</strong> — ferramentas de melhoria presentes; sistema de monitoramento contínuo ausente.</p>
+<hr />
+<h2 id="3-meta">3. META</h2>
+<h3 id="31-metas-de-resultado-com-baselines-reais-dos-tccs-onde-disponivel">3.1 Metas de resultado — com baselines reais dos TCCs onde disponível</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Meta</th>
+<th>Indicador</th>
+<th>Baseline REAL (fonte TCC)</th>
+<th>Benchmark</th>
+<th>Alvo</th>
+<th>Prazo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>Aumentar rendimento operacional do Produto S</td>
+<td>Rendimento anual MP → Produto S (%)</td>
+<td><strong>71,49%</strong> (2024 — TCC Soares)</td>
+<td>⚠️ ADM rede global</td>
+<td>≥ 78% ⚠️</td>
+<td>Mês 6</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>Zerar descarte de startup (sustentar melhoria implantada)</td>
+<td>Ton descartada por startup</td>
+<td><strong>1 ton/startup antes da válvula</strong> → 0 ton (TCC Soares)</td>
+<td>0</td>
+<td>Manter 0 ton</td>
+<td>Contínuo</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>Manter resultado da melhoria de selagem</td>
+<td>NCs de selagem por mês</td>
+<td><strong>756 NCs (jan–mai/25)</strong> → 13 NCs (jul–set/25) (TCC Santos)</td>
+<td>&lt; 5/mês</td>
+<td>≤ 5 NCs/mês</td>
+<td>Contínuo</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>Reduzir custo de processamento por tonelada</td>
+<td>R$/ton PTS ou Produto S</td>
+<td><strong>R$ 2,40/kg MP</strong> = R$ 2.400/ton (TCC Soares)</td>
+<td>⚠️ Benchmark ADM global</td>
+<td>⚠️ a calibrar</td>
+<td>Mês 6</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>Aumentar rendimento de conversão PTS (extrusão)</td>
+<td>Rendimento farinha → PTS (%)</td>
+<td>⚠️ Levantar em campo</td>
+<td>92–95% (world class)</td>
+<td>≥ 91% ⚠️</td>
+<td>Mês 6</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>Reduzir consumo específico de energia nas linhas</td>
+<td>kWh/ton produzida</td>
+<td>⚠️ Levantar em campo</td>
+<td>≤ 220 kWh/ton</td>
+<td>≤ 260 ⚠️</td>
+<td>Mês 6</td>
+</tr>
+</tbody>
+</table>
+<h3 id="impacto-financeiro-estimado-base-nos-dados-reais-dos-tccs">Impacto financeiro estimado — base nos dados reais dos TCCs</h3>
+<table>
+<thead>
+<tr>
+<th>Origem da perda</th>
+<th>Dado real</th>
+<th>Cálculo</th>
+<th>Impacto/ano</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Startup Produto S (já resolvido — manter)</td>
+<td>23 startups × 1 ton × R$ 2,40/kg = R$ 77.746,48 (TCC Soares)</td>
+<td>Manutenção da válvula diversora</td>
+<td><strong>R$ 77.746 protegidos/ano</strong></td>
+</tr>
+<tr>
+<td>Rendimento Produto S: 71,49% → 78%</td>
+<td>+6,51 pp × 16.904 ton MP = +1.100 ton Produto S/ano</td>
+<td>1.100 ton × ⚠️ preço/ton</td>
+<td><strong>a calcular com preço real</strong></td>
+</tr>
+<tr>
+<td>Selagem (já resolvido — manter)</td>
+<td>De 756 NCs → ≤5 NCs/mês</td>
+<td>Eliminação de logística reversa, retrabalho, reclamação de cliente</td>
+<td><strong>a quantificar</strong></td>
+</tr>
+<tr>
+<td>Rendimento PTS: extrusão (gap ativo)</td>
+<td>⚠️ baseline a levantar; +5pp estimado = +2.500 ton PTS/ano</td>
+<td>2.500 × R$ 5.500/ton (estimado)</td>
+<td><strong>~R$ 13,75M/ano</strong> ⚠️</td>
+</tr>
+<tr>
+<td>Energia (gap ativo)</td>
+<td>⚠️ baseline a levantar</td>
+<td>–80 kWh/ton × 50.000 ton = 4M kWh</td>
+<td><strong>~R$ 2,6M/ano</strong> ⚠️</td>
+</tr>
+<tr>
+<td><strong>Total estimado</strong></td>
+<td></td>
+<td></td>
+<td><strong>R$ 16–22M/ano</strong> (conservador)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-metas-de-processo-meios">3.2 Metas de processo (meios)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Meta de processo</th>
+<th>Baseline</th>
+<th>Alvo</th>
+<th>Prazo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td>Itens de Controle completos (7 componentes) formalizados</td>
+<td>0 ICs completos</td>
+<td>20 ICs (5 por nível × 4 níveis)</td>
+<td>Semana 6</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Painéis de gestão visual instalados por nível</td>
+<td>0</td>
+<td>4 (Operador / Supervisor / Ger. Operações / Ger. Unidade)</td>
+<td>Semana 8</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>Pessoas-chave treinadas no ritual de verificação</td>
+<td>0%</td>
+<td>100% dos envolvidos nos setores MAIN e FC</td>
+<td>Semana 9</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>Reuniões QC Story mensais realizadas</td>
+<td>0%</td>
+<td>100% a partir do Mês 3</td>
+<td>Mês 3</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>Relatórios Hansei concluídos</td>
+<td>0</td>
+<td>2</td>
+<td>Mês 4 e Mês 6</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-analise-de-causa-raiz">4. ANÁLISE DE CAUSA RAIZ</h2>
+<h3 id="41-causas-raiz-reais-documentadas-nos-tccs-o-que-ja-foi-investigado">4.1 Causas raiz REAIS documentadas nos TCCs — o que já foi investigado</h3>
+<h4 id="causa-raiz-1-ma-selagem-de-sacarias-valvuladas-tcc-santospdca_adm">Causa raiz 1 — Má selagem de sacarias valvuladas (TCC Santos/PDCA_ADM)</h4>
+<p><strong>Problema:</strong> 756 NCs de selagem acumuladas entre jan–mai 2025.
+<strong>Investigação:</strong> Brainstorming multifuncional + Diagrama de Ishikawa (6M).
+- Hipótese Máquina (temperatura da barra de selagem): testada e <strong>descartada</strong> — aumentar temperatura causava endurecimento do polímero.
+- Hipótese Material: <strong>validada</strong> — janela de processamento térmico do polímero original era estreita demais para a velocidade e variação da linha de alta produtividade.
+<strong>Causa raiz confirmada:</strong> Incompatibilidade do polímero da sacaria com as condições de operação da linha.
+<strong>Solução:</strong> Substituição por plastômero (combinação de polietilenos e elastômeros — menor ponto de fusão, maior flexibilidade). <strong>STATUS: IMPLANTADO.</strong></p>
+<h4 id="causa-raiz-2-descarte-de-produto-no-startup-tcc-soaresmelhoria_fpy">Causa raiz 2 — Descarte de produto no startup (TCC Soares/MELHORIA_FPY)</h4>
+<p><strong>Problema:</strong> 23 startups em 2024 × 1 ton descartada = R$ 77.746,48/ano aceito como custo normal.
+<strong>Investigação:</strong> DMAIC + SIPOC + Diagrama de Ishikawa + análise de processo.
+- Máquina: equipamentos em estabilização térmica (~1h) no início de cada partida.
+- Método: procedimento vigente determinava segregação da 1ª batelada por segurança microbiológica.
+- <strong>Causa dominante validada:</strong> Ausência de mecanismo físico de recirculação — o produto inicial, com potencial de reaproveitamento, não tinha como retornar ao tanque de MP.
+<strong>Solução:</strong> Instalação de válvula diversora (R$ 74.404,32, payback ~11,5 meses). <strong>STATUS: IMPLANTADO.</strong></p>
+<hr />
+<h3 id="42-causa-raiz-do-gap-atual-por-que-o-sistema-de-controle-gerencial-nao-existe">4.2 Causa raiz do GAP ATUAL — por que o sistema de controle gerencial não existe</h3>
+<pre><code>PROBLEMA CENTRAL:
+Desvios operacionais (rendimento, qualidade, energia) só geram resposta
+quando acumulados o suficiente para justificar um projeto.
+O intervalo entre o desvio e a ação é de semanas a meses.
+│
+├─ Por quê 1: Não há Itens de Controle com faixa estatística por nível hierárquico
+│   └─ Por quê 2: Os projetos PDCA e DMAIC usaram Ishikawa e análise de causa
+│                 para resolver problemas pontuais — não deixaram ICs
+│                 funcionando como sistema de detecção contínua
+│       └─ Por quê 3: ⚠️ Levantar em campo
+│                     (a) Cultura de &quot;projeto fecha o problema&quot; — sem transição
+│                         para &quot;sistema monitora a sustentação&quot;
+│                     (b) Nenhum padrão de Quadro de Pontos de Controle (GPD)
+│                         implementado após o encerramento dos projetos
+│
+├─ Por quê 1: A resposta ao desvio depende do especialista ou do operador sênior
+│   └─ Por quê 2: O PDCA documentou a causa raiz da selagem, mas o POP de ação
+│                 gerencial para variações futuras não foi formalizado
+│       └─ Por quê 3: ⚠️ Levantar em campo
+│                     A fase C (Check contínuo) e A (Action padronizada) do PDCA
+│                     não foram completamente estruturadas após a fase D (Do)
+│
+├─ Por quê 1: Não há ritual de verificação com frequência e pauta definidas
+│   └─ Por quê 2: As reuniões diárias de produção focam em volume e pendências
+│                 de CQ — não em análise de causa raiz de desvios de parâmetro
+│       └─ Por quê 3: ⚠️ Levantar em campo
+│                     Supervisores não têm treinamento formal para conduzir
+│                     reunião no formato QC Story (meta → resultado → causa → plano)
+│
+└─ Por quê 1: Gerente de Unidade e Operador monitoram mundos diferentes
+    └─ Por quê 2: O gerente vê rendimento anual (71,49% em 2024 — percebido
+                  no fechamento de dezembro). O operador vê temperatura
+                  e corrente do motor. Não existe matriz de desdobramento
+                  vertical que conecte os dois
+        └─ Por quê 3: ⚠️ Levantar em campo
+                      Ausência da matriz: margem → rendimento → proteína
+                      do produto → parâmetros de processo por turno
+</code></pre>
+<hr />
+<h2 id="5-contramedidas-plano-de-acao-5w1h">5. CONTRAMEDIDAS — PLANO DE AÇÃO (5W1H)</h2>
+<h3 id="fase-1-diagnostico-e-estruturacao-semanas-14">Fase 1 — Diagnóstico e Estruturação (Semanas 1–4)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>O quê</th>
+<th>Quem</th>
+<th>Quando</th>
+<th>Como</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>Mapear todos os indicadores existentes nos setores MAIN e FC + linha PTS</td>
+<td>Luiggi</td>
+<td>Semana 1</td>
+<td>Entrevista com operadores e supervisores dos 3 turnos; análise de dashboards SAP; painel dos equipamentos; relatórios de CQ</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td>Aplicar checklist de maturidade dos ICs (7 componentes) para cada indicador</td>
+<td>Luiggi</td>
+<td>Semana 1</td>
+<td>Gemba: checklist preenchido ao lado de cada equipamento crítico (spray dryer, extrusora, linha de envase)</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td>Levantar histórico de desvios dos últimos 12 meses — incluindo os dados já documentados nos TCCs como ponto de partida</td>
+<td>Luiggi + CQ + Engenharia</td>
+<td>Semana 2</td>
+<td>Dados do SAP + sistema de CQ + dados dos TCCs Santos e Soares como baseline; Pareto por indicador, turno e setor</td>
+</tr>
+<tr>
+<td>1.4</td>
+<td>Workshop de definição dos ICs por nível hierárquico — aproveitar o domínio de ferramentas já existente na equipe (Ishikawa, SIPOC)</td>
+<td>Luiggi + Ger. Operações + Supervisores</td>
+<td>Semana 2</td>
+<td>Workshop de 4h com a equipe que participou dos projetos PDCA e DMAIC; construir a matriz de desdobramento: margem → rendimento → parâmetros de processo</td>
+</tr>
+<tr>
+<td>1.5</td>
+<td>Definir faixas de controle estatísticas (CEP) para cada IC — usando os dados históricos já disponíveis nos projetos anteriores</td>
+<td>Luiggi + Engenharia + Laboratório</td>
+<td>Semana 3</td>
+<td>Média ± 2σ e ± 3σ com dados históricos de 12 meses; separar por linha (Produto S / PTS), turno e SKU</td>
+</tr>
+<tr>
+<td>1.6</td>
+<td>Redigir POPs de Ação Gerencial — começar pelos indicadores que os TCCs já identificaram como críticos (selagem, startup, rendimento)</td>
+<td>Operador sênior + Supervisor + Luiggi</td>
+<td>Semana 4</td>
+<td>Operador sênior dita a sequência de resposta ao desvio. Luiggi documenta. Operador novo executa sem ajuda para validar</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fase-2-instalacao-do-sistema-visual-semanas-58">Fase 2 — Instalação do Sistema Visual (Semanas 5–8)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>O quê</th>
+<th>Quem</th>
+<th>Quando</th>
+<th>Como</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.1</td>
+<td>Painel nível Operador (horário/turno) — MAIN e FC</td>
+<td>Luiggi + Operadores</td>
+<td>Semana 5</td>
+<td>Fixo ao lado do spray dryer e da extrusora: parâmetros críticos + faixas de controle + campo de registro de desvio ⚠️ formato: Q5</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>Painel nível Supervisor (diário/turno)</td>
+<td>Luiggi + Supervisores</td>
+<td>Semana 6</td>
+<td>Sala de turno: indicadores de qualidade + rendimento do turno + status das linhas + NCs de embalagem</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>Painel nível Ger. Operações (semanal)</td>
+<td>Luiggi + Ger. Operações</td>
+<td>Semana 7</td>
+<td>Dashboard integrado: rendimento semanal Produto S + PTS + reprocesso + energia + NCs de selagem</td>
+</tr>
+<tr>
+<td>2.4</td>
+<td>Painel nível Ger. Unidade (mensal)</td>
+<td>Luiggi + Ger. Unidade</td>
+<td>Semana 8</td>
+<td>Visão executiva: volume produzido × plano + custo R$/ton + rendimento + margem — conectado ao Plano Anual</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fase-3-capacitacao-e-go-live-semanas-912">Fase 3 — Capacitação e Go-live (Semanas 9–12)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>O quê</th>
+<th>Quem</th>
+<th>Quando</th>
+<th>Como</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.1</td>
+<td>Treinar operadores no ritual de verificação</td>
+<td>Luiggi</td>
+<td>Semana 9</td>
+<td>OJT: 1h por turno × 5 dias (3 turnos = 15h total); aproveitar os operadores que participaram dos projetos PDCA/DMAIC como multiplicadores</td>
+</tr>
+<tr>
+<td>3.2</td>
+<td>Treinar supervisores no formato de reunião QC Story</td>
+<td>Luiggi</td>
+<td>Semana 10</td>
+<td>Usar os casos reais dos TCCs (selagem e startup) como exercícios de simulação — a equipe já conhece os problemas</td>
+</tr>
+<tr>
+<td>3.3</td>
+<td>Reunião 0 — simulação com dados históricos reais</td>
+<td>Supervisores + Luiggi</td>
+<td>Semana 11</td>
+<td>QC Story com os dados dos projetos PDCA e DMAIC como casos: metas que foram, o que desviou, o que foi feito</td>
+</tr>
+<tr>
+<td>3.4</td>
+<td>Go-live: Reunião 1 oficial com dados em tempo real</td>
+<td>Ger. Operações + Supervisores</td>
+<td>Semana 12</td>
+<td>Pauta: meta → resultado → causa do desvio → plano → responsável + prazo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fase-4-ciclos-de-reflexao-meses-4-e-6">Fase 4 — Ciclos de Reflexão (Meses 4 e 6)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>O quê</th>
+<th>Quem</th>
+<th>Quando</th>
+<th>Como</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.1</td>
+<td>Relatório Hansei — Ciclo 1</td>
+<td>Luiggi + Ger. Operações</td>
+<td>Mês 4</td>
+<td>O que funcionou / o que não funcionou / o que faremos diferente no Ciclo 2</td>
+</tr>
+<tr>
+<td>4.2</td>
+<td>Recalibração das faixas de controle com dados reais do Ciclo 1</td>
+<td>Luiggi + Engenharia</td>
+<td>Mês 5</td>
+<td>CEP atualizado com os dados dos 4 meses de operação do sistema</td>
+</tr>
+<tr>
+<td>4.3</td>
+<td>Relatório Hansei — Ciclo 2 + apresentação de replicação</td>
+<td>Luiggi + Ger. Unidade</td>
+<td>Mês 6</td>
+<td>Resultados × metas × aprendizados; modelo para replicação em outras plantas ADM América Latina</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-quadro-de-itens-de-controle-adm-campo-grande">6. QUADRO DE ITENS DE CONTROLE — ADM CAMPO GRANDE</h2>
+<h3 id="estrutura-vertical-dos-ics-por-nivel-hierarquico">Estrutura vertical dos ICs por nível hierárquico</h3>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Indicador</th>
+<th>Unidade</th>
+<th>Meta</th>
+<th>Alerta</th>
+<th>Crítico</th>
+<th>Ciclo</th>
+<th>POP de resposta</th>
+<th>Fonte</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Gerente de Unidade</strong></td>
+<td>Volume total produzido (PTS + Produto S) vs. plano</td>
+<td>ton/mês</td>
+<td>⚠️ Plano Anual</td>
+<td>&lt; 95% do plano</td>
+<td>&lt; 90% do plano</td>
+<td>Mensal</td>
+<td>Reunião com Ger. Operações: identificar gargalo por linha</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Gerente de Unidade</strong></td>
+<td>Rendimento operacional anual — Produto S</td>
+<td>%</td>
+<td>≥ 78% ⚠️</td>
+<td>&lt; 75%</td>
+<td>&lt; 72%</td>
+<td>Mensal</td>
+<td>Acionar análise de causa: startup, centrifugação, spray dryer</td>
+<td>TCC Soares (baseline real: 71,49%)</td>
+</tr>
+<tr>
+<td><strong>Gerente de Unidade</strong></td>
+<td>Custo de processamento por tonelada</td>
+<td>R$/ton</td>
+<td>⚠️ Plano Anual</td>
+<td>±8% da meta</td>
+<td>±15% da meta</td>
+<td>Mensal</td>
+<td>Acionar análise de rendimento + energia + reprocesso</td>
+<td>TCC Soares (ref: R$ 2,40/kg)</td>
+</tr>
+<tr>
+<td><strong>Gerente de Unidade</strong></td>
+<td>Rendimento de conversão PTS (extrusão)</td>
+<td>%</td>
+<td>≥ 91% ⚠️</td>
+<td>&lt; 89%</td>
+<td>&lt; 86%</td>
+<td>Mensal</td>
+<td>Acionar Projeto de Melhoria Específica na linha de extrusão</td>
+<td>⚠️ baseline a levantar</td>
+</tr>
+<tr>
+<td><strong>Gerente de Unidade</strong></td>
+<td>NCs de selagem de sacarias (total mensal)</td>
+<td>ocorrências/mês</td>
+<td>≤ 5</td>
+<td>6–15</td>
+<td>&gt; 15</td>
+<td>Mensal</td>
+<td>Acionar análise de material + máquina (repetir protocolo PDCA Santos)</td>
+<td>TCC Santos (histórico: 756 NCs / 5 meses antes da melhoria)</td>
+</tr>
+<tr>
+<td><strong>Ger. de Operações</strong></td>
+<td>Startups com descarte zero (válvula diversora ativa)</td>
+<td>% de startups sem descarte</td>
+<td>100%</td>
+<td>&lt; 95%</td>
+<td>&lt; 90%</td>
+<td>Semanal</td>
+<td>POP-OPE-001: verificar operação da válvula diversora; acionar Manutenção se necessário</td>
+<td>TCC Soares (23 startups em 2024)</td>
+</tr>
+<tr>
+<td><strong>Ger. de Operações</strong></td>
+<td>Qualidade da MP na entrada (proteína do farelo branco)</td>
+<td>% proteína (b.s.)</td>
+<td>≥ 46%</td>
+<td>&lt; 46,5%</td>
+<td>&lt; 46,0%</td>
+<td>Por lote</td>
+<td>POP-OPE-002: rejeitar lote + acionar fornecedor + ajustar parâmetros do FC</td>
+<td>IN nº 11/2007 MAPA</td>
+</tr>
+<tr>
+<td><strong>Ger. de Operações</strong></td>
+<td>Atividade ureática do farelo branco</td>
+<td>ΔpH</td>
+<td>0,05–0,30</td>
+<td>&lt; 0,05 ou &gt; 0,30</td>
+<td>Fora dos limites</td>
+<td>Por lote</td>
+<td>POP-OPE-003: rejeitar lote sub/super-tostado + acionar controle de fornecedor</td>
+<td>TCC Vilalva</td>
+</tr>
+<tr>
+<td><strong>Ger. de Operações</strong></td>
+<td>OEE das linhas (Produto S + PTS)</td>
+<td>%</td>
+<td>≥ 80%</td>
+<td>&lt; 75%</td>
+<td>&lt; 70%</td>
+<td>Semanal</td>
+<td>Reunião com Supervisores + Manutenção: Pareto das paradas da semana</td>
+<td>⚠️ verificar monitoramento atual</td>
+</tr>
+<tr>
+<td><strong>Ger. de Operações</strong></td>
+<td>Taxa de reprocesso + refugo (PTS)</td>
+<td>% da produção</td>
+<td>≤ 2,0%</td>
+<td>&gt; 3,0%</td>
+<td>&gt; 5,0%</td>
+<td>Diário</td>
+<td>POP-OPE-004: rastrear lote, identificar parâmetro causador, acionar supervisor da linha</td>
+<td>⚠️ baseline a levantar</td>
+</tr>
+<tr>
+<td><strong>Supervisor de Turno</strong></td>
+<td>Umidade do Produto S saída do spray dryer</td>
+<td>%</td>
+<td>⚠️ spec do produto</td>
+<td>⚠️</td>
+<td>⚠️</td>
+<td>Por turno</td>
+<td>POP-SUP-001: ajuste de temperatura e vazão no spray dryer</td>
+<td>⚠️ confirmar spec</td>
+</tr>
+<tr>
+<td><strong>Supervisor de Turno</strong></td>
+<td>Proteína do Produto S (resultado do turno)</td>
+<td>%</td>
+<td>~75% ⚠️</td>
+<td>⚠️</td>
+<td>⚠️</td>
+<td>Por turno</td>
+<td>POP-SUP-002: verificar dosagem de insumos + eficiência do decanter</td>
+<td>TCC Soares (~75% proteína)</td>
+</tr>
+<tr>
+<td><strong>Supervisor de Turno</strong></td>
+<td>Temperatura da extrusora — zona de compressão (PTS)</td>
+<td>°C</td>
+<td>150–165°C ⚠️</td>
+<td>&lt; 147 ou &gt; 170</td>
+<td>&gt; 175</td>
+<td>Registro horário</td>
+<td>POP-SUP-003: ajuste de aquecimento/resfriamento; se persistir &gt; 20min, acionar Engenharia</td>
+<td>⚠️ confirmar com manual</td>
+</tr>
+<tr>
+<td><strong>Supervisor de Turno</strong></td>
+<td>NCs de selagem identificadas no turno</td>
+<td>unidades</td>
+<td>0</td>
+<td>1–2</td>
+<td>&gt; 3</td>
+<td>Por turno</td>
+<td>POP-SUP-004: verificar plastômero (fornecedor, lote, parâmetro da barra) — repetir checklist do PDCA Santos</td>
+<td>TCC Santos</td>
+</tr>
+<tr>
+<td><strong>Supervisor de Turno</strong></td>
+<td>Disponibilidade dos equipamentos críticos (spray dryer, decanter, extrusoras)</td>
+<td>%</td>
+<td>≥ 95%/turno</td>
+<td>&lt; 92%</td>
+<td>&lt; 88%</td>
+<td>Por turno</td>
+<td>POP-SUP-005: acionar Manutenção + registrar causa e tempo de parada no sistema</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Operador de Processo</strong></td>
+<td>Operação da válvula diversora no startup</td>
+<td>Status</td>
+<td>Ativa nos primeiros 60min de cada startup</td>
+<td>Inativa durante startup</td>
+<td>—</td>
+<td>A cada startup</td>
+<td>POP-OP-001: verificar posição da válvula antes de iniciar; confirmar no painel de controle</td>
+<td>TCC Soares</td>
+</tr>
+<tr>
+<td><strong>Operador de Processo</strong></td>
+<td>Umidade do farelo branco na entrada do FC</td>
+<td>%</td>
+<td>12–13%</td>
+<td>&lt; 11,5% ou &gt; 13,5%</td>
+<td>&gt; 14%</td>
+<td>Por troca de silo/lote</td>
+<td>POP-OP-002: ajustar condicionamento antes de alimentar o processo; acionar supervisor se fora do crítico</td>
+<td>IN nº 11/2007 MAPA</td>
+</tr>
+<tr>
+<td><strong>Operador de Processo</strong></td>
+<td>Pressão na matriz da extrusora (PTS)</td>
+<td>bar</td>
+<td>55–75 ⚠️</td>
+<td>&lt; 50 ou &gt; 80</td>
+<td>&gt; 90</td>
+<td>Registro horário</td>
+<td>POP-OP-003: verificar vazão de alimentação + umidade da farinha; parar e acionar supervisor se crítico</td>
+<td>⚠️ confirmar com manual</td>
+</tr>
+<tr>
+<td><strong>Operador de Processo</strong></td>
+<td>Corrente do motor da extrusora — carga</td>
+<td>% da nominal</td>
+<td>75–90% ⚠️</td>
+<td>&lt; 70% ou &gt; 93%</td>
+<td>&gt; 97%</td>
+<td>Contínuo (registro horário)</td>
+<td>POP-OP-004: verificar taxa de alimentação + umidade; se &gt; 95% por 10min, reduzir vazão e acionar supervisor</td>
+<td>⚠️ confirmar</td>
+</tr>
+<tr>
+<td><strong>Operador de Processo</strong></td>
+<td>Verificação de selagem (amostra por turno)</td>
+<td>Nº de sacos testados com aprovação</td>
+<td>100% da amostra aprovada</td>
+<td>1 NC isolada</td>
+<td>&gt; 1 NC ou padrão recorrente</td>
+<td>Por turno</td>
+<td>POP-OP-005: isolar o saco NC, verificar temperatura da barra, registrar e informar supervisor imediatamente</td>
+<td>TCC Santos</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ Parâmetros de extrusão (temperatura, pressão, corrente) devem ser confirmados com o manual técnico das extrusoras e com o histórico de configurações aprovadas pelo P&amp;D da ADM Campo Grande.
+Parâmetros do spray dryer e do Produto S devem ser confirmados com a Engenharia de Processo do setor FC.</p>
+</blockquote>
+<hr />
+<h2 id="7-verificacao-de-resultados">7. VERIFICAÇÃO DE RESULTADOS</h2>
+<h3 id="71-acompanhamento-mensal-dos-ics-de-resultado">7.1 Acompanhamento mensal dos ICs de resultado</h3>
+<table>
+<thead>
+<tr>
+<th>Indicador</th>
+<th>Baseline REAL (fonte)</th>
+<th>M1</th>
+<th>M2</th>
+<th>M3</th>
+<th>M4</th>
+<th>M5</th>
+<th>M6</th>
+<th>Meta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rendimento operacional Produto S (%)</td>
+<td>71,49% (2024 — TCC Soares)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>≥ 78%</td>
+</tr>
+<tr>
+<td>Startups com descarte zero (%)</td>
+<td>0% antes / 100% esperado após válvula (TCC Soares)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>100%</td>
+</tr>
+<tr>
+<td>NCs de selagem por mês</td>
+<td>~151 NCs/mês (jan–mai/25 — TCC Santos) → 3/mês pós-melhoria</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>≤ 5</td>
+</tr>
+<tr>
+<td>Rendimento PTS extrusão (%)</td>
+<td>⚠️ levantar</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>≥ 91%</td>
+</tr>
+<tr>
+<td>Custo de processamento R$/ton</td>
+<td>R$ 2.400/ton (ref. TCC Soares)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>⚠️ Meta Plano Anual</td>
+</tr>
+<tr>
+<td>OEE das linhas (%)</td>
+<td>⚠️ levantar</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>≥ 80%</td>
+</tr>
+<tr>
+<td>% anomalias com POP (sem acionar especialista)</td>
+<td>~0% (estimado)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>≥ 80%</td>
+</tr>
+<tr>
+<td>% reuniões QC Story realizadas</td>
+<td>0%</td>
+<td></td>
+<td></td>
+<td>100%</td>
+<td>100%</td>
+<td>100%</td>
+<td>100%</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>ICs com 7 componentes completos</td>
+<td>0</td>
+<td></td>
+<td></td>
+<td>20</td>
+<td>20</td>
+<td>20</td>
+<td>20</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-impacto-financeiro-acumulado-preencher-mensalmente">7.2 Impacto financeiro acumulado (preencher mensalmente)</h3>
+<table>
+<thead>
+<tr>
+<th>Mês</th>
+<th>Ganho rendimento Produto S (R$)</th>
+<th>NC selagem evitadas</th>
+<th>Descarte startup = R$ 0</th>
+<th>Ganho extrusão PTS (R$)</th>
+<th>Total acumulado (R$)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>M2</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>M3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>M4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>M5</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>M6</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>Meta: R$ 8–11M acumulado</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-padronizacao-e-reflexao-hansei">8. PADRONIZAÇÃO E REFLEXÃO (Hansei)</h2>
+<h3 id="entregaveis-de-conclusao-do-projeto">Entregáveis de conclusão do projeto</h3>
+<ul>
+<li>[ ] <strong>Manual do Sistema de Monitoramento</strong> — 20 ICs com os 7 componentes, faixas de controle e responsáveis por nível (MAIN + FC + linha PTS)</li>
+<li>[ ] <strong>20 POPs de Ação Gerencial</strong> — 5 por nível (Operador, Supervisor, Ger. Operações, Ger. Unidade)</li>
+<li>[ ] <strong>Calendário anual de reuniões QC Story</strong> — com pauta padrão e participantes por nível hierárquico</li>
+<li>[ ] <strong>Relatório Hansei — Ciclo 1</strong> (Mês 4): o que funcionou / o que não funcionou / o que faremos diferente</li>
+<li>[ ] <strong>Relatório Hansei — Ciclo 2</strong> (Mês 6): avaliação de sustentação + modelo para replicação ADM América Latina</li>
+<li>[ ] <strong>Integração com projetos anteriores</strong>: garantir que os aprendizados do PDCA Santos (selagem) e do DMAIC Soares (startup) estejam formalizados como ICs sustentados — não apenas como melhorias encerradas</li>
+</ul>
+<h3 id="perguntas-do-hansei-ciclo-1-mes-4">Perguntas do Hansei — Ciclo 1 (Mês 4)</h3>
+<ul>
+<li>Os ICs detectaram desvios antes de acumularem NCs ou perdas de rendimento? (Teste central: o sistema funciona como alerta antecipado ou apenas como registro?)</li>
+<li>Os operadores executaram os POPs de resposta sem precisar acionar o especialista?</li>
+<li>A válvula diversora continua operando corretamente? O IC de startup está mostrando 100%?</li>
+<li>As NCs de selagem estão abaixo de 5/mês? O plastômero ainda está sendo especificado corretamente?</li>
+<li>Quais ICs precisam ser recalibrados (faixa larga demais → não detectou; estreita demais → falsos alarmes)?</li>
+</ul>
+<h3 id="perguntas-do-hansei-ciclo-2-mes-6">Perguntas do Hansei — Ciclo 2 (Mês 6)</h3>
+<ul>
+<li>O sistema de 20 ICs se sustenta sem a presença ativa do especialista?</li>
+<li>O rendimento do Produto S evoluiu de 71,49% em direção à meta de ≥ 78%?</li>
+<li>O custo de processamento de R$ 2,40/kg está sendo monitorado mensalmente com ação gerencial padronizada para desvios?</li>
+<li>O modelo está documentado o suficiente para replicação em outra unidade da rede ADM?</li>
+<li>O que entra no Plano Anual 2027 como diretriz de gestão da rotina?</li>
+</ul>
+<hr />
+<h2 id="9-registro-de-projetos-anteriores-base-para-os-ics">9. REGISTRO DE PROJETOS ANTERIORES — BASE PARA OS ICS</h2>
+<blockquote>
+<p>Esta seção documenta os dois projetos já concluídos que alimentam diretamente os ICs deste A3.</p>
+</blockquote>
+<h3 id="projeto-1-pdca-ma-selagem-de-sacarias-tcc-santos-pdca_adm">Projeto 1 — PDCA: Má Selagem de Sacarias (TCC Santos / PDCA_ADM)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Dado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Problema</td>
+<td>756 sacarias valvuladas com NC de selagem (jan–mai 2025)</td>
+</tr>
+<tr>
+<td>Ferramentas</td>
+<td>Brainstorming multifuncional + Diagrama de Ishikawa (6M)</td>
+</tr>
+<tr>
+<td>Causa raiz</td>
+<td>Polímero original: janela térmica estreita demais para a linha de alta velocidade</td>
+</tr>
+<tr>
+<td>Solução</td>
+<td>Substituição por plastômero (maior flexibilidade, menor ponto de fusão)</td>
+</tr>
+<tr>
+<td>Resultado</td>
+<td>13 NCs em jul–set 2025 — redução de ~98%</td>
+</tr>
+<tr>
+<td>IC gerado neste A3</td>
+<td>Ger. Unidade: NCs de selagem ≤ 5/mês + Operador: verificação de selagem por turno (POP-OP-005)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="projeto-2-dmaic-perda-no-startup-tcc-soares-melhoria_fpy">Projeto 2 — DMAIC: Perda no Startup (TCC Soares / MELHORIA_FPY)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Dado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Problema</td>
+<td>23 startups em 2024 × 1 ton descartada = R$ 77.746,48/ano de perda</td>
+</tr>
+<tr>
+<td>Volume da planta</td>
+<td>16.904 ton MP → 12.084 ton Produto S (rendimento anual: 71,49%)</td>
+</tr>
+<tr>
+<td>Custo MP processada</td>
+<td>R$ 2,40/kg</td>
+</tr>
+<tr>
+<td>Ferramentas</td>
+<td>DMAIC + SIPOC + VOC + Ishikawa + análise de alternativas (3 opções comparadas)</td>
+</tr>
+<tr>
+<td>Causa raiz</td>
+<td>Ausência de mecanismo de recirculação — produto de startup sem destino alternativo ao descarte</td>
+</tr>
+<tr>
+<td>Solução</td>
+<td>Válvula diversora — R$ 74.404,32 (payback ~11,5 meses)</td>
+</tr>
+<tr>
+<td>Resultado esperado</td>
+<td>R$ 77.746,48/ano economizados; rendimento projetado: superar 71,49%</td>
+</tr>
+<tr>
+<td>IC gerado neste A3</td>
+<td>Ger. Operações: startups com descarte zero ≥ 100% + Operador: verificação da válvula diversora por startup (POP-OP-001)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-questoes-abertas-confirmar-em-campo-antes-de-avancar-cada-secao">10. QUESTÕES ABERTAS — confirmar em campo antes de avançar cada seção</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Questão</th>
+<th>Desbloqueia</th>
+<th>Como obter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⚠️ Q1</td>
+<td>Nº de linhas de extrusão de PTS e capacidade por linha</td>
+<td>Escopo dos ICs e dos painéis da linha PTS</td>
+<td>Gerente de Unidade / Engenharia</td>
+</tr>
+<tr>
+<td>⚠️ Q2</td>
+<td>Baseline real dos indicadores de extrusão PTS (rendimento, reprocesso, energia) — últimos 12 meses</td>
+<td>Calibração de metas e faixas de controle dos ICs de PTS</td>
+<td>Extração de dados do SAP + laboratório</td>
+</tr>
+<tr>
+<td>⚠️ Q3</td>
+<td>Benchmark ADM global — outras plantas de proteínas da rede (EUA, Europa) para rendimento e OEE</td>
+<td>Define o "world class" nas metas</td>
+<td>Performance Excellence ADM</td>
+</tr>
+<tr>
+<td>⚠️ Q4</td>
+<td>Meta estratégica 2026 da unidade (Plano Anual / BSC) — rendimento, custo, volume</td>
+<td>Conecta todos os ICs à diretriz do presidente</td>
+<td>Acesso ao Plano Anual da unidade</td>
+</tr>
+<tr>
+<td>⚠️ Q5</td>
+<td>Ferramenta de visualização disponível na planta (Power BI, SAP MES, quadro físico)</td>
+<td>Define o formato dos 4 painéis</td>
+<td>TI + padrão global ADM</td>
+</tr>
+<tr>
+<td>⚠️ Q6</td>
+<td>Specs operacionais completas do Produto S (umidade saída spray dryer, proteína por turno)</td>
+<td>Calibra os ICs de Supervisor e Operador do setor FC</td>
+<td>Manual técnico do processo + Engenharia</td>
+</tr>
+<tr>
+<td>⚠️ Q7</td>
+<td>Parâmetros técnicos homologados para extrusão de PTS por SKU (temperatura, pressão, umidade)</td>
+<td>Calibra os ICs do Operador da linha PTS</td>
+<td>Manual das extrusoras + P&amp;D</td>
+</tr>
+<tr>
+<td>⚠️ Q8</td>
+<td>Rendimento do Produto S após instalação da válvula diversora (dados de 2026)</td>
+<td>Confirma se o baseline de 71,49% evoluiu — e quanto o IC de rendimento deve capturar</td>
+<td>SAP / relatório de produção mensal</td>
+</tr>
+<tr>
+<td>⚠️ Q9</td>
+<td>A farinha desengordurada (farelo branco) para o Produto S é produzida in loco ou recebida de outras plantas ADM?</td>
+<td>Define se o escopo dos ICs de qualidade de MP inclui o processo de esmagamento</td>
+<td>Gerente de Unidade / Supply Chain</td>
+</tr>
+</tbody>
+</table>
+    </div>
+
+  </div><!-- /content -->
+
+  <footer>
+    Preparado por <strong>Luiggi Melhoria</strong> &middot; Especialista em Otimizacao de Processos &middot; ADM Campo Grande
+    &nbsp;|&nbsp; Referencia: <strong>Vicente Falconi &mdash; Gerenciamento pelas Diretrizes</strong>
+  </footer>
+
+</div><!-- /main -->
+</body>
+</html>
