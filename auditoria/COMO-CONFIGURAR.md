@@ -52,6 +52,29 @@ SUPABASE_URL=... SUPABASE_SERVICE_KEY=... python scripts/auditoria.py importar "
 
 Pode rodar de novo sem duplicar: o `ID` da resposta é a chave.
 
+## 3b. Atualizar a base pelo site (botão "Atualizar base")
+
+É o jeito mais simples: exporte as respostas do Forms (**Respostas → Abrir no
+Excel**), clique em **Atualizar base** no painel e escolha o arquivo. O painel
+mostra quantas respostas são novas, quantas já existem (serão atualizadas, não
+duplicadas) e quais linhas têm erro, antes de enviar.
+
+Só administradores podem enviar. Para liberar alguém:
+
+1. Supabase → **Authentication → Users → Add user → Create new user**: e-mail
+   e senha (marque *Auto Confirm User*).
+2. Supabase → **SQL Editor**:
+   ```sql
+   insert into administradores values ('email.da.pessoa@empresa.com');
+   ```
+
+Recomendado: em **Authentication → Sign In / Providers**, desligue *Allow new
+users to sign up*. Mesmo que alguém crie conta, sem estar na tabela
+`administradores` não consegue gravar.
+
+Com o botão, o Power Automate (passo 5) passa a ser opcional: use-o só se quiser
+que cada resposta entre sozinha, sem exportar o Excel.
+
 ## 4. Microsoft Forms
 
 Em **Configurações** do formulário, marque *Somente pessoas da minha organização
