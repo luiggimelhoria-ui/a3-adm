@@ -107,16 +107,44 @@ cross join lateral (
 ) c;
 
 -- ---------------------------------------------------------------------
--- Segurança: o site (chave "anon") só LÊ. Só a GitHub Action, com a
--- chave service_role, consegue gravar (service_role ignora RLS).
+-- Segurança
+--   • Visitante do site (chave "anon"): só LÊ.
+--   • Administrador logado (e-mail na tabela administradores): pode enviar
+--     o Excel pelo botão "Atualizar base" (insere e atualiza auditorias).
+--   • GitHub Action (chave service_role): grava sem passar por RLS.
 -- ---------------------------------------------------------------------
-alter table auditorias enable row level security;
-alter table perguntas  enable row level security;
+create table if not exists administradores (
+  email text primary key check (email = lower(email))
+);
+-- Cadastre quem pode atualizar a base (e crie o mesmo usuário em
+-- Authentication → Users → Add user, com e-mail e senha):
+--   insert into administradores values ('seu.email@empresa.com');
+
+create or replace function eh_admin() returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from administradores
+    where email = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+$$;
+revoke all on function eh_admin() from public;
+grant execute on function eh_admin() to authenticated;
+
+alter table auditorias      enable row level security;
+alter table perguntas       enable row level security;
+alter table administradores enable row level security;   -- sem política: ninguém lê pelo site
 
 drop policy if exists "leitura publica" on auditorias;
 create policy "leitura publica" on auditorias for select to anon, authenticated using (true);
+
+drop policy if exists "admin insere" on auditorias;
+create policy "admin insere" on auditorias for insert to authenticated with check (eh_admin());
+
+drop policy if exists "admin atualiza" on auditorias;
+create policy "admin atualiza" on auditorias for update to authenticated using (eh_admin()) with check (eh_admin());
 
 drop policy if exists "leitura publica" on perguntas;
 create policy "leitura publica" on perguntas for select to anon, authenticated using (true);
 
 grant select on auditorias, perguntas, auditorias_resultado to anon, authenticated;
+grant insert, update on auditorias to authenticated;
