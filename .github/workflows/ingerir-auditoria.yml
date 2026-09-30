@@ -1,0 +1,48 @@
+# Recebe cada resposta do Forms (enviada pelo Power Automate como issue)
+# e grava no Supabase. Depois comenta o resultado e fecha a issue.
+name: Ingerir auditoria
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  ingerir:
+    # Só issues de auditoria abertas pelo dono do repositório (a conta
+    # conectada no Power Automate). O repositório é público: sem isso,
+    # qualquer pessoa poderia inserir auditorias falsas.
+    if: >-
+      startsWith(github.event.issue.title, '[auditoria]') &&
+      github.event.issue.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gravar no Supabase
+        id: gravar
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python3 scripts/auditoria.py issue > resultado.md
+
+      - name: Comentar resultado e fechar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMERO: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$NUMERO" --repo "$GITHUB_REPOSITORY" --body-file resultado.md
+          gh issue close "$NUMERO" --repo "$GITHUB_REPOSITORY" --reason completed
+
+      - name: Avisar falha na issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMERO: ${{ github.event.issue.number }}
+          LOG: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$NUMERO" --repo "$GITHUB_REPOSITORY" \
+            --body "⚠️ Não consegui gravar esta auditoria no Supabase. Veja o log: $LOG"
