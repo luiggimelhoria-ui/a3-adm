@@ -162,8 +162,8 @@ estiver vazio, o painel mostra dados de demonstração.
   85% e reprovadas por item crítico, com seta de tendência contra o mês anterior.
 - **Por planta / área / equipamento / auditor** (menu lateral ou abas): do pior
   para o melhor. Clicar numa planta abre as áreas; numa área, os equipamentos.
-- **Temas prioritários**: radar com a nota média de cada pergunta (1 no centro,
-  4 na borda), meta de 3,4 (= 85%) tracejada e, com filtro ativo, a média geral
+- **Temas prioritários**: radar com a nota média de cada pergunta (0 no centro,
+  4 na borda, então a distância é proporcional à nota), meta de 3,4 (= 85%) tracejada e, com filtro ativo, a média geral
   para comparar. Ao lado, as perguntas com menor nota, em ordem de prioridade.
 - **Auditorias**: reprovadas ou todas; clicar numa linha abre as 13 respostas.
 - Logos ADM e Performance Excellence em `auditoria/img/`.
