@@ -1,19 +1,23 @@
 # Auditoria DEC — Passo 1 · como configurar
 
 ```
-Microsoft Forms ──▶ Power Automate ──(abre uma issue)──▶ GitHub Action ──▶ Supabase
-                                                                              │
-                        GitHub (código) ──(deploy automático)──▶ Vercel ◀─────┘ (lê as notas)
+                       ┌── merge na main ──▶ Supabase (aplica supabase/migrations)
+GitHub (este repo) ────┤
+                       └── merge na main ──▶ Vercel (publica o painel /auditoria)
+
+Excel do Forms ──(botão "Atualizar base" no painel)──▶ Supabase ──▶ painel lê as notas
+Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶ Supabase   (opcional, automático)
 ```
 
 | Arquivo | Para que serve |
 |---|---|
-| `supabase/schema.sql` | Tabelas + **regra de aprovação** (view `auditorias_resultado`) |
+| `supabase/migrations/20260930120000_auditoria_dec.sql` | Tabelas, segurança e **regra de aprovação** (view `auditorias_resultado`) |
+| `supabase/config.toml` | Configuração mínima para a integração Supabase ↔ GitHub |
 | `.github/workflows/ingerir-auditoria.yml` | Recebe a issue do Power Automate e grava no Supabase |
 | `scripts/auditoria.py` | Converte a resposta do Forms e grava; também importa o Excel |
 | `auditoria/index.html` + `config.js` | O painel publicado no Vercel (`/auditoria`) |
 
-## Regra de aprovação (implementada em `supabase/schema.sql`)
+## Regra de aprovação (implementada na migração)
 
 - 13 perguntas, nota de 1 a 4 → máximo de 52 pontos.
 - **Critério 1:** pontos ≥ 85% de 52 → **45 pontos ou mais** (44 = 84,6% reprova).
@@ -21,18 +25,31 @@ Microsoft Forms ──▶ Power Automate ──(abre uma issue)──▶ GitHub 
   **P16 – Limpeza como momento de inspeção** com nota **≥ 3**.
 - Aprovada só se os dois critérios forem atendidos.
 
-Para mudar a regra, altere só a view `auditorias_resultado` e rode o SQL de novo.
+Para mudar a regra, crie uma **nova** migração em `supabase/migrations/` que recrie a view
+`auditorias_resultado` (migrações já aplicadas não rodam de novo).
 
 ---
 
 ## 1. Supabase (banco de dados)
 
-1. Crie um projeto em <https://supabase.com> (plano gratuito atende).
-2. **SQL Editor → New query** → cole todo o `supabase/schema.sql` → **Run**.
-3. Em **Project Settings → API**, anote:
-   - `Project URL`
-   - chave `anon` `public` → vai no site
-   - chave `service_role` → **secreta**, vai só no GitHub
+O banco é criado **pelo GitHub**, via integração do Supabase:
+
+1. Supabase → **Project Settings → Integrations → GitHub** → conecte o
+   repositório `luiggimelhoria-ui/a3-adm`.
+   - *Supabase directory*: `.` (a pasta `supabase/` fica na raiz do repositório)
+   - *Production branch*: `main`
+   - Ative **Deploy to production**
+2. A cada merge na `main`, o Supabase aplica as migrações novas de
+   `supabase/migrations/`. Se a integração foi ligada depois do merge, faça um
+   commit qualquer na `main` (ou cole a migração no **SQL Editor**, que é
+   idempotente) para ela rodar a primeira vez.
+3. Confira em **Table Editor** se existem `auditorias`, `perguntas` e
+   `administradores`.
+4. Em **Project Settings → API Keys**, anote:
+   - `Project URL` e a chave **pública** (`anon` ou `publishable`) → vão no
+     `auditoria/config.js`
+   - chave `service_role` / `secret` → **secreta**, só nos secrets do GitHub
+     (passo 2), nunca no código
 
 ## 2. GitHub (secrets da Action)
 

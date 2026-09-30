@@ -1,7 +1,9 @@
-// Preencha com os dados do seu projeto Supabase (Project Settings → API).
-// A chave "anon" é pública por natureza: o banco só permite LEITURA com ela.
+// Preencha com os dados do seu projeto Supabase (Project Settings → API Keys).
+// Use a chave pública: "anon" (eyJ...) ou "publishable" (sb_publishable_...).
+// Ela é pública por natureza: sem login, o banco só permite LEITURA.
+// NUNCA coloque aqui a service_role / secret.
 // Enquanto estiver vazio, o painel mostra dados de demonstração.
 window.AUDITORIA_CONFIG = {
   SUPABASE_URL: "",       // ex.: "https://abcdefgh.supabase.co"
-  SUPABASE_ANON_KEY: "",  // ex.: "eyJhbGciOi..."
+  SUPABASE_ANON_KEY: "",  // ex.: "sb_publishable_..." ou "eyJhbGciOi..."
 };
