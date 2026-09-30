@@ -119,11 +119,18 @@ estiver vazio, o painel mostra dados de demonstração.
 
 ## Navegação do painel
 
-- Filtros por **Planta, Área, Equipamento, Auditor e período**. Eles ficam na URL,
+- **Menu lateral** (Plantas, Áreas, Equipamentos, Auditores) troca a visão do
+  *Progresso por…*. Clicar num cartão de planta abre as áreas dela; clicar numa
+  área abre os equipamentos.
+- **Filtros** por Planta, Área, Equipamento, Auditor e período. Ficam na URL,
   então dá para mandar o link de uma visão filtrada.
-- **Navegar por**: clicar numa planta abre as áreas; clicar numa área abre os equipamentos.
+- **Status das auditorias** (aprovadas / reprovadas por pontuação / por item
+  crítico), **nota média** contra a meta de 85% e **indicadores do mês** com a
+  tendência dos últimos 6 meses.
+- **Auditorias que requerem atenção**: reprovadas primeiro; o ícone de olho
+  abre as 13 respostas.
 - **Nota média por pergunta** mostra os itens mais fracos, com os críticos marcados.
-- Clicar numa auditoria abre as 13 respostas.
+- Logos ADM e Performance Excellence em `auditoria/img/`.
 
 ## Privacidade
 
