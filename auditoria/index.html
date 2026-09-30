@@ -125,6 +125,8 @@ main{padding:18px 28px 40px;display:flex;flex-direction:column;gap:16px;max-widt
 .prior-item .meta span{background:var(--bar)}
 .prior-item.baixo .meta span{background:var(--bad)}
 .crit{flex:none;font-size:9px;font-weight:700;color:var(--bad);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:6px}
+.prior-grupo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 0 2px}
+.prior-grupo:first-child{padding-top:0}
 .mais-itens{font-size:12px;margin-top:8px}
 
 /* tabela */
@@ -216,7 +218,7 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
     <div class="regra">
       <h4>Regra de aprovação</h4>
       <p>Pontuação ≥ <b>85%</b> (45 de 52)</p>
-      <p><b>e</b> P13 e P17 com nota ≥ <b>3</b></p>
+      <p><b>e</b> <span id="regra-criticas">perguntas críticas</span> com nota ≥ <b>3</b></p>
     </div>
   </aside>
 
@@ -316,6 +318,7 @@ const fmtData = d => d ? new Date(d).toLocaleDateString("pt-BR") : "—";
 const qcol = n => "q" + String(n).padStart(2,"0");
 const faixa = p => p >= 85 ? "ok" : p >= 70 ? "warn" : "bad";
 const modoDemo = () => !CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY || new URLSearchParams(location.search).has("demo");
+const listaP = ps => { const n = ps.map(p=>"P"+p.numero_forms); return n.length > 1 ? n.slice(0,-1).join(", ")+" e "+n.at(-1) : n.join(""); };
 const temFiltro = () => Object.values(estado.filtros).some(Boolean);
 
 // ---------- carga ----------
@@ -344,7 +347,7 @@ const TITULOS = ["Treinamento da operação","Recursos da estação","Donos do e
 function carregarDemo(){
   const titulos = TITULOS;
   const vies = [0.3,0.2,0.1,-0.4,-0.6,0,-0.7,0.1,-0.2,0.2,-0.1,-0.3,0];   // temas mais fracos que outros
-  const perguntas = titulos.map((t,i)=>({numero:i+1, numero_forms:i+6, titulo:t, critica:i===7||i===11}));
+  const perguntas = titulos.map((t,i)=>({numero:i+1, numero_forms:i+6, titulo:t, critica:i>=7&&i<=10}));
   const mapa = {
     "Campo Grande":{"Extração":["Laminador","Expander","Extrator"],"Preparação":["Quebrador","Condicionador"],"Ensaque":["Ensacadeira 1","Ensacadeira 2"]},
     "Rondonópolis":{"Extração":["Laminador","Extrator"],"Refinaria":["Clarificador","Desodorizador"]},
@@ -360,7 +363,7 @@ function carregarDemo(){
       let pts = 0;
       titulos.forEach((_,i)=>{ const n = Math.max(1, Math.min(4, Math.round(nivel + vies[i] + k*0.1 + (rnd()-.5)*1.4))); r[qcol(i+1)] = n; pts += n; });
       r.pontos = pts; r.pontos_max = 52; r.percentual = Math.round(pts*1000/52)/10;
-      r.criterio_pontos_ok = pts*100 >= 85*52; r.criterio_criticos_ok = r.q08 >= 3 && r.q12 >= 3;
+      r.criterio_pontos_ok = pts*100 >= 85*52; r.criterio_criticos_ok = perguntas.filter(p=>p.critica).every(p => r[qcol(p.numero)] >= 3);
       r.aprovado = r.criterio_pontos_ok && r.criterio_criticos_ok;
       r.motivo_reprovacao = r.aprovado ? null : !r.criterio_pontos_ok && !r.criterio_criticos_ok ? "Pontuação abaixo de 85% e item crítico abaixo de 3" : !r.criterio_pontos_ok ? "Pontuação abaixo de 85%" : "Item crítico abaixo de 3";
       dados.push(r);
@@ -482,7 +485,7 @@ function render(){
     <div class="kpi"><div class="l">Nota média</div><div class="v ${fx}">${k.media==null?"—":fmt1(k.media)+"%"} <small>meta 85%</small></div>
       <div class="meta" data-dica="Nota média ${fmt1(k.media)}% · meta 85%"><span style="width:${k.media??0}%;background:var(--${fx||"track"})"></span><i style="left:85%"></i></div></div>
     <div class="kpi"><div class="l">Reprovadas por item crítico</div><div class="v ${k.critico?"bad":""}">${k.critico}</div>
-      <div class="s">P13 ou P17 abaixo de 3 ${t ? seta(t.atual.critico, t.anterior.critico, false) : ""}</div></div>`;
+      <div class="s">alguma pergunta crítica abaixo de 3 ${t ? seta(t.atual.critico, t.anterior.critico, false) : ""}</div></div>`;
 
   // por dimensão
   document.querySelectorAll("#abas button").forEach(b => b.setAttribute("aria-selected", b.dataset.dim === estado.dim));
@@ -509,16 +512,25 @@ function render(){
     <span><i style="border-color:var(--ok);border-top-style:dashed"></i>Meta (média 3,4 = 85%)</span>
     <span style="color:var(--bad)">★ crítica: precisa de nota ≥ 3</span>` : "";
 
+  // Críticas sempre aparecem (reprovam a auditoria sozinhas se < 3), mesmo que
+  // outras perguntas tenham nota menor; depois, as demais com menor nota.
   const ordem = medias.filter(m=>m.media!=null).sort((a,b)=>a.media-b.media);
-  const mostrar = estado.todasPrior ? ordem : ordem.slice(0,5);
-  $("#prior").innerHTML = mostrar.map((m,i)=>`
+  const criticas = ordem.filter(m=>m.critica), demais = ordem.filter(m=>!m.critica);
+  const demaisVis = estado.todasPrior ? demais : demais.slice(0,3);
+  const item = (m,i) => `
     <div class="prior-item ${m.media<3?"baixo":""}" data-dica="${m.abaixo3} de ${m.n} resposta(s) abaixo de 3">
       <span class="pos">${i+1}</span>
       <span class="nome" title="${esc(m.titulo)}"><span class="t"><small>P${m.numero_forms}</small>${esc(m.titulo)}</span>${m.critica?'<span class="crit">CRÍTICA</span>':""}</span>
       <div class="meta"><span style="width:${m.media/4*100}%"></span><i style="left:${META_MEDIA/4*100}%"></i></div>
       <span class="v">${fmtN(m.media)}</span>
-    </div>`).join("") || `<div class="vazio">—</div>`;
-  $("#prior-mais").textContent = ordem.length > 5 ? (estado.todasPrior ? "Mostrar só as 5 primeiras" : `Ver todas as ${ordem.length} perguntas`) : "";
+    </div>`;
+  $("#prior").innerHTML = ordem.length ? `
+    ${criticas.length ? `<div class="prior-grupo">Críticas · reprovam a auditoria se ficarem abaixo de 3</div>${criticas.map(item).join("")}` : ""}
+    ${demaisVis.length ? `<div class="prior-grupo">${estado.todasPrior ? "Demais perguntas" : "Demais perguntas com menor nota"}</div>${demaisVis.map((m,i)=>item(m, criticas.length+i)).join("")}` : ""}` : `<div class="vazio">—</div>`;
+  $("#prior-mais").textContent = demais.length > 3 ? (estado.todasPrior ? "Mostrar menos" : `Ver todas as ${ordem.length} perguntas`) : "";
+
+  // textos da regra (as críticas vêm da tabela perguntas)
+  $("#regra-criticas").textContent = listaP(estado.perguntas.filter(p=>p.critica));
 
   // tabela
   document.querySelectorAll("#modo-lista button").forEach(b => b.setAttribute("aria-selected", b.dataset.modo === estado.modo));

@@ -13,7 +13,8 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 |---|---|
 | `supabase/migrations/20260930174847_auditoria_dec.sql` | Tabelas, segurança e **regra de aprovação** (view `auditorias_resultado`) |
 | `supabase/migrations/20260930175759_envio_sem_login.sql` | Libera o botão "Atualizar base" sem login (incluir/atualizar; apagar não) |
-| `supabase/migrations/20260930175931_auditor_e_numeracao.sql` | Coluna do nome do auditor e numeração P6–P18 (críticas P13 e P17) |
+| `supabase/migrations/20260930175931_auditor_e_numeracao.sql` | Coluna do nome do auditor e numeração P6–P18 |
+| `supabase/migrations/20260930190239_criticas_configuraveis.sql` | Críticas P13–P16; a regra passa a ler as críticas da tabela `perguntas` |
 | `supabase/config.toml` | Configuração mínima para a integração Supabase ↔ GitHub |
 | `.github/workflows/ingerir-auditoria.yml` | Recebe a issue do Power Automate e grava no Supabase |
 | `scripts/auditoria.py` | Converte a resposta do Forms e grava; também importa o Excel |
@@ -23,9 +24,11 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 
 - 13 perguntas, nota de 1 a 4 → máximo de 52 pontos.
 - **Critério 1:** pontos ≥ 85% de 52 → **45 pontos ou mais** (44 = 84,6% reprova).
-- **Critério 2:** perguntas críticas **P13 – Abertura de etiquetas no MAXIMO** e
-  **P17 – Limpeza como momento de inspeção** com nota **≥ 3** (numeração do Forms
-  depois da inclusão do campo "nome do auditor"; no banco são `q08` e `q12`).
+- **Critério 2:** todas as perguntas **críticas** com nota **≥ 3**. Hoje são:
+  **P13 – Abertura de etiquetas no MAXIMO**, **P14 – Monitoramento de etiquetas
+  abertas x fechadas**, **P15 – Checklist de Limpeza** e **P16 – Checklist de
+  Inspeção**. Elas ficam marcadas na coluna `critica` da tabela `perguntas`; a
+  regra lê dali, então para mudar as críticas basta atualizar essa coluna.
 - Aprovada só se os dois critérios forem atendidos.
 
 Para mudar a regra, crie uma **nova** migração em `supabase/migrations/` que recrie a view
