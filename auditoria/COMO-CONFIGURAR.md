@@ -27,8 +27,9 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 - 10 perguntas (P6 a P15 no Forms), nota de 1 a 4 → máximo de **40 pontos**.
 - **Critério 1:** pontos ≥ 85% do máximo → **34 pontos ou mais**.
 - **Critério 2:** todas as perguntas **críticas** com nota **≥ 3**. Hoje são:
-  **P12 – Abertura de etiquetas no MAXIMO**, **P13 – Monitoramento de etiquetas
-  abertas x fechadas** e **P14 – Checklist de Limpeza e Inspeção**. Elas ficam
+  **7 – Abertura de etiquetas no MAXIMO**, **8 – Monitoramento de etiquetas
+  abertas x fechadas** e **9 – Checklist de Limpeza e Inspeção** (o painel numera
+  as perguntas de 1 a 10; no Forms elas são P6 a P15). Elas ficam
   marcadas na coluna `critica` da tabela `perguntas`; a regra lê dali.
 - O total e o máximo de pontos também vêm da tabela `perguntas` (4 pontos por
   pergunta), então a conta se ajusta se o número de perguntas mudar.

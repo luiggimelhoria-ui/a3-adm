@@ -339,7 +339,7 @@ const fmtData = d => d ? new Date(d).toLocaleDateString("pt-BR") : "—";
 const qcol = n => "q" + String(n).padStart(2,"0");
 const faixa = p => p >= 85 ? "ok" : p >= 70 ? "warn" : "bad";
 const modoDemo = () => !CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY || new URLSearchParams(location.search).has("demo");
-const listaP = ps => { const n = ps.map(p=>"P"+p.numero_forms); return n.length > 1 ? n.slice(0,-1).join(", ")+" e "+n.at(-1) : n.join(""); };
+const listaP = ps => { const n = ps.map(p=>String(p.numero)); return (n.length > 1 ? "perguntas " : "pergunta ") + (n.length > 1 ? n.slice(0,-1).join(", ")+" e "+n.at(-1) : n.join("")); };
 const temFiltro = () => Object.values(estado.filtros).some(Boolean);
 
 // ---------- carga ----------
@@ -476,12 +476,12 @@ function svgRadar(series){
     g += `<polygon points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" ")}" fill="${s.preenche ? "var(--bar)" : "none"}" fill-opacity=".12" stroke="${s.cor}" stroke-width="2" ${s.tracejado ? 'stroke-dasharray="4 3"' : ""} stroke-linejoin="round"/>`;
     if (s.pontos) pts.forEach((p,i)=>{ const m = s.medias[i];
       g += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${m.media!=null && m.media<NOTA_MINIMA ? "var(--bad)" : s.cor}" stroke="var(--surface)" stroke-width="1.5"/>
-            <circle cx="${p[0]}" cy="${p[1]}" r="12" fill="transparent" data-dica="P${m.numero_forms} · ${esc(m.titulo)}: média ${m.media==null?"—":fmtN(m.media,2)} · ${m.abaixo3} de ${m.n} resposta(s) abaixo de 3"/>`; });
+            <circle cx="${p[0]}" cy="${p[1]}" r="12" fill="transparent" data-dica="Pergunta ${m.numero} · ${esc(m.titulo)}: média ${m.media==null?"—":fmtN(m.media,2)} · ${m.abaixo3} de ${m.n} resposta(s) abaixo de 3"/>`; });
   }
   itens.forEach((p,i)=>{
     const a = -Math.PI/2 + i*2*Math.PI/N, [x,y] = pos(i,4.55), c = Math.cos(a);
     const anchor = Math.abs(c) < .2 ? "middle" : c > 0 ? "start" : "end";
-    g += `<text x="${x}" y="${y+4}" text-anchor="${anchor}" class="eixo-rot ${p.critica?"crit":""}" data-dica="P${p.numero_forms} · ${esc(p.titulo)}${p.critica?" (crítica)":""}">P${p.numero_forms}${p.critica?" ★":""}</text>`;
+    g += `<text x="${x}" y="${y+4}" text-anchor="${anchor}" class="eixo-rot ${p.critica?"crit":""}" data-dica="Pergunta ${p.numero} · ${esc(p.titulo)}${p.critica?" (crítica)":""}">${p.numero}${p.critica?" ★":""}</text>`;
   });
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Radar da nota média por pergunta, escala de 1 a 4">${g}</svg>`;
 }
@@ -540,8 +540,8 @@ function render(){
   const demaisVis = estado.todasPrior ? demais : demais.slice(0,5);
   const item = (m,i) => `
     <div class="prior-item ${m.media<NOTA_MINIMA?"baixo":""}" data-dica="${m.abaixo3} de ${m.n} resposta(s) abaixo de 3">
-      <span class="pos">${i+1}</span>
-      <span class="nome" title="${esc(m.titulo)}"><span class="t"><small>P${m.numero_forms}</small>${esc(m.titulo)}</span>${m.critica?'<span class="crit">CRÍTICA</span>':""}</span>
+      <span class="pos" title="Pergunta ${m.numero}">${m.numero}</span>
+      <span class="nome" title="${esc(m.titulo)}"><span class="t">${esc(m.titulo)}</span>${m.critica?'<span class="crit">CRÍTICA</span>':""}</span>
       <div class="meta" data-dica="Nota ${fmtN(m.media)} · linha em 3 (mínimo)"><span style="width:${m.media/4*100}%"></span><i style="left:${NOTA_MINIMA/4*100}%"></i></div>
       <span class="v">${fmtN(m.media)}</span>
     </div>`;
@@ -582,7 +582,7 @@ function abrirDetalhe(id){
     <div class="dlg-corpo">${estado.perguntas.map(p=>{
       const n = r[qcol(p.numero)], txt = (r.respostas_texto||{})[qcol(p.numero)] || "";
       return `<div class="resp"><div class="n n${n||1}" style="${n?"":"background:var(--muted)"}">${n??"—"}</div>
-        <div class="t"><b>P${p.numero_forms} · ${esc(p.titulo)}${p.critica?'<span class="crit">CRÍTICA</span>':""}</b><span>${esc(txt.replace(/^\s*[1-4]\s*[—–-]\s*/,""))}</span></div></div>`;
+        <div class="t"><b>${p.numero} · ${esc(p.titulo)}${p.critica?'<span class="crit">CRÍTICA</span>':""}</b><span>${esc(txt.replace(/^\s*[1-4]\s*[—–-]\s*/,""))}</span></div></div>`;
     }).join("")}</div>`;
   dlg.showModal();
   $("#fechar").onclick = () => dlg.close();
