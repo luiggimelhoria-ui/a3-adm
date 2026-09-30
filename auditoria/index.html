@@ -168,6 +168,15 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
 .soltar{border:2px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--ink-2);cursor:pointer}
 .soltar:hover,.soltar.sobre{border-color:var(--bar);background:var(--surface-2)}
 .soltar b{color:var(--bar)}
+.modo-imp{display:flex;flex-direction:column;gap:6px}
+.modo-imp label{flex-direction:row;align-items:flex-start;gap:8px;font-weight:400;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;color:var(--ink)}
+.modo-imp label:has(input:checked){border-color:var(--bar);background:var(--surface-2)}
+.modo-imp input{margin-top:3px}
+.modo-imp small{display:block;color:var(--muted);font-size:12px}
+.perigo{border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.perigo small{display:block;color:var(--muted);font-size:12px}
+.btn-perigo{color:var(--bad);border-color:var(--bad);background:var(--surface)}
+.btn-perigo:hover{background:var(--bad-bg)}
 .resumo-imp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .resumo-imp div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .resumo-imp b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
@@ -298,8 +307,16 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
     <div id="area-arquivo" style="display:flex;flex-direction:column;gap:12px">
             <div class="soltar" id="soltar" tabindex="0">Arraste o Excel aqui ou <b>clique para escolher</b><br><small style="color:var(--muted)">.xlsx exportado do Forms (“Abrir no Excel”)</small></div>
       <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" hidden>
+      <div class="modo-imp" id="modo-imp">
+        <label><input type="radio" name="modo-imp" value="somar" checked><span><b>Adicionar e atualizar</b><small>Mantém o que já está na base; respostas com o mesmo ID são atualizadas.</small></span></label>
+        <label><input type="radio" name="modo-imp" value="substituir"><span><b>Substituir toda a base por este arquivo</b><small>Apaga tudo o que está na base e deixa só o que vier no arquivo. Use quando mudar o Forms (ex.: tirar uma pergunta).</small></span></label>
+      </div>
       <div id="previa"></div>
       <div class="imp-rod"><span id="imp-status" style="font-size:12px;color:var(--muted)"></span><button class="btn btn-prim" id="enviar" disabled>Enviar para a base</button></div>
+    </div>
+    <div class="perigo">
+      <div><b>Apagar todas as auditorias</b><small>A base fica vazia. Uma cópia de segurança é guardada no banco.</small></div>
+      <button class="btn btn-perigo" id="apagar-tudo">Apagar tudo…</button>
     </div>
   </div>
 </dialog>
@@ -644,37 +661,74 @@ async function prepararArquivo(arquivo){
       <div><b>${imp.linhas.length - novas}</b><span>já na base (serão atualizadas)</span></div>
       <div><b style="color:${erros.length?"var(--bad)":"inherit"}">${erros.length}</b><span>com erro (serão ignoradas)</span></div>
     </div>
+    <div id="aviso-substituir"></div>
     ${faltam.length && imp.linhas.length ? `<div class="msg warn">Colunas não encontradas no arquivo: ${faltam.map(esc).join(", ")}. Essas notas ficarão em branco e contam 0 ponto.</div>` : ""}
     ${erros.length ? `<div class="erros-imp">${erros.slice(0,50).map(e=>`<span>${esc(e)}</span>`).join("")}${erros.length>50?`<span>… e mais ${erros.length-50}</span>`:""}</div>` : ""}
     ${!imp.linhas.length ? `<div class="msg bad">Nenhuma resposta válida encontrada. Confira se é o Excel exportado do Forms.</div>` : ""}`;
   atualizarBotaoEnviar();
 }
 
+const modoImp = () => document.querySelector('input[name="modo-imp"]:checked').value;
+
 function atualizarBotaoEnviar(){
-  const demo = modoDemo();
+  const demo = modoDemo(), subst = modoImp() === "substituir";
   $("#enviar").disabled = !imp.linhas.length || demo;
+  $("#enviar").textContent = subst ? "Substituir a base" : "Enviar para a base";
+  $("#enviar").classList.toggle("btn-perigo", subst); $("#enviar").classList.toggle("btn-prim", !subst);
+  $("#apagar-tudo").disabled = demo || !estado.dados.length;
+  const aviso = $("#aviso-substituir");
+  if (aviso) aviso.innerHTML = subst && imp.linhas.length
+    ? `<div class="msg warn">As <b>${estado.dados.length}</b> auditoria(s) que estão hoje na base serão removidas (com cópia de segurança) e substituídas pelas <b>${imp.linhas.length}</b> deste arquivo.</div>` : "";
   $("#imp-status").textContent = demo ? "Pré-visualização: o Supabase ainda não foi configurado (config.js)." : "";
 }
 
+async function substituirBase(linhas){   // lista vazia = apagar tudo
+  const r = await fetch(CFG.SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/rpc/substituir_auditorias", {method:"POST",
+    headers:{apikey:CFG.SUPABASE_ANON_KEY, "Content-Type":"application/json"}, body: JSON.stringify({linhas})});
+  if (!r.ok) throw new Error(`o Supabase respondeu ${r.status}: ${await r.text()}`);
+}
+
 async function enviarBase(){
-  const url = CFG.SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/auditorias?on_conflict=resposta_id";
+  const subst = modoImp() === "substituir", total = imp.linhas.length;
+  if (subst && !confirm(`Substituir toda a base?\n\nAs ${estado.dados.length} auditoria(s) atuais serão removidas (com cópia de segurança) e ficarão só as ${total} deste arquivo.`)) return;
   const btn = $("#enviar"); btn.disabled = true;
   try {
-    for (let i = 0; i < imp.linhas.length; i += 500) {
-      $("#imp-status").textContent = `Enviando ${Math.min(i+500, imp.linhas.length)} de ${imp.linhas.length}…`;
-      const r = await fetch(url, {method:"POST", headers:{apikey:CFG.SUPABASE_ANON_KEY,
-        "Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=minimal"}, body: JSON.stringify(imp.linhas.slice(i, i+500))});
-      if (!r.ok) throw new Error(`o Supabase respondeu ${r.status}: ${await r.text()}`);
+    if (subst) {
+      $("#imp-status").textContent = `Substituindo a base (${total} auditorias)…`;
+      await substituirBase(imp.linhas);
+    } else {
+      const url = CFG.SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/auditorias?on_conflict=resposta_id";
+      for (let i = 0; i < total; i += 500) {
+        $("#imp-status").textContent = `Enviando ${Math.min(i+500, total)} de ${total}…`;
+        const r = await fetch(url, {method:"POST", headers:{apikey:CFG.SUPABASE_ANON_KEY,
+          "Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=minimal"}, body: JSON.stringify(imp.linhas.slice(i, i+500))});
+        if (!r.ok) throw new Error(`o Supabase respondeu ${r.status}: ${await r.text()}`);
+      }
     }
-    const total = imp.linhas.length;
     Object.assign(estado, await carregarSupabase()); render();
     imp.linhas = []; $("#arquivo").value = "";
-    $("#previa").innerHTML = `<div class="msg ok">✔ ${total} auditoria(s) gravada(s). O painel já está atualizado.</div>`;
-    $("#imp-status").textContent = "";
+    $("#previa").innerHTML = `<div class="msg ok">✔ ${subst ? `Base substituída: agora tem ${total} auditoria(s).` : `${total} auditoria(s) gravada(s).`} O painel já está atualizado.</div>`;
+    $("#imp-status").textContent = ""; atualizarBotaoEnviar();
   } catch (e) {
-    $("#previa").insertAdjacentHTML("beforeend", `<div class="msg bad" style="margin-top:10px">Não foi possível enviar: ${esc(e.message)}</div>`);
+    $("#previa").insertAdjacentHTML("beforeend", `<div class="msg bad" style="margin-top:10px">Não foi possível enviar: ${esc(e.message)}${subst ? " A base não foi alterada." : ""}</div>`);
     $("#imp-status").textContent = ""; btn.disabled = false;
   }
+}
+
+async function apagarTudo(){
+  const n = estado.dados.length;
+  const resp = prompt(`Isso apaga as ${n} auditoria(s) da base (fica uma cópia de segurança no banco).\n\nPara confirmar, digite APAGAR:`);
+  if (resp == null) return;
+  if (resp.trim().toUpperCase() !== "APAGAR") { alert("Nada foi apagado: a confirmação não confere."); return; }
+  const btn = $("#apagar-tudo"); btn.disabled = true;
+  try {
+    await substituirBase([]);
+    Object.assign(estado, await carregarSupabase()); render();
+    $("#previa").innerHTML = `<div class="msg ok">✔ ${n} auditoria(s) apagada(s). A base está vazia.</div>`;
+  } catch (e) {
+    $("#previa").innerHTML = `<div class="msg bad">Não foi possível apagar: ${esc(e.message)}</div>`;
+  }
+  atualizarBotaoEnviar();
 }
 
 $("#abrir-importar").onclick = () => { atualizarBotaoEnviar(); $("#importar").showModal(); };
@@ -688,6 +742,8 @@ soltar.ondragleave = () => soltar.classList.remove("sobre");
 soltar.ondrop = e => { e.preventDefault(); soltar.classList.remove("sobre"); if (e.dataTransfer.files[0]) prepararArquivo(e.dataTransfer.files[0]); };
 $("#arquivo").onchange = e => { if (e.target.files[0]) prepararArquivo(e.target.files[0]); };
 $("#enviar").onclick = enviarBase;
+$("#apagar-tudo").onclick = apagarTudo;
+$("#modo-imp").addEventListener("change", atualizarBotaoEnviar);
 
 // ---------- eventos ----------
 for (const d of Object.keys(DIMS)) $("#f-"+d).addEventListener("change", e => definirFiltro(d, e.target.value));

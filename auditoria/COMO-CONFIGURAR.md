@@ -15,6 +15,7 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 | `supabase/migrations/20260930175759_envio_sem_login.sql` | Libera o botão "Atualizar base" sem login (incluir/atualizar; apagar não) |
 | `supabase/migrations/20260930175931_auditor_e_numeracao.sql` | Coluna do nome do auditor e numeração P6–P18 |
 | `supabase/migrations/20260930190239_criticas_configuraveis.sql` | Críticas P13–P16; a regra passa a ler as críticas da tabela `perguntas` |
+| `supabase/migrations/20260930210558_substituir_e_limpar_base.sql` | Substituir toda a base / apagar tudo, com cópia de segurança em `auditorias_backup` |
 | `supabase/config.toml` | Configuração mínima para a integração Supabase ↔ GitHub |
 | `.github/workflows/ingerir-auditoria.yml` | Recebe a issue do Power Automate e grava no Supabase |
 | `scripts/auditoria.py` | Converte a resposta do Forms e grava; também importa o Excel |
@@ -86,6 +87,16 @@ O envio **não pede login**: qualquer pessoa com o link do painel consegue
 incluir e atualizar auditorias (apagar não é permitido). Foi uma escolha do dono
 do painel; para voltar a exigir login, veja o histórico das migrações em
 `supabase/migrations/`.
+
+Na mesma janela:
+
+- **Substituir toda a base por este arquivo**: apaga o que está na base e deixa
+  só o que vier no Excel. Use quando mudar o Forms (ex.: tirar uma pergunta).
+- **Apagar tudo…**: esvazia a base (pede para digitar `APAGAR`).
+
+Nos dois casos o que sai vai antes para a tabela `auditorias_backup` (não
+aparece no site). Se o arquivo tiver erro, nada é apagado. Para recuperar um
+backup, peça pelo SQL Editor / Claude.
 
 Com o botão, o Power Automate (passo 5) passa a ser opcional: use-o só se quiser
 que cada resposta entre sozinha, sem exportar o Excel.
