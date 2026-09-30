@@ -16,6 +16,7 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 | `supabase/migrations/20260930175931_auditor_e_numeracao.sql` | Coluna do nome do auditor e numeração P6–P18 |
 | `supabase/migrations/20260930190239_criticas_configuraveis.sql` | Críticas P13–P16; a regra passa a ler as críticas da tabela `perguntas` |
 | `supabase/migrations/20260930210558_substituir_e_limpar_base.sql` | Substituir toda a base / apagar tudo, com cópia de segurança em `auditorias_backup` |
+| `supabase/migrations/20260930211306_modelo_10_itens.sql` | Modelo de 10 perguntas / 40 pontos; regra genérica a partir da tabela `perguntas` |
 | `supabase/config.toml` | Configuração mínima para a integração Supabase ↔ GitHub |
 | `.github/workflows/ingerir-auditoria.yml` | Recebe a issue do Power Automate e grava no Supabase |
 | `scripts/auditoria.py` | Converte a resposta do Forms e grava; também importa o Excel |
@@ -23,13 +24,14 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 
 ## Regra de aprovação (implementada na migração)
 
-- 13 perguntas, nota de 1 a 4 → máximo de 52 pontos.
-- **Critério 1:** pontos ≥ 85% de 52 → **45 pontos ou mais** (44 = 84,6% reprova).
+- 10 perguntas (P6 a P15 no Forms), nota de 1 a 4 → máximo de **40 pontos**.
+- **Critério 1:** pontos ≥ 85% do máximo → **34 pontos ou mais**.
 - **Critério 2:** todas as perguntas **críticas** com nota **≥ 3**. Hoje são:
-  **P13 – Abertura de etiquetas no MAXIMO**, **P14 – Monitoramento de etiquetas
-  abertas x fechadas**, **P15 – Checklist de Limpeza** e **P16 – Checklist de
-  Inspeção**. Elas ficam marcadas na coluna `critica` da tabela `perguntas`; a
-  regra lê dali, então para mudar as críticas basta atualizar essa coluna.
+  **P12 – Abertura de etiquetas no MAXIMO**, **P13 – Monitoramento de etiquetas
+  abertas x fechadas** e **P14 – Checklist de Limpeza e Inspeção**. Elas ficam
+  marcadas na coluna `critica` da tabela `perguntas`; a regra lê dali.
+- O total e o máximo de pontos também vêm da tabela `perguntas` (4 pontos por
+  pergunta), então a conta se ajusta se o número de perguntas mudar.
 - Aprovada só se os dois critérios forem atendidos.
 
 Para mudar a regra, crie uma **nova** migração em `supabase/migrations/` que recrie a view
@@ -123,7 +125,7 @@ Crie um **Fluxo da nuvem automatizado**:
      "id": "<Id da resposta>",
      "conclusao": "<Hora do envio>",
      "email": "<Email do respondente>",
-     "auditor_nome": "<Nome do auditor>",
+     "auditor_nome": "<Auditor>",
      "planta": "<Planta>",
      "area": "<Área>",
      "equipamento": "<Equipamento2>",
@@ -133,14 +135,11 @@ Crie um **Fluxo da nuvem automatizado**:
      "q03": "<Donos do equipamento>",
      "q04": "<Mapa de contaminação>",
      "q05": "<Tratamento das fontes de contaminação>",
-     "q06": "<Grande Limpeza e restauração>",
-     "q07": "<Evidências Antes x Depois>",
-     "q08": "<Abertura de etiquetas no MAXIMO>",
-     "q09": "<Monitoramento de etiquetas abertas x fechadas>",
-     "q10": "<Checklist de Limpeza>",
-     "q11": "<Checklist de Inspeção>",
-     "q12": "<Limpeza como momento de inspeção>",
-     "q13": "<Checklist de Lubrificação>"
+     "q06": "<Grande Limpeza e restauração com registros antes e depois>",
+     "q07": "<Abertura de etiquetas no MAXIMO>",
+     "q08": "<Monitoramento de etiquetas abertas x fechadas>",
+     "q09": "<Checklist de Limpeza e Inspeção>",
+     "q10": "<Checklist de Lubrificação>"
    }
    ```
 
