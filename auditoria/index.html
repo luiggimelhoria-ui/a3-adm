@@ -307,7 +307,7 @@ const CFG = window.AUDITORIA_CONFIG || {};
 const DIMS = {planta:"Planta", area:"Área", equipamento:"Equipamento", auditor:"Auditor"};
 const TITULO_DIM = {planta:"Por planta", area:"Por área", equipamento:"Por equipamento", auditor:"Por auditor"};
 const PROXIMA = {planta:"area", area:"equipamento", equipamento:"equipamento", auditor:"auditor"};
-const META_MEDIA = 0.85 * 4;   // 85% dos pontos = média 3,4 por pergunta
+const NOTA_MINIMA = 3;   // abaixo disso a pergunta fica em vermelho (e a crítica reprova)
 const estado = {dados:[], perguntas:[], filtros:{planta:"",area:"",equipamento:"",auditor:"",de:"",ate:""}, dim:"planta", modo:"reprovadas", limite:10, todasPrior:false};
 
 const $ = s => document.querySelector(s);
@@ -449,12 +449,11 @@ function svgRadar(series){
   for (const v of [1,2,3,4]) g += `<polygon points="${anel(v)}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
   itens.forEach((_,i)=>{ const [x,y] = pos(i,4); g += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`; });
   for (const v of [1,2,3,4]) { const [x,y] = pos(0,v); g += `<text x="${x+4}" y="${y-3}" font-size="10" fill="var(--muted)">${v}</text>`; }
-  g += `<polygon points="${anel(META_MEDIA)}" fill="none" stroke="var(--ok)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
   for (const s of series) {
     const pts = s.medias.map((m,i)=>pos(i, m.media ?? 0));
     g += `<polygon points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" ")}" fill="${s.preenche ? "var(--bar)" : "none"}" fill-opacity=".12" stroke="${s.cor}" stroke-width="2" ${s.tracejado ? 'stroke-dasharray="4 3"' : ""} stroke-linejoin="round"/>`;
     if (s.pontos) pts.forEach((p,i)=>{ const m = s.medias[i];
-      g += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${m.media!=null && m.media<3 ? "var(--bad)" : s.cor}" stroke="var(--surface)" stroke-width="1.5"/>
+      g += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${m.media!=null && m.media<NOTA_MINIMA ? "var(--bad)" : s.cor}" stroke="var(--surface)" stroke-width="1.5"/>
             <circle cx="${p[0]}" cy="${p[1]}" r="12" fill="transparent" data-dica="P${m.numero_forms} · ${esc(m.titulo)}: média ${m.media==null?"—":fmtN(m.media,2)} · ${m.abaixo3} de ${m.n} resposta(s) abaixo de 3"/>`; });
   }
   itens.forEach((p,i)=>{
@@ -509,7 +508,6 @@ function render(){
   $("#radar-leg").innerHTML = linhas.length ? `
     <span><i style="border-color:var(--bar)"></i>${temFiltro() ? "Seleção atual" : "Todas as auditorias"}</span>
     ${temFiltro() ? `<span><i style="border-color:var(--ref);border-top-style:dashed"></i>Todas as auditorias</span>` : ""}
-    <span><i style="border-color:var(--ok);border-top-style:dashed"></i>Meta (média 3,4 = 85%)</span>
     <span style="color:var(--bad)">★ crítica: precisa de nota ≥ 3</span>` : "";
 
   // Críticas sempre aparecem (reprovam a auditoria sozinhas se < 3), mesmo que
@@ -518,10 +516,10 @@ function render(){
   const criticas = ordem.filter(m=>m.critica), demais = ordem.filter(m=>!m.critica);
   const demaisVis = estado.todasPrior ? demais : demais.slice(0,3);
   const item = (m,i) => `
-    <div class="prior-item ${m.media<3?"baixo":""}" data-dica="${m.abaixo3} de ${m.n} resposta(s) abaixo de 3">
+    <div class="prior-item ${m.media<NOTA_MINIMA?"baixo":""}" data-dica="${m.abaixo3} de ${m.n} resposta(s) abaixo de 3">
       <span class="pos">${i+1}</span>
       <span class="nome" title="${esc(m.titulo)}"><span class="t"><small>P${m.numero_forms}</small>${esc(m.titulo)}</span>${m.critica?'<span class="crit">CRÍTICA</span>':""}</span>
-      <div class="meta"><span style="width:${m.media/4*100}%"></span><i style="left:${META_MEDIA/4*100}%"></i></div>
+      <div class="meta" data-dica="Nota ${fmtN(m.media)} · linha em 3 (mínimo)"><span style="width:${m.media/4*100}%"></span><i style="left:${NOTA_MINIMA/4*100}%"></i></div>
       <span class="v">${fmtN(m.media)}</span>
     </div>`;
   $("#prior").innerHTML = ordem.length ? `
