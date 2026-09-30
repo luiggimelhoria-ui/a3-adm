@@ -12,7 +12,8 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 | Arquivo | Para que serve |
 |---|---|
 | `supabase/migrations/20260930174847_auditoria_dec.sql` | Tabelas, segurança e **regra de aprovação** (view `auditorias_resultado`) |
-| `supabase/migrations/20260930174913_eh_admin_privado.sql` | Tira a checagem de administrador da API pública (recomendação do Security Advisor) |
+| `supabase/migrations/20260930175759_envio_sem_login.sql` | Libera o botão "Atualizar base" sem login (incluir/atualizar; apagar não) |
+| `supabase/migrations/20260930175931_auditor_e_numeracao.sql` | Coluna do nome do auditor e numeração P6–P18 (críticas P13 e P17) |
 | `supabase/config.toml` | Configuração mínima para a integração Supabase ↔ GitHub |
 | `.github/workflows/ingerir-auditoria.yml` | Recebe a issue do Power Automate e grava no Supabase |
 | `scripts/auditoria.py` | Converte a resposta do Forms e grava; também importa o Excel |
@@ -22,8 +23,9 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 
 - 13 perguntas, nota de 1 a 4 → máximo de 52 pontos.
 - **Critério 1:** pontos ≥ 85% de 52 → **45 pontos ou mais** (44 = 84,6% reprova).
-- **Critério 2:** perguntas críticas **P12 – Abertura de etiquetas no MAXIMO** e
-  **P16 – Limpeza como momento de inspeção** com nota **≥ 3**.
+- **Critério 2:** perguntas críticas **P13 – Abertura de etiquetas no MAXIMO** e
+  **P17 – Limpeza como momento de inspeção** com nota **≥ 3** (numeração do Forms
+  depois da inclusão do campo "nome do auditor"; no banco são `q08` e `q12`).
 - Aprovada só se os dois critérios forem atendidos.
 
 Para mudar a regra, crie uma **nova** migração em `supabase/migrations/` que recrie a view
@@ -45,7 +47,7 @@ O banco é criado **pelo GitHub**, via integração do Supabase:
    commit qualquer na `main` (ou cole a migração no **SQL Editor**, que é
    idempotente) para ela rodar a primeira vez.
 3. Confira em **Table Editor** se existem `auditorias`, `perguntas` e
-   `administradores`.
+   a view `auditorias_resultado`.
 4. Em **Project Settings → API Keys**, anote:
    - `Project URL` e a chave **pública** (`anon` ou `publishable`) → vão no
      `auditoria/config.js`
@@ -77,27 +79,20 @@ Excel**), clique em **Atualizar base** no painel e escolha o arquivo. O painel
 mostra quantas respostas são novas, quantas já existem (serão atualizadas, não
 duplicadas) e quais linhas têm erro, antes de enviar.
 
-Só administradores podem enviar. Para liberar alguém:
-
-1. Supabase → **Authentication → Users → Add user → Create new user**: e-mail
-   e senha (marque *Auto Confirm User*).
-2. Supabase → **SQL Editor**:
-   ```sql
-   insert into administradores values ('email.da.pessoa@empresa.com');
-   ```
-
-Recomendado: em **Authentication → Sign In / Providers**, desligue *Allow new
-users to sign up*. Mesmo que alguém crie conta, sem estar na tabela
-`administradores` não consegue gravar.
+O envio **não pede login**: qualquer pessoa com o link do painel consegue
+incluir e atualizar auditorias (apagar não é permitido). Foi uma escolha do dono
+do painel; para voltar a exigir login, veja o histórico das migrações em
+`supabase/migrations/`.
 
 Com o botão, o Power Automate (passo 5) passa a ser opcional: use-o só se quiser
 que cada resposta entre sozinha, sem exportar o Excel.
 
 ## 4. Microsoft Forms
 
-Em **Configurações** do formulário, marque *Somente pessoas da minha organização
-podem responder* + *Registrar nome*. Sem isso o auditor fica como
-"anonymous" e o painel mostra **Não identificado**.
+O formulário tem um campo com o **nome do auditor**. Qualquer coluna com
+"auditor" no título (ex.: *Nome do auditor*) é gravada em `auditor_nome` e é o
+nome que aparece no painel. Se ela vier vazia, o painel usa o nome/e-mail
+registrado pelo Forms e, sem nada disso, mostra **Não identificado**.
 
 ## 5. Power Automate (a cada resposta nova)
 
@@ -114,6 +109,7 @@ Crie um **Fluxo da nuvem automatizado**:
      "id": "<Id da resposta>",
      "conclusao": "<Hora do envio>",
      "email": "<Email do respondente>",
+     "auditor_nome": "<Nome do auditor>",
      "planta": "<Planta>",
      "area": "<Área>",
      "equipamento": "<Equipamento2>",
