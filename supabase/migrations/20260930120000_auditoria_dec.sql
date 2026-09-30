@@ -1,7 +1,7 @@
 -- =====================================================================
 -- Auditoria DEC — Passo 1 · esquema do Supabase
--- Rode este arquivo inteiro no SQL Editor do Supabase (pode rodar de novo
--- sem perder dados: tudo usa IF NOT EXISTS / OR REPLACE).
+-- Migração aplicada automaticamente pela integração Supabase ↔ GitHub a cada
+-- merge na main. Também pode ser colada no SQL Editor (é idempotente).
 -- =====================================================================
 
 -- ---------------------------------------------------------------------

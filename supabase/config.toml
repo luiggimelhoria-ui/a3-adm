@@ -1,0 +1,3 @@
+# Configuração mínima do Supabase CLI. A integração com o GitHub aplica as
+# migrações de supabase/migrations/ ao fazer merge na main.
+project_id = "a3-adm"

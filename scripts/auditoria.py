@@ -7,7 +7,7 @@ Uso:
 
 Variáveis de ambiente: SUPABASE_URL, SUPABASE_SERVICE_KEY.
 A nota e a aprovação NÃO são calculadas aqui: elas vêm da view
-auditorias_resultado (supabase/schema.sql), a única fonte da regra.
+auditorias_resultado (supabase/migrations/20260930120000_auditoria_dec.sql), a única fonte da regra.
 """
 import json
 import os
