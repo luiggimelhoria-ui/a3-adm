@@ -4,6 +4,6 @@
 // NUNCA coloque aqui a service_role / secret.
 // Enquanto estiver vazio, o painel mostra dados de demonstração.
 window.AUDITORIA_CONFIG = {
-  SUPABASE_URL: "",       // ex.: "https://abcdefgh.supabase.co"
-  SUPABASE_ANON_KEY: "",  // ex.: "sb_publishable_..." ou "eyJhbGciOi..."
+  SUPABASE_URL: "https://qaurvhmgdoqcqdjcgggy.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_EPyF7Hua4w61RC0W_h3NJw_DDnznsmL",
 };
