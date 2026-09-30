@@ -510,11 +510,11 @@ function render(){
     ${temFiltro() ? `<span><i style="border-color:var(--ref);border-top-style:dashed"></i>Todas as auditorias</span>` : ""}
     <span style="color:var(--bad)">★ crítica: precisa de nota ≥ 3</span>` : "";
 
-  // Críticas sempre aparecem (reprovam a auditoria sozinhas se < 3), mesmo que
-  // outras perguntas tenham nota menor; depois, as demais com menor nota.
+  // Só entra quem está abaixo de 3 (nota 3 já passa). Críticas vêm primeiro,
+  // mesmo que outras tenham nota menor. "Ver todas" mostra as 13.
   const ordem = medias.filter(m=>m.media!=null).sort((a,b)=>a.media-b.media);
-  const criticas = ordem.filter(m=>m.critica), demais = ordem.filter(m=>!m.critica);
-  const demaisVis = estado.todasPrior ? demais : demais.slice(0,3);
+  const visiveis = estado.todasPrior ? ordem : ordem.filter(m=>m.media<NOTA_MINIMA);
+  const criticas = visiveis.filter(m=>m.critica), demais = visiveis.filter(m=>!m.critica);
   const item = (m,i) => `
     <div class="prior-item ${m.media<NOTA_MINIMA?"baixo":""}" data-dica="${m.abaixo3} de ${m.n} resposta(s) abaixo de 3">
       <span class="pos">${i+1}</span>
@@ -522,10 +522,11 @@ function render(){
       <div class="meta" data-dica="Nota ${fmtN(m.media)} · linha em 3 (mínimo)"><span style="width:${m.media/4*100}%"></span><i style="left:${NOTA_MINIMA/4*100}%"></i></div>
       <span class="v">${fmtN(m.media)}</span>
     </div>`;
-  $("#prior").innerHTML = ordem.length ? `
-    ${criticas.length ? `<div class="prior-grupo">Críticas · reprovam a auditoria se ficarem abaixo de 3</div>${criticas.map(item).join("")}` : ""}
-    ${demaisVis.length ? `<div class="prior-grupo">${estado.todasPrior ? "Demais perguntas" : "Demais perguntas com menor nota"}</div>${demaisVis.map((m,i)=>item(m, criticas.length+i)).join("")}` : ""}` : `<div class="vazio">—</div>`;
-  $("#prior-mais").textContent = demais.length > 3 ? (estado.todasPrior ? "Mostrar menos" : `Ver todas as ${ordem.length} perguntas`) : "";
+  $("#prior").innerHTML = !ordem.length ? `<div class="vazio">—</div>`
+    : !visiveis.length ? `<div class="msg ok">✔ Nenhuma pergunta com média abaixo de 3.</div>`
+    : `${criticas.length ? `<div class="prior-grupo">Críticas${estado.todasPrior ? "" : " abaixo de 3 · reprovam a auditoria"}</div>${criticas.map(item).join("")}` : ""}
+       ${demais.length ? `<div class="prior-grupo">${estado.todasPrior ? "Demais perguntas" : "Demais perguntas abaixo de 3"}</div>${demais.map((m,i)=>item(m, criticas.length+i)).join("")}` : ""}`;
+  $("#prior-mais").textContent = estado.todasPrior ? "Mostrar só as abaixo de 3" : `Ver todas as ${ordem.length} perguntas`;
 
   // textos da regra (as críticas vêm da tabela perguntas)
   $("#regra-criticas").textContent = listaP(estado.perguntas.filter(p=>p.critica));
