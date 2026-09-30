@@ -4,26 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Auditoria DEC — Passo 1</title>
-<link rel="icon" href="img/adm.png">
+<!-- Caminhos absolutos: a página abre tanto em /auditoria quanto em /auditoria/ -->
+<link rel="icon" href="/auditoria/img/adm.png">
 <style>
 :root{
-  --bg:#f4f6fa;--surface:#fff;--surface-2:#f8f9fc;--ink:#1d2433;--ink-2:#4b5568;--muted:#8a93a6;--line:#e7eaf0;
+  --bg:#f5f6f9;--surface:#fff;--surface-2:#f7f8fb;--ink:#1d2433;--ink-2:#4b5568;--muted:#8a93a6;--line:#e7eaf0;
   --navy:#212c65;--green:#85c440;--on-navy:#fff;
-  --bar:#3a63d6;--bar-soft:#e3e8f4;--track:#e6e8ee;
+  --bar:#3a63d6;--bar-soft:#e3e8f4;--track:#e9ebf0;--ref:#9aa3b5;
   --ok:#139f5b;--ok-bg:#e4f6ec;--warn:#d98a06;--warn-bg:#fdf1dc;--bad:#d9362b;--bad-bg:#fde7e5;
-  --shadow:0 1px 3px rgba(20,30,60,.06),0 1px 2px rgba(20,30,60,.04);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0e1320;--surface:#161d2e;--surface-2:#1b2337;--ink:#e8ecf5;--ink-2:#b3bdd1;--muted:#7d889e;--line:#273047;
-  --navy:#8fa0e8;--on-navy:#0e1320;--bar:#6d92f0;--bar-soft:#22304f;--track:#27304a;
+  --navy:#8fa0e8;--on-navy:#0e1320;--bar:#6d92f0;--bar-soft:#22304f;--track:#27304a;--ref:#6b7690;
   --ok:#43c686;--ok-bg:#12301f;--warn:#f0a93a;--warn-bg:#3a2a0e;--bad:#f07167;--bad-bg:#3a1917;
-  --shadow:none;
 }}
 :root[data-theme="dark"]{
   --bg:#0e1320;--surface:#161d2e;--surface-2:#1b2337;--ink:#e8ecf5;--ink-2:#b3bdd1;--muted:#7d889e;--line:#273047;
-  --navy:#8fa0e8;--on-navy:#0e1320;--bar:#6d92f0;--bar-soft:#22304f;--track:#27304a;
+  --navy:#8fa0e8;--on-navy:#0e1320;--bar:#6d92f0;--bar-soft:#22304f;--track:#27304a;--ref:#6b7690;
   --ok:#43c686;--ok-bg:#12301f;--warn:#f0a93a;--warn-bg:#3a2a0e;--bad:#f07167;--bad-bg:#3a1917;
-  --shadow:none;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -32,148 +30,127 @@ button{font:inherit;cursor:pointer;color:inherit}
 .app{display:flex;min-height:100vh}
 
 /* ---------- menu lateral ---------- */
-.lateral{width:220px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:20px 14px}
-.placa-logo{background:#fff;border-radius:12px;padding:10px;display:flex;justify-content:center}
+.lateral{width:200px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;padding:20px 12px}
+.placa-logo{background:#fff;border-radius:10px;padding:8px;display:flex;justify-content:center}
 .placa-logo img{display:block;height:auto}
-.lateral .placa-logo img{width:78px}
-.menu-titulo{font-size:17px;font-weight:700;text-align:center;margin:22px 0 12px}
-.menu{display:flex;flex-direction:column;gap:4px}
+.lateral .placa-logo img{width:72px}
+.menu{display:flex;flex-direction:column;gap:2px}
 .menu button{display:flex;align-items:center;gap:10px;border:none;background:none;border-radius:8px;padding:9px 12px;font-size:13px;color:var(--ink-2);text-align:left}
 .menu button:hover{background:var(--surface-2);color:var(--ink)}
 .menu button.ativo{background:var(--navy);color:var(--on-navy);font-weight:600}
 .menu svg{width:16px;height:16px;flex:none}
-.regra{margin-top:auto;background:#1b2250;color:#fff;border-radius:14px;padding:16px}
-.regra h4{font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.regra h4 i{width:8px;height:8px;border-radius:50%;background:var(--green)}
-.regra p{font-size:12px;color:#c9cfe6;margin-bottom:6px}
-.regra b{color:#fff}
+.regra{margin-top:auto;border-top:1px solid var(--line);padding:14px 6px 0;font-size:12px;color:var(--ink-2)}
+.regra h4{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+.regra p{margin-bottom:4px}
+.regra b{color:var(--ink)}
 
 /* ---------- topo ---------- */
 .conteudo{flex:1;min-width:0}
-.topo{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
-.topo h1{font-size:19px;font-weight:700}
+.topo{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 28px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.topo h1{font-size:18px;font-weight:700}
 .topo p{font-size:12px;color:var(--muted);margin-top:2px}
 .topo-dir{display:flex;align-items:center;gap:14px}
-.topo .placa-logo{padding:6px 10px}
-.topo .placa-logo img{height:44px;width:auto}
+.topo .placa-logo{padding:4px 8px}
+.topo .placa-logo img{height:40px;width:auto}
 .fonte{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--ok-bg);color:var(--ok);white-space:nowrap}
 .fonte.demo{background:var(--warn-bg);color:var(--warn)}
 .fonte.erro{background:var(--bad-bg);color:var(--bad)}
-main{padding:20px 28px 40px;display:flex;flex-direction:column;gap:18px}
+main{padding:18px 28px 40px;display:flex;flex-direction:column;gap:16px;max-width:1400px}
 
 /* ---------- filtros ---------- */
-.filtros{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
-.filtros label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--muted)}
-.filtros select,.filtros input{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:150px}
-.btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--surface)}
-.btn:hover{border-color:var(--muted)}
-.trilha{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted);min-height:26px}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filtros select,.filtros input{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;height:34px}
+.filtros select{min-width:140px}
+.filtros .periodo{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.link{border:none;background:none;color:var(--bar);font-size:13px;font-weight:600;padding:6px 4px}
+.trilha{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.trilha:empty{display:none}
 .chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:2px 4px 2px 10px;color:var(--ink-2)}
 .chip b{color:var(--ink)}
 .chip button{border:none;background:none;color:var(--muted);font-size:15px;line-height:1;padding:0 5px}
+.btn{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--surface)}
+.btn:hover{border-color:var(--muted)}
+
+/* ---------- indicadores ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .l{font-size:12px;color:var(--muted);font-weight:600}
+.kpi .v{font-size:28px;font-weight:800;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:13px;font-weight:600;color:var(--muted)}
+.kpi .s{font-size:12px;color:var(--ink-2);margin-top:6px;display:flex;align-items:center;gap:6px}
+.kpi .v.ok{color:var(--ok)}.kpi .v.bad{color:var(--bad)}
+.meta{position:relative;height:6px;background:var(--track);border-radius:3px;margin-top:10px}
+.meta span{position:absolute;inset:0 auto 0 0;border-radius:3px}
+.meta i{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.45}
+.seta{font-weight:700}.seta.bom{color:var(--ok)}.seta.ruim{color:var(--bad)}
 
 /* ---------- cartões ---------- */
-.card{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--line);padding:16px 18px;min-width:0}
+.card{background:var(--surface);border-radius:12px;border:1px solid var(--line);padding:16px 18px;min-width:0}
 .card h2{font-size:15px;font-weight:700}
 .card .sub{font-size:12px;color:var(--muted);margin-top:2px}
-.card-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.card-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .abas{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px}
 .abas button{border:none;background:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted)}
-.abas button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.abas button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(20,30,60,.08)}
 
 /* progresso por grupo */
-.progresso{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
-.grupo{flex:0 0 210px;scroll-snap-align:start;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);text-align:left}
+.progresso{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+.grupo{flex:0 0 200px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);text-align:left}
 .grupo:hover{border-color:var(--bar)}
-.grupo .l1{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.grupo .l1{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
 .grupo .nome{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
-.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.warn{background:var(--warn-bg);color:var(--warn)}.pill.bad{background:var(--bad-bg);color:var(--bad)}
-.barra{position:relative;height:14px;background:var(--track);border-radius:7px;overflow:hidden}
-.barra span{position:absolute;inset:0 auto 0 0;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10px;font-weight:700;color:#fff}
-.barra span.ok{background:var(--ok)}.barra span.warn{background:var(--warn)}.barra span.bad{background:var(--bad)}
-.barra i{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.35}
+.grupo .pct{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.grupo .pct.ok{color:var(--ok)}.grupo .pct.warn{color:var(--warn)}.grupo .pct.bad{color:var(--bad)}
+.grupo .meta span.ok{background:var(--ok)}.grupo .meta span.warn{background:var(--warn)}.grupo .meta span.bad{background:var(--bad)}
 .grupo .l3{font-size:11px;color:var(--muted);margin-top:8px}
 
-.grade{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,1.05fr);gap:18px}
-.grade2{display:grid;grid-template-columns:minmax(0,2.5fr) minmax(0,1.05fr);gap:18px}
-.coluna{display:flex;flex-direction:column;gap:18px;min-width:0}
-
-/* rosca */
-.rosca{display:flex;justify-content:center;padding:10px 0 14px}
-.rosca svg{width:190px;height:190px}
-.legenda{display:flex;flex-direction:column;gap:8px;font-size:12px}
-.legenda div{display:flex;align-items:center;gap:8px}
-.legenda .cor{width:10px;height:10px;border-radius:3px;flex:none}
-.legenda .num{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
-
-/* medidor */
-.medidor{display:flex;align-items:center;justify-content:center;gap:26px;padding:6px 0}
-.medidor svg{width:130px;height:130px;flex:none}
-.medidor .lado b{display:block;font-size:15px}
-.medidor .lado span{display:block;font-size:13px;color:var(--muted);margin-top:4px}
-
-/* mini indicadores */
-.minis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.mini{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px}
-.mini .t{font-size:12px;font-weight:600;color:var(--ink-2)}
-.mini .l{display:flex;align-items:center;justify-content:space-between;gap:6px}
-.mini .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
-.mini .d{font-size:13px;font-weight:700}
-.mini .d.bom{color:var(--ok)}.mini .d.ruim{color:var(--bad)}.mini .d.neutro{color:var(--muted)}
-.mini svg{width:64px;height:26px;flex:none}
-.mini .l>span{white-space:nowrap}
-.mini .rod{font-size:11px;color:var(--muted)}
-
-/* atividade */
-.atividade{display:flex;flex-direction:column;gap:14px}
-.ativ{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--ink-2)}
-.ativ .ic{width:30px;height:30px;border-radius:50%;background:var(--bar-soft);color:var(--bar);display:flex;align-items:center;justify-content:center;flex:none}
-.ativ b{color:var(--ink)}
-.ativ small{display:block;color:var(--muted);margin-top:2px}
-
-/* ranking */
-.ranking{display:flex;flex-direction:column;gap:12px}
-.rank .l{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
-.rank .l b{font-weight:600}
-.rank .l span{color:var(--muted);font-variant-numeric:tabular-nums}
-.trilho{height:6px;background:var(--track);border-radius:3px;overflow:hidden}
-.trilho span{display:block;height:100%;background:var(--bar);border-radius:3px}
+/* radar + prioridades */
+.radar-grade{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:center}
+.radar svg{width:100%;max-width:520px;height:auto;display:block;margin:0 auto;overflow:visible}
+.radar .eixo-rot{font-size:11px;font-weight:600;fill:var(--ink-2);cursor:default}
+.radar .eixo-rot.crit{fill:var(--bad)}
+.legenda{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-size:12px;color:var(--ink-2);margin-top:8px}
+.legenda span{display:inline-flex;align-items:center;gap:6px}
+.legenda i{display:inline-block;width:16px;height:0;border-top:2px solid}
+.prior h3{font-size:13px;font-weight:700;margin-bottom:10px}
+.prior-lista{display:flex;flex-direction:column}
+.prior-item{display:grid;grid-template-columns:22px minmax(0,1fr) 110px 34px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.prior-item:last-child{border-bottom:none}
+.prior-item .pos{font-weight:800;color:var(--muted);text-align:center}
+.prior-item .nome{display:flex;align-items:center;min-width:0}
+.prior-item .nome .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.prior-item .nome small{color:var(--muted);margin-right:4px}
+.prior-item .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.prior-item .meta{margin-top:0}
+.prior-item .meta span{background:var(--bar)}
+.prior-item.baixo .meta span{background:var(--bad)}
+.crit{flex:none;font-size:9px;font-weight:700;color:var(--bad);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:6px}
+.mais-itens{font-size:12px;margin-top:8px}
 
 /* tabela */
 .tabela-rolagem{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{font-size:11px;color:var(--ink-2);font-weight:600;text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;color:var(--muted);font-weight:600;text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:9px 8px;border-bottom:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
 td b{color:var(--ink);font-weight:600}
 th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
 .pto{display:inline-flex;align-items:center;gap:6px;font-weight:600}
 .pto::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
 .pto.ok{color:var(--ok)}.pto.bad{color:var(--bad)}
-.acao{border:none;background:none;color:var(--warn);padding:4px;border-radius:6px;display:inline-flex}
-.acao:hover{background:var(--warn-bg)}
+.motivo{color:var(--muted);margin-left:6px}
 .vazio{padding:28px;text-align:center;color:var(--muted)}
 
-/* perguntas */
-.itens{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(7,auto);grid-auto-flow:column;gap:10px 32px}
-.item{display:grid;grid-template-columns:minmax(0,1fr) 140px 32px;gap:10px;align-items:center;font-size:12px}
-.item .nome{display:flex;align-items:center;min-width:0}
-.item .nome .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.item .nome small{color:var(--muted);margin-right:4px}
-.crit{flex:none;font-size:9px;font-weight:700;color:var(--bad);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:6px}
-.item .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
-.item .trilho{position:relative;height:8px;overflow:visible}
-.item .trilho i{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.4}
-.nota-leg{font-size:11px;color:var(--muted);margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-.nota-leg .marca{display:inline-block;width:2px;height:11px;background:var(--ink);opacity:.4;vertical-align:middle;margin-right:4px}
-
 /* detalhe + dica */
-#dica{position:fixed;pointer-events:none;background:#1b2250;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.2);display:none;z-index:200;max-width:280px}
+#dica{position:fixed;pointer-events:none;background:#1b2250;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.2);display:none;z-index:200;max-width:300px}
 dialog{margin:auto;border:none;border-radius:14px;padding:0;max-width:760px;width:calc(100% - 32px);background:var(--surface);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.3)}
 dialog::backdrop{background:rgba(10,14,35,.55)}
 .dlg-cab{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
 .dlg-cab h3{font-size:16px}
 .dlg-cab p{font-size:12px;color:var(--muted);margin-top:3px}
+.pill{font-size:12px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.bad{background:var(--bad-bg);color:var(--bad)}
 .dlg-corpo{padding:10px 22px 22px;max-height:70vh;overflow:auto}
 .resp{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 .resp .n{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
@@ -181,49 +158,46 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
 .n1{background:#d9362b}.n2{background:#d98a06}.n3{background:#3a63d6}.n4{background:#139f5b}
 .aviso{background:var(--bad-bg);color:var(--bad);padding:12px 16px;border-radius:10px;display:none}
 
-@media (max-width:1180px){
-  .grade{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
-  .grade>.coluna:last-child{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .radar-grade{grid-template-columns:1fr}
 }
-@media (max-width:1360px){.grade2{grid-template-columns:1fr}}
 @media (max-width:820px){
   .app{flex-direction:column}
   .lateral{position:static;width:auto;height:auto;flex-direction:row;align-items:center;gap:10px;padding:10px 16px;border-right:none;border-bottom:1px solid var(--line);overflow-x:auto}
-  .lateral .placa-logo img{width:44px}
-  .menu-titulo,.regra{display:none}
+  .lateral .placa-logo img{width:40px}
+  .regra{display:none}
   .menu{flex-direction:row}
   .menu button{white-space:nowrap;padding:7px 10px}
   .topo{position:static;padding:12px 16px;flex-wrap:wrap}
-  .topo h1{font-size:17px}
-  .topo .placa-logo img{height:32px}
-  main{padding:16px}
-  .grade,.grade>.coluna:last-child{grid-template-columns:1fr;display:flex;flex-direction:column}
-  .minis{grid-template-columns:1fr}
-  .itens{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}
-  .item{grid-template-columns:minmax(0,1fr) 80px 30px}
-  .filtros label{flex:1 1 140px}.filtros select,.filtros input{min-width:0;width:100%}
-  .medidor{gap:16px}
+  .topo h1{font-size:16px}
+  .topo .placa-logo img{height:30px}
+  main{padding:14px 16px}
+  .kpis{gap:10px}
+  .kpi .v{font-size:22px}
+  .filtros select,.filtros .periodo{flex:1 1 140px}
+  .filtros .periodo input{flex:1;min-width:0}
+  .prior-item{grid-template-columns:20px minmax(0,1fr) 60px 30px}
 }
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="lateral">
-    <div class="placa-logo"><img src="img/adm.png" alt="ADM" width="137" height="102"></div>
-    <div class="menu-titulo">Menu</div>
+    <div class="placa-logo"><img src="/auditoria/img/adm.png" alt="ADM" width="137" height="102"></div>
     <nav class="menu" id="menu">
       <button data-ir="painel" class="ativo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</button>
       <button data-ir="planta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V9l6 4V9l6 4V5h6v16z"/></svg>Plantas</button>
       <button data-ir="area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>Áreas</button>
       <button data-ir="equipamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Equipamentos</button>
       <button data-ir="auditor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Auditores</button>
-      <button data-ir="perguntas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Perguntas</button>
+      <button data-ir="temas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 6.5-3.5 10.5h-11L3 8.5z"/><path d="M12 7l4.5 3.3-1.7 5.2H9.2L7.5 10.3z"/></svg>Temas</button>
       <button data-ir="auditorias"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Auditorias</button>
     </nav>
     <div class="regra">
-      <h4><i></i>Regra de aprovação</h4>
-      <p>Pontuação ≥ <b>85%</b> (45 de 52 pontos)</p>
-      <p><b>e</b> perguntas críticas <b>P12</b> e <b>P16</b> com nota ≥ <b>3</b></p>
+      <h4>Regra de aprovação</h4>
+      <p>Pontuação ≥ <b>85%</b> (45 de 52)</p>
+      <p><b>e</b> P12 e P16 com nota ≥ <b>3</b></p>
     </div>
   </aside>
 
@@ -232,29 +206,29 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
       <div><h1>Auditoria DEC — Passo 1</h1><p id="hoje"></p></div>
       <div class="topo-dir">
         <span id="fonte" class="fonte">carregando…</span>
-        <div class="placa-logo"><img src="img/performance-excellence.png" alt="Performance Excellence" width="345" height="127"></div>
+        <div class="placa-logo"><img src="/auditoria/img/performance-excellence.png" alt="Performance Excellence" width="345" height="127"></div>
       </div>
     </header>
 
     <main id="painel">
       <div class="aviso" id="aviso"></div>
 
-      <div>
-        <div class="filtros">
-          <label>Planta<select id="f-planta"></select></label>
-          <label>Área<select id="f-area"></select></label>
-          <label>Equipamento<select id="f-equipamento"></select></label>
-          <label>Auditor<select id="f-auditor"></select></label>
-          <label>De<input type="date" id="f-de"></label>
-          <label>Até<input type="date" id="f-ate"></label>
-          <button class="btn" id="limpar">Limpar filtros</button>
-        </div>
-        <div class="trilha" id="trilha" style="margin-top:10px"></div>
+      <div class="filtros">
+        <select id="f-planta" aria-label="Planta"></select>
+        <select id="f-area" aria-label="Área"></select>
+        <select id="f-equipamento" aria-label="Equipamento"></select>
+        <select id="f-auditor" aria-label="Auditor"></select>
+        <label class="periodo">de <input type="date" id="f-de"></label>
+        <label class="periodo">até <input type="date" id="f-ate"></label>
+        <button class="link" id="limpar">Limpar</button>
       </div>
+      <div class="trilha" id="trilha"></div>
+
+      <section class="kpis" id="kpis"></section>
 
       <section class="card" id="sec-progresso">
         <div class="card-cab">
-          <div><h2 id="tit-progresso">Progresso por planta</h2><div class="sub">Nota média · clique num cartão para abrir o próximo nível</div></div>
+          <div><h2 id="tit-progresso">Por planta</h2><div class="sub">Nota média · do pior para o melhor · clique para detalhar</div></div>
           <div class="abas" role="tablist" id="abas">
             <button role="tab" data-dim="planta">Planta</button>
             <button role="tab" data-dim="area">Área</button>
@@ -265,54 +239,27 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
         <div class="progresso" id="progresso"></div>
       </section>
 
-      <div class="grade">
-        <section class="card">
-          <h2>Status das auditorias</h2>
-          <div class="rosca" id="rosca"></div>
-          <div class="legenda" id="rosca-leg"></div>
-        </section>
-
-        <div class="coluna">
-          <section class="card">
-            <h2>Nota média</h2>
-            <div class="medidor" id="medidor"></div>
-          </section>
-          <section class="card">
-            <h2>Indicadores do mês</h2>
-            <div class="sub" id="sub-minis" style="margin-bottom:12px"></div>
-            <div class="minis" id="minis"></div>
-          </section>
-        </div>
-
-        <div class="coluna">
-          <section class="card">
-            <h2 style="margin-bottom:14px">Atividade recente</h2>
-            <div class="atividade" id="atividade"></div>
-          </section>
-        </div>
-      </div>
-
-      <div class="grade2">
-        <section class="card" id="sec-auditorias">
-          <div class="card-cab">
-            <div><h2>Auditorias que requerem atenção</h2><div class="sub" id="sub-lista"></div></div>
-            <div class="abas" id="modo-lista">
-              <button data-modo="reprovadas" aria-selected="true">Reprovadas</button>
-              <button data-modo="todas">Todas</button>
-            </div>
+      <section class="card" id="sec-temas">
+        <div class="card-cab"><div><h2>Temas prioritários</h2><div class="sub">Nota média por pergunta, de 1 a 4 · quanto mais perto do centro, maior a prioridade</div></div></div>
+        <div class="radar-grade">
+          <div class="radar"><div id="radar"></div><div class="legenda" id="radar-leg"></div></div>
+          <div class="prior">
+            <h3>Onde agir primeiro</h3>
+            <div class="prior-lista" id="prior"></div>
+            <button class="link mais-itens" id="prior-mais"></button>
           </div>
-          <div class="tabela-rolagem"><table id="tab-lista"></table></div>
-        </section>
-        <section class="card">
-          <h2 style="margin-bottom:14px">Auditorias por auditor</h2>
-          <div class="ranking" id="ranking"></div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <section class="card" id="sec-perguntas">
-        <div class="card-cab"><div><h2>Nota média por pergunta</h2><div class="sub">Escala de 1 a 4 · as mais fracas indicam onde agir</div></div></div>
-        <div class="itens" id="itens"></div>
-        <div class="nota-leg"><span><span class="marca"></span>nota 3 (mínimo das perguntas críticas)</span><span><span class="crit" style="margin:0 4px 0 0">CRÍTICA</span>reprova a auditoria sozinha se ficar abaixo de 3</span></div>
+      <section class="card" id="sec-auditorias">
+        <div class="card-cab">
+          <div><h2>Auditorias</h2><div class="sub" id="sub-lista"></div></div>
+          <div class="abas" id="modo-lista">
+            <button data-modo="reprovadas" aria-selected="true">Reprovadas</button>
+            <button data-modo="todas">Todas</button>
+          </div>
+        </div>
+        <div class="tabela-rolagem"><table id="tab-lista"></table></div>
       </section>
     </main>
   </div>
@@ -321,24 +268,23 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
 <dialog id="detalhe"></dialog>
 <div id="dica"></div>
 
-<script src="config.js"></script>
+<script src="/auditoria/config.js"></script>
 <script>
 const CFG = window.AUDITORIA_CONFIG || {};
 const DIMS = {planta:"Planta", area:"Área", equipamento:"Equipamento", auditor:"Auditor"};
-const PLURAL = {planta:"planta", area:"área", equipamento:"equipamento", auditor:"auditor"};
+const TITULO_DIM = {planta:"Por planta", area:"Por área", equipamento:"Por equipamento", auditor:"Por auditor"};
 const PROXIMA = {planta:"area", area:"equipamento", equipamento:"equipamento", auditor:"auditor"};
-const estado = {dados:[], perguntas:[], filtros:{planta:"",area:"",equipamento:"",auditor:"",de:"",ate:""}, dim:"planta", modo:"reprovadas", limite:10};
+const META_MEDIA = 0.85 * 4;   // 85% dos pontos = média 3,4 por pergunta
+const estado = {dados:[], perguntas:[], filtros:{planta:"",area:"",equipamento:"",auditor:"",de:"",ate:""}, dim:"planta", modo:"reprovadas", limite:10, todasPrior:false};
 
 const $ = s => document.querySelector(s);
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt1 = n => n == null || isNaN(n) ? "—" : Number(n).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
+const fmtN = (n, d=1) => n == null || isNaN(n) ? "—" : Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
 const fmtData = d => d ? new Date(d).toLocaleDateString("pt-BR") : "—";
 const qcol = n => "q" + String(n).padStart(2,"0");
-const MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
-const nomeMes = m => { const [a,b] = m.split("-"); return MESES[+b-1] + "/" + a.slice(2); };
 const faixa = p => p >= 85 ? "ok" : p >= 70 ? "warn" : "bad";
-const ICONE_OLHO = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
-const ICONE_DOC = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>`;
+const temFiltro = () => Object.values(estado.filtros).some(Boolean);
 
 // ---------- carga ----------
 async function carregarSupabase(){
@@ -363,6 +309,7 @@ async function carregarSupabase(){
 // A regra oficial de aprovação está no banco (supabase/schema.sql).
 function carregarDemo(){
   const titulos = ["Treinamento da operação","Recursos da estação","Donos do equipamento","Mapa de contaminação","Tratamento das fontes de contaminação","Grande Limpeza e restauração","Evidências Antes x Depois","Abertura de etiquetas no MAXIMO","Monitoramento de etiquetas abertas x fechadas","Checklist de Limpeza","Checklist de Inspeção","Limpeza como momento de inspeção","Checklist de Lubrificação"];
+  const vies = [0.3,0.2,0.1,-0.4,-0.6,0,-0.7,0.1,-0.2,0.2,-0.1,-0.3,0];   // temas mais fracos que outros
   const perguntas = titulos.map((t,i)=>({numero:i+1, numero_forms:i+5, titulo:t, critica:i===7||i===11}));
   const mapa = {
     "Campo Grande":{"Extração":["Laminador","Expander","Extrator"],"Preparação":["Quebrador","Condicionador"],"Ensaque":["Ensacadeira 1","Ensacadeira 2"]},
@@ -372,12 +319,12 @@ function carregarDemo(){
   let s = 7; const rnd = () => (s = (s*16807) % 2147483647) / 2147483647;
   const dados = []; let id = 0;
   for (const [planta, areas] of Object.entries(mapa)) for (const [area, eqs] of Object.entries(areas)) for (const eq of eqs) {
-    const nivel = 2.3 + rnd()*1.5;
+    const nivel = 2.5 + rnd()*1.3;
     for (let k = 0; k < 6; k++) {
       const r = {id:++id, resposta_id:String(id), planta, area, equipamento:eq, tag:eq.slice(0,3).toUpperCase()+"-"+(100+id), auditor:auditores[Math.floor(rnd()*4)], respostas_texto:{}};
       r.conclusao = new Date(2026, 3 + k, 1 + Math.floor(rnd()*27), 8 + Math.floor(rnd()*9)).toISOString();
       let pts = 0;
-      titulos.forEach((_,i)=>{ const n = Math.max(1, Math.min(4, Math.round(nivel + k*0.1 + (rnd()-.5)*1.6))); r[qcol(i+1)] = n; pts += n; });
+      titulos.forEach((_,i)=>{ const n = Math.max(1, Math.min(4, Math.round(nivel + vies[i] + k*0.1 + (rnd()-.5)*1.4))); r[qcol(i+1)] = n; pts += n; });
       r.pontos = pts; r.pontos_max = 52; r.percentual = Math.round(pts*1000/52)/10;
       r.criterio_pontos_ok = pts*100 >= 85*52; r.criterio_criticos_ok = r.q08 >= 3 && r.q12 >= 3;
       r.aprovado = r.criterio_pontos_ok && r.criterio_criticos_ok;
@@ -399,10 +346,11 @@ function filtrar(ignorar){
 }
 
 function preencherSelects(){
+  const todos = {planta:"Todas as plantas", area:"Todas as áreas", equipamento:"Todos os equipamentos", auditor:"Todos os auditores"};
   for (const d of Object.keys(DIMS)) {
     const opcoes = [...new Set(filtrar(d).map(r => r[d]))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
     const atual = estado.filtros[d];
-    $("#f-"+d).innerHTML = `<option value="">Todos</option>` + opcoes.map(o=>`<option ${o===atual?"selected":""}>${esc(o)}</option>`).join("");
+    $("#f-"+d).innerHTML = `<option value="">${todos[d]}</option>` + opcoes.map(o=>`<option ${o===atual?"selected":""}>${esc(o)}</option>`).join("");
   }
 }
 
@@ -429,53 +377,55 @@ function resumo(linhas){
     taxa: n ? ap*100/n : null,
     media: n ? linhas.reduce((s,r)=>s+Number(r.percentual),0)/n : null,
     critico: linhas.filter(r=>!r.criterio_criticos_ok).length,
-    ultima: linhas.reduce((m,r)=> r.conclusao && r.conclusao > m ? r.conclusao : m, ""),
   };
 }
 
-function porMes(linhas){
+function mediasPorPergunta(linhas){
+  return estado.perguntas.map(p => {
+    const vals = linhas.map(r=>r[qcol(p.numero)]).filter(v=>v!=null);
+    return {...p, media: vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null, abaixo3: vals.filter(v=>v<3).length, n: vals.length};
+  });
+}
+
+// mês mais recente x anterior, para a seta de tendência
+function tendencia(linhas){
   const m = {};
   for (const r of linhas) if (r.conclusao) (m[r.conclusao.slice(0,7)] ||= []).push(r);
-  return Object.keys(m).sort().slice(-6).map(k => ({mes:k, ...resumo(m[k])}));
+  const ks = Object.keys(m).sort();
+  if (ks.length < 2) return null;
+  return {atual: resumo(m[ks.at(-1)]), anterior: resumo(m[ks.at(-2)])};
+}
+function seta(a, b, maiorMelhor){
+  if (a == null || b == null || Math.abs(a-b) < 0.05) return "";
+  const sobe = a > b;
+  return `<span class="seta ${sobe === maiorMelhor ? "bom" : "ruim"}">${sobe ? "↑" : "↓"}</span>`;
 }
 
-// ---------- componentes ----------
-function svgRosca(fatias){
-  const total = fatias.reduce((s,f)=>s+f.n,0), R = 70, C = 2*Math.PI*R, GAP = total > 0 && fatias.filter(f=>f.n).length > 1 ? 3 : 0;
-  let acc = 0;
-  const arcos = fatias.filter(f=>f.n).map(f => {
-    const len = f.n/total*C, s = `<circle cx="90" cy="90" r="${R}" fill="none" stroke="${f.cor}" stroke-width="34" stroke-dasharray="${Math.max(len-GAP,0)} ${C}" stroke-dashoffset="${-acc}" transform="rotate(-90 90 90)" data-dica="${esc(f.nome)}: ${f.n} (${fmt1(f.n*100/total)}%)"/>`;
-    acc += len; return s;
-  }).join("");
-  return `<svg viewBox="0 0 180 180" role="img" aria-label="Status das auditorias">
-    <circle cx="90" cy="90" r="${R}" fill="none" stroke="var(--track)" stroke-width="34"/>${arcos}
-    <text x="90" y="88" text-anchor="middle" font-size="26" font-weight="800" fill="var(--ink)">${total}</text>
-    <text x="90" y="106" text-anchor="middle" font-size="11" fill="var(--muted)">auditorias</text></svg>`;
-}
-
-function svgMedidor(p){
-  const R = 54, C = 2*Math.PI*R, v = p ?? 0, meta = 85;
-  const ang = meta/100*2*Math.PI - Math.PI/2, x1 = 65 + (R-11)*Math.cos(ang), y1 = 65 + (R-11)*Math.sin(ang), x2 = 65 + (R+11)*Math.cos(ang), y2 = 65 + (R+11)*Math.sin(ang);
-  return `<svg viewBox="0 0 130 130" role="img" aria-label="Nota média ${fmt1(p)}%">
-    <circle cx="65" cy="65" r="${R}" fill="none" stroke="var(--track)" stroke-width="12"/>
-    <circle cx="65" cy="65" r="${R}" fill="none" stroke="var(--${p==null?"track":faixa(v)})" stroke-width="12" stroke-linecap="round" stroke-dasharray="${v/100*C} ${C}" transform="rotate(-90 65 65)"/>
-    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink)" stroke-width="2.5" opacity=".55"/>
-    <text x="65" y="73" text-anchor="middle" font-size="24" font-weight="800" fill="var(--ink)">${p==null?"—":Math.round(v)+"%"}</text></svg>`;
-}
-
-function svgLinha(valores, rotulos, fmt){
-  const vs = valores.map(v=>v ?? 0);
-  if (vs.length < 2) return `<svg viewBox="0 0 80 30"></svg>`;
-  const min = Math.min(...vs), max = Math.max(...vs), amp = max - min || 1;
-  const pts = vs.map((v,i)=>[2 + i*76/(vs.length-1), 26 - (v-min)/amp*22]);
-  const dica = rotulos.map((r,i)=>`${r}: ${fmt(valores[i])}`).join(" · ");
-  return `<svg viewBox="0 0 80 30" data-dica="${esc(dica)}"><polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="var(--bar)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="3" fill="var(--bar)" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
-}
-
-function tempoRelativo(d){
-  if (!d) return "";
-  const dias = Math.floor((Date.now() - new Date(d)) / 864e5);
-  return dias <= 0 ? "hoje" : dias === 1 ? "ontem" : dias < 30 ? `há ${dias} dias` : fmtData(d);
+// ---------- radar (escala 1 a 4) ----------
+function svgRadar(series){
+  const itens = estado.perguntas, N = itens.length;
+  const W = 520, H = 440, cx = W/2, cy = H/2 + 4, R = 160;
+  // centro = nota 1, borda = nota 4
+  const pos = (i, v) => { const a = -Math.PI/2 + i*2*Math.PI/N, r = Math.max(v-1,0)/3*R; return [cx + r*Math.cos(a), cy + r*Math.sin(a)]; };
+  const anel = v => itens.map((_,i)=>pos(i,v).map(n=>n.toFixed(1)).join(",")).join(" ");
+  let g = "";
+  for (const v of [2,3,4]) g += `<polygon points="${anel(v)}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+  itens.forEach((_,i)=>{ const [x,y] = pos(i,4); g += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`; });
+  for (const v of [1,2,3,4]) { const [x,y] = pos(0,v); g += `<text x="${x+4}" y="${y-3}" font-size="10" fill="var(--muted)">${v}</text>`; }
+  g += `<polygon points="${anel(META_MEDIA)}" fill="none" stroke="var(--ok)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  for (const s of series) {
+    const pts = s.medias.map((m,i)=>pos(i, m.media ?? 1));
+    g += `<polygon points="${pts.map(p=>p.map(n=>n.toFixed(1)).join(",")).join(" ")}" fill="${s.preenche ? "var(--bar)" : "none"}" fill-opacity=".12" stroke="${s.cor}" stroke-width="2" ${s.tracejado ? 'stroke-dasharray="4 3"' : ""} stroke-linejoin="round"/>`;
+    if (s.pontos) pts.forEach((p,i)=>{ const m = s.medias[i];
+      g += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${m.media!=null && m.media<3 ? "var(--bad)" : s.cor}" stroke="var(--surface)" stroke-width="1.5"/>
+            <circle cx="${p[0]}" cy="${p[1]}" r="12" fill="transparent" data-dica="P${m.numero_forms} · ${esc(m.titulo)}: média ${m.media==null?"—":fmtN(m.media,2)} · ${m.abaixo3} de ${m.n} resposta(s) abaixo de 3"/>`; });
+  }
+  itens.forEach((p,i)=>{
+    const a = -Math.PI/2 + i*2*Math.PI/N, [x,y] = pos(i,4.55), c = Math.cos(a);
+    const anchor = Math.abs(c) < .2 ? "middle" : c > 0 ? "start" : "end";
+    g += `<text x="${x}" y="${y+4}" text-anchor="${anchor}" class="eixo-rot ${p.critica?"crit":""}" data-dica="P${p.numero_forms} · ${esc(p.titulo)}${p.critica?" (crítica)":""}">P${p.numero_forms}${p.critica?" ★":""}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Radar da nota média por pergunta, escala de 1 a 4">${g}</svg>`;
 }
 
 // ---------- render ----------
@@ -485,94 +435,69 @@ function render(){
   const f = estado.filtros;
 
   $("#trilha").innerHTML = Object.keys(DIMS).filter(d=>f[d]).map(d =>
-    `<span class="chip">${DIMS[d]}: <b>${esc(f[d])}</b><button aria-label="Remover filtro ${DIMS[d]}" data-rm="${d}">×</button></span>`).join("")
-    || `<span>Mostrando todas as auditorias</span>`;
+    `<span class="chip">${DIMS[d]}: <b>${esc(f[d])}</b><button aria-label="Remover filtro ${DIMS[d]}" data-rm="${d}">×</button></span>`).join("");
 
-  // progresso por dimensão
+  // indicadores
+  const k = resumo(linhas), t = tendencia(linhas);
+  const fx = k.media == null ? "" : k.media >= 85 ? "ok" : "bad";
+  $("#kpis").innerHTML = `
+    <div class="kpi"><div class="l">Auditorias</div><div class="v">${k.n}</div>
+      <div class="s">${t ? `${t.atual.n} no último mês ${seta(t.atual.n, t.anterior.n, true)}` : "&nbsp;"}</div></div>
+    <div class="kpi"><div class="l">Taxa de aprovação</div><div class="v ${k.taxa==null?"":k.taxa>=85?"ok":"bad"}">${k.taxa==null?"—":Math.round(k.taxa)+"%"}</div>
+      <div class="s">${k.ap} de ${k.n} aprovadas ${t ? seta(t.atual.taxa, t.anterior.taxa, true) : ""}</div></div>
+    <div class="kpi"><div class="l">Nota média</div><div class="v ${fx}">${k.media==null?"—":fmt1(k.media)+"%"} <small>meta 85%</small></div>
+      <div class="meta" data-dica="Nota média ${fmt1(k.media)}% · meta 85%"><span style="width:${k.media??0}%;background:var(--${fx||"track"})"></span><i style="left:85%"></i></div></div>
+    <div class="kpi"><div class="l">Reprovadas por item crítico</div><div class="v ${k.critico?"bad":""}">${k.critico}</div>
+      <div class="s">P12 ou P16 abaixo de 3 ${t ? seta(t.atual.critico, t.anterior.critico, false) : ""}</div></div>`;
+
+  // por dimensão
   document.querySelectorAll("#abas button").forEach(b => b.setAttribute("aria-selected", b.dataset.dim === estado.dim));
-  document.querySelectorAll("#menu button").forEach(b => b.classList.toggle("ativo", b.dataset.ir === estado.dim));
-  $("#tit-progresso").textContent = "Progresso por " + PLURAL[estado.dim];
+  $("#tit-progresso").textContent = TITULO_DIM[estado.dim];
   const grupos = {};
   for (const r of linhas) (grupos[r[estado.dim]] ||= []).push(r);
   const lista = Object.entries(grupos).map(([nome, rs]) => ({nome, ...resumo(rs)})).sort((a,b)=>a.media-b.media);
   $("#progresso").innerHTML = lista.length ? lista.map(g => {
-    const fx = faixa(g.media);
+    const c = faixa(g.media);
     return `<button class="grupo" data-grupo="${esc(g.nome)}" data-dica="${esc(g.nome)}: nota média ${fmt1(g.media)}% · ${g.ap} de ${g.n} aprovada(s)">
-      <div class="l1"><span class="nome">${esc(g.nome)}</span><span class="pill ${fx}">${fx==="ok"?"Na meta":fx==="warn"?"Atenção":"Crítico"}</span></div>
-      <div class="barra"><span class="${fx}" style="width:${Math.max(g.media,18)}%">${Math.round(g.media)}%</span><i style="left:85%"></i></div>
-      <div class="l3">${g.n} auditoria(s) · ${fmt1(g.taxa)}% aprovadas</div></button>`;
+      <div class="l1"><span class="nome">${esc(g.nome)}</span><span class="pct ${c}">${Math.round(g.media)}%</span></div>
+      <div class="meta"><span class="${c}" style="width:${g.media}%"></span><i style="left:85%"></i></div>
+      <div class="l3">${g.n} auditoria(s) · ${Math.round(g.taxa)}% aprovadas</div></button>`;
   }).join("") : `<div class="vazio">Nenhuma auditoria com esses filtros</div>`;
 
-  // rosca de status
-  const k = resumo(linhas);
-  const soPontos = linhas.filter(r=>!r.aprovado && r.criterio_criticos_ok).length;
-  const fatias = [
-    {nome:"Aprovadas", n:k.ap, cor:"var(--ok)"},
-    {nome:"Reprovadas por pontuação", n:soPontos, cor:"var(--warn)"},
-    {nome:"Reprovadas por item crítico", n:k.critico, cor:"var(--bad)"},
-  ];
-  $("#rosca").innerHTML = svgRosca(fatias);
-  $("#rosca-leg").innerHTML = fatias.map(f=>`<div><span class="cor" style="background:${f.cor}"></span>${f.nome}<span class="num">${f.n}</span></div>`).join("");
+  // radar + prioridades
+  const medias = mediasPorPergunta(linhas);
+  const series = [{medias, cor:"var(--bar)", preenche:true, pontos:true}];
+  if (temFiltro()) series.unshift({medias: mediasPorPergunta(estado.dados), cor:"var(--ref)", tracejado:true});
+  $("#radar").innerHTML = linhas.length ? svgRadar(series) : `<div class="vazio">Nenhuma auditoria com esses filtros</div>`;
+  $("#radar-leg").innerHTML = linhas.length ? `
+    <span><i style="border-color:var(--bar)"></i>${temFiltro() ? "Seleção atual" : "Todas as auditorias"}</span>
+    ${temFiltro() ? `<span><i style="border-color:var(--ref);border-top-style:dashed"></i>Todas as auditorias</span>` : ""}
+    <span><i style="border-color:var(--ok);border-top-style:dashed"></i>Meta (média 3,4 = 85%)</span>
+    <span style="color:var(--bad)">★ crítica: precisa de nota ≥ 3</span>` : "";
 
-  // medidor
-  $("#medidor").innerHTML = svgMedidor(k.media) + `<div class="lado"><b>Nota média das<br>auditorias</b><span>Meta: 85%</span><span>${k.ap} de ${k.n} aprovadas (${fmt1(k.taxa)}%)</span></div>`;
-
-  // indicadores mensais
-  const meses = porMes(linhas), rot = meses.map(m=>nomeMes(m.mes)), ult = meses.at(-1), ant = meses.at(-2);
-  $("#sub-minis").textContent = ult ? `${nomeMes(ult.mes)} comparado a ${ant ? nomeMes(ant.mes) : "—"} · linha: últimos ${meses.length} meses` : "Sem dados no período";
-  const delta = (a, b, maiorMelhor) => {
-    if (a == null || b == null || a === b) return `<span class="d neutro">＝</span>`;
-    const sobe = a > b, bom = sobe === maiorMelhor;
-    return `<span class="d ${bom?"bom":"ruim"}">${sobe?"↑":"↓"}</span>`;
-  };
-  const mini = (t, v, d, spark, rod) => `<div class="mini"><div class="t">${t}</div><div class="l"><span><span class="v">${v}</span> ${d}</span>${spark}</div><div class="rod">${rod}</div></div>`;
-  $("#minis").innerHTML = ult ? [
-    mini("Auditorias", ult.n, delta(ult.n, ant?.n, true), svgLinha(meses.map(m=>m.n), rot, v=>v), `mês anterior: ${ant?.n ?? "—"}`),
-    mini("Taxa de aprovação", Math.round(ult.taxa)+"%", delta(ult.taxa, ant?.taxa, true), svgLinha(meses.map(m=>m.taxa), rot, v=>fmt1(v)+"%"), `mês anterior: ${ant ? Math.round(ant.taxa)+"%" : "—"}`),
-    mini("Reprovadas por item crítico", ult.critico, delta(ult.critico, ant?.critico, false), svgLinha(meses.map(m=>m.critico), rot, v=>v), `mês anterior: ${ant?.critico ?? "—"}`),
-  ].join("") : `<div class="vazio">—</div>`;
-
-  // atividade recente
-  $("#atividade").innerHTML = linhas.slice(0,5).map(r => `
-    <div class="ativ"><span class="ic">${ICONE_DOC}</span><div>
-      <b>${esc(r.auditor)}</b> auditou <b>${esc(r.equipamento)}</b>${r.tag?" ("+esc(r.tag)+")":""} — ${esc(r.area)}
-      <small><span class="pto ${r.aprovado?"ok":"bad"}">${r.aprovado?"Aprovada":"Reprovada"} · ${fmt1(r.percentual)}%</span> · ${tempoRelativo(r.conclusao)}</small>
-    </div></div>`).join("") || `<div class="vazio">Nenhuma auditoria</div>`;
-
-  // auditores
-  const aud = {};
-  for (const r of linhas) (aud[r.auditor] ||= []).push(r);
-  const audL = Object.entries(aud).map(([nome, rs])=>({nome, ...resumo(rs)})).sort((a,b)=>b.n-a.n);
-  const maxN = Math.max(1, ...audL.map(a=>a.n));
-  $("#ranking").innerHTML = audL.map(a=>`
-    <div class="rank" data-dica="${esc(a.nome)}: ${a.n} auditoria(s), nota média ${fmt1(a.media)}%, ${fmt1(a.taxa)}% aprovadas">
-      <div class="l"><b>${esc(a.nome)}</b><span>${a.n}</span></div>
-      <div class="trilho"><span style="width:${a.n/maxN*100}%"></span></div></div>`).join("") || `<div class="vazio">—</div>`;
+  const ordem = medias.filter(m=>m.media!=null).sort((a,b)=>a.media-b.media);
+  const mostrar = estado.todasPrior ? ordem : ordem.slice(0,5);
+  $("#prior").innerHTML = mostrar.map((m,i)=>`
+    <div class="prior-item ${m.media<3?"baixo":""}" data-dica="${m.abaixo3} de ${m.n} resposta(s) abaixo de 3">
+      <span class="pos">${i+1}</span>
+      <span class="nome" title="${esc(m.titulo)}"><span class="t"><small>P${m.numero_forms}</small>${esc(m.titulo)}</span>${m.critica?'<span class="crit">CRÍTICA</span>':""}</span>
+      <div class="meta"><span style="width:${(m.media-1)/3*100}%"></span><i style="left:${(META_MEDIA-1)/3*100}%"></i></div>
+      <span class="v">${fmtN(m.media)}</span>
+    </div>`).join("") || `<div class="vazio">—</div>`;
+  $("#prior-mais").textContent = ordem.length > 5 ? (estado.todasPrior ? "Mostrar só as 5 primeiras" : `Ver todas as ${ordem.length} perguntas`) : "";
 
   // tabela
   document.querySelectorAll("#modo-lista button").forEach(b => b.setAttribute("aria-selected", b.dataset.modo === estado.modo));
   const tab = estado.modo === "reprovadas" ? linhas.filter(r=>!r.aprovado) : linhas;
-  $("#sub-lista").textContent = `${tab.length} auditoria(s)` + (tab.length > estado.limite ? ` · mostrando as ${estado.limite} mais recentes` : "");
+  $("#sub-lista").textContent = `${tab.length} auditoria(s)` + (tab.length > estado.limite ? ` · mostrando as ${estado.limite} mais recentes` : "") + " · clique numa linha para ver as respostas";
   $("#tab-lista").innerHTML = tab.length ? `
-    <thead><tr><th>Data</th><th>Planta</th><th>Área</th><th>Equipamento</th><th>Tag</th><th>Auditor</th><th class="num">Nota</th><th>Resultado</th><th>Ação</th></tr></thead>
+    <thead><tr><th>Data</th><th>Planta</th><th>Área</th><th>Equipamento</th><th>Tag</th><th>Auditor</th><th class="num">Nota</th><th>Resultado</th></tr></thead>
     <tbody>${tab.slice(0,estado.limite).map(r=>`
-      <tr>
+      <tr data-id="${r.id}">
         <td>${fmtData(r.conclusao)}</td><td>${esc(r.planta)}</td><td>${esc(r.area)}</td><td><b>${esc(r.equipamento)}</b></td><td>${esc(r.tag||"—")}</td><td>${esc(r.auditor)}</td>
         <td class="num" data-dica="${r.pontos} de 52 pontos">${fmt1(r.percentual)}%</td>
-        <td><span class="pto ${r.aprovado?"ok":"bad"}">${r.aprovado?"Aprovada":"Reprovada"}</span>${r.aprovado ? "" : `<small style="display:block;color:var(--muted);margin:2px 0 0 14px">${!r.criterio_pontos_ok && !r.criterio_criticos_ok ? "pontuação e item crítico" : !r.criterio_pontos_ok ? "pontuação < 85%" : "item crítico < 3"}</small>`}</td>
-        <td><button class="acao" data-id="${r.id}" aria-label="Ver respostas">${ICONE_OLHO}</button></td>
-      </tr>`).join("")}</tbody>` + (tab.length > estado.limite ? `<tfoot><tr><td colspan="9" style="text-align:center"><button class="btn" id="mais">Mostrar mais (${Math.min(tab.length-estado.limite,50)})</button></td></tr></tfoot>` : "") : `<tbody><tr><td class="vazio">Nenhuma auditoria ${estado.modo==="reprovadas"?"reprovada ":""}com esses filtros</td></tr></tbody>`;
-
-  // perguntas
-  $("#itens").innerHTML = estado.perguntas.map(p => {
-    const vals = linhas.map(r=>r[qcol(p.numero)]).filter(v=>v!=null);
-    const m = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-    const abaixo3 = vals.filter(v=>v<3).length;
-    return `<div class="item">
-      <div class="nome" title="${esc(p.titulo)}"><span class="t"><small>P${p.numero_forms}</small>${esc(p.titulo)}</span>${p.critica?'<span class="crit">CRÍTICA</span>':""}</div>
-      <div class="trilho" data-dica="P${p.numero_forms} · ${esc(p.titulo)}: média ${m==null?"—":m.toFixed(2).replace(".",",")} · ${abaixo3} resposta(s) abaixo de 3"><span style="width:${m==null?0:(m-1)/3*100}%"></span><i style="left:${(3-1)/3*100}%"></i></div>
-      <div class="v">${m==null?"—":m.toFixed(1).replace(".",",")}</div></div>`;
-  }).join("");
+        <td><span class="pto ${r.aprovado?"ok":"bad"}">${r.aprovado?"Aprovada":"Reprovada"}</span>${r.aprovado ? "" : `<span class="motivo">${!r.criterio_pontos_ok && !r.criterio_criticos_ok ? "pontuação e item crítico" : !r.criterio_pontos_ok ? "pontuação < 85%" : "item crítico < 3"}</span>`}</td>
+      </tr>`).join("")}</tbody>` + (tab.length > estado.limite ? `<tfoot><tr><td colspan="8" style="text-align:center"><button class="btn" id="mais">Mostrar mais</button></td></tr></tfoot>` : "") : `<tbody><tr><td class="vazio">Nenhuma auditoria ${estado.modo==="reprovadas"?"reprovada ":""}com esses filtros</td></tr></tbody>`;
 }
 
 function abrirDetalhe(id){
@@ -582,7 +507,7 @@ function abrirDetalhe(id){
     <div class="dlg-cab"><div>
       <h3>${esc(r.equipamento)} ${r.tag?"· "+esc(r.tag):""}</h3>
       <p>${esc(r.planta)} › ${esc(r.area)} · ${esc(r.auditor)} · ${fmtData(r.conclusao)}</p>
-      <p style="margin-top:8px"><span class="pill ${r.aprovado?"ok":"bad"}" style="font-size:12px">${r.aprovado?"✔ Aprovada":"✖ Reprovada — "+esc(r.motivo_reprovacao)}</span>
+      <p style="margin-top:8px"><span class="pill ${r.aprovado?"ok":"bad"}">${r.aprovado?"✔ Aprovada":"✖ Reprovada — "+esc(r.motivo_reprovacao)}</span>
         &nbsp;<b style="color:var(--ink)">${r.pontos}/52</b> (${fmt1(r.percentual)}%)</p>
     </div><button class="btn" id="fechar">Fechar</button></div>
     <div class="dlg-corpo">${estado.perguntas.map(p=>{
@@ -602,6 +527,7 @@ $("#limpar").onclick = () => { for (const k in estado.filtros) estado.filtros[k]
 $("#trilha").addEventListener("click", e => { const d = e.target.dataset.rm; if (d) definirFiltro(d, ""); });
 $("#abas").addEventListener("click", e => { const d = e.target.closest("[data-dim]")?.dataset.dim; if (d) { estado.dim = d; salvarUrl(); render(); } });
 $("#modo-lista").addEventListener("click", e => { const m = e.target.closest("[data-modo]")?.dataset.modo; if (m) { estado.modo = m; estado.limite = 10; render(); } });
+$("#prior-mais").onclick = () => { estado.todasPrior = !estado.todasPrior; render(); };
 $("#progresso").addEventListener("click", e => {
   const b = e.target.closest("[data-grupo]"); if (!b) return;
   estado.filtros[estado.dim] = b.dataset.grupo;
@@ -610,14 +536,14 @@ $("#progresso").addEventListener("click", e => {
 });
 $("#menu").addEventListener("click", e => {
   const ir = e.target.closest("[data-ir]")?.dataset.ir; if (!ir) return;
-  if (DIMS[ir]) { estado.dim = ir; salvarUrl(); render(); $("#sec-progresso").scrollIntoView(); }
-  else if (ir === "painel") { window.scrollTo(0,0); }
-  else $("#sec-"+ir).scrollIntoView();
   document.querySelectorAll("#menu button").forEach(b => b.classList.toggle("ativo", b.dataset.ir === ir));
+  if (DIMS[ir]) { estado.dim = ir; salvarUrl(); render(); $("#sec-progresso").scrollIntoView(); }
+  else if (ir === "painel") window.scrollTo(0,0);
+  else $("#sec-"+ir).scrollIntoView();
 });
 $("#tab-lista").addEventListener("click", e => {
   if (e.target.id === "mais") { estado.limite += 50; render(); return; }
-  const b = e.target.closest("[data-id]"); if (b) abrirDetalhe(b.dataset.id);
+  const tr = e.target.closest("tr[data-id]"); if (tr) abrirDetalhe(tr.dataset.id);
 });
 $("#detalhe").addEventListener("click", e => { if (e.target.id === "detalhe") e.target.close(); });
 
