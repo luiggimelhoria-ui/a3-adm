@@ -216,7 +216,7 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
     <div class="regra">
       <h4>Regra de aprovação</h4>
       <p>Pontuação ≥ <b>85%</b> (45 de 52)</p>
-      <p><b>e</b> P12 e P16 com nota ≥ <b>3</b></p>
+      <p><b>e</b> P13 e P17 com nota ≥ <b>3</b></p>
     </div>
   </aside>
 
@@ -289,16 +289,8 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
 <dialog id="importar">
   <div class="dlg-cab"><div><h3>Atualizar base de auditorias</h3><p>Envie o Excel exportado do Microsoft Forms. Respostas que já existem são atualizadas, não duplicadas.</p></div><button class="btn" id="fechar-imp">Fechar</button></div>
   <div class="imp">
-    <form id="login" style="display:none;flex-direction:column;gap:10px">
-      <span class="passo">1 · Entrar como administrador</span>
-      <label>E-mail<input type="email" id="login-email" autocomplete="username" required></label>
-      <label>Senha<input type="password" id="login-senha" autocomplete="current-password" required></label>
-      <div class="imp-rod"><span id="login-msg" style="font-size:12px;color:var(--bad)"></span><button class="btn btn-prim" type="submit">Entrar</button></div>
-    </form>
-    <div id="logado" style="display:none" class="imp-rod"><span style="font-size:12px;color:var(--muted)">Conectado como <b id="logado-email" style="color:var(--ink)"></b></span><button class="link" id="sair">Sair</button></div>
     <div id="area-arquivo" style="display:flex;flex-direction:column;gap:12px">
-      <span class="passo" id="passo-arquivo">Escolher o arquivo</span>
-      <div class="soltar" id="soltar" tabindex="0">Arraste o Excel aqui ou <b>clique para escolher</b><br><small style="color:var(--muted)">.xlsx exportado do Forms (“Abrir no Excel”)</small></div>
+            <div class="soltar" id="soltar" tabindex="0">Arraste o Excel aqui ou <b>clique para escolher</b><br><small style="color:var(--muted)">.xlsx exportado do Forms (“Abrir no Excel”)</small></div>
       <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" hidden>
       <div id="previa"></div>
       <div class="imp-rod"><span id="imp-status" style="font-size:12px;color:var(--muted)"></span><button class="btn btn-prim" id="enviar" disabled>Enviar para a base</button></div>
@@ -352,7 +344,7 @@ const TITULOS = ["Treinamento da operação","Recursos da estação","Donos do e
 function carregarDemo(){
   const titulos = TITULOS;
   const vies = [0.3,0.2,0.1,-0.4,-0.6,0,-0.7,0.1,-0.2,0.2,-0.1,-0.3,0];   // temas mais fracos que outros
-  const perguntas = titulos.map((t,i)=>({numero:i+1, numero_forms:i+5, titulo:t, critica:i===7||i===11}));
+  const perguntas = titulos.map((t,i)=>({numero:i+1, numero_forms:i+6, titulo:t, critica:i===7||i===11}));
   const mapa = {
     "Campo Grande":{"Extração":["Laminador","Expander","Extrator"],"Preparação":["Quebrador","Condicionador"],"Ensaque":["Ensacadeira 1","Ensacadeira 2"]},
     "Rondonópolis":{"Extração":["Laminador","Extrator"],"Refinaria":["Clarificador","Desodorizador"]},
@@ -490,7 +482,7 @@ function render(){
     <div class="kpi"><div class="l">Nota média</div><div class="v ${fx}">${k.media==null?"—":fmt1(k.media)+"%"} <small>meta 85%</small></div>
       <div class="meta" data-dica="Nota média ${fmt1(k.media)}% · meta 85%"><span style="width:${k.media??0}%;background:var(--${fx||"track"})"></span><i style="left:85%"></i></div></div>
     <div class="kpi"><div class="l">Reprovadas por item crítico</div><div class="v ${k.critico?"bad":""}">${k.critico}</div>
-      <div class="s">P12 ou P16 abaixo de 3 ${t ? seta(t.atual.critico, t.anterior.critico, false) : ""}</div></div>`;
+      <div class="s">P13 ou P17 abaixo de 3 ${t ? seta(t.atual.critico, t.anterior.critico, false) : ""}</div></div>`;
 
   // por dimensão
   document.querySelectorAll("#abas button").forEach(b => b.setAttribute("aria-selected", b.dataset.dim === estado.dim));
@@ -566,9 +558,9 @@ function abrirDetalhe(id){
 // continuam sendo calculadas pelo banco (view auditorias_resultado).
 const chave = t => String(t ?? "").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ").trim().toLowerCase();
 const CAMPOS = {"id":"resposta_id","hora de inicio":"inicio","hora de conclusao":"conclusao","email":"email","nome":"nome",
-  "planta":"planta","area":"area","equipamento":"equipamento","equipamento2":"equipamento","informe a tag do equipamento":"tag","tag":"tag"};
+  "auditor_nome":"auditor_nome","planta":"planta","area":"area","equipamento":"equipamento","equipamento2":"equipamento","informe a tag do equipamento":"tag","tag":"tag"};
 TITULOS.forEach((t,i) => { CAMPOS[chave(t)] = qcol(i+1); CAMPOS[qcol(i+1)] = qcol(i+1); });
-const imp = {token:null, email:null, linhas:[]};
+const imp = {linhas:[]};
 
 const doisDig = n => String(n).padStart(2,"0");
 function dataLocal(v){   // mantém a hora "de parede" do Excel, igual ao script Python
@@ -581,7 +573,8 @@ function dataLocal(v){   // mantém a hora "de parede" do Excel, igual ao script
 function normalizarLinha(resposta){
   const linha = {}, textos = {}, reconhecidas = new Set();
   for (const [titulo, valor] of Object.entries(resposta)) {
-    const campo = CAMPOS[chave(titulo)];
+    // qualquer coluna com "auditor" no título (ex.: "Nome do auditor") vira o nome do auditor
+    const campo = CAMPOS[chave(titulo)] ?? (chave(titulo).includes("auditor") ? "auditor_nome" : null);
     if (!campo) continue;
     reconhecidas.add(campo);
     if (campo.startsWith("q")) {
@@ -644,36 +637,9 @@ async function prepararArquivo(arquivo){
 
 function atualizarBotaoEnviar(){
   const demo = modoDemo();
-  $("#enviar").disabled = !imp.linhas.length || !imp.token || demo;
-  $("#imp-status").textContent = demo ? "Pré-visualização: o Supabase ainda não foi configurado (config.js)." : !imp.token ? "Entre como administrador para enviar." : "";
+  $("#enviar").disabled = !imp.linhas.length || demo;
+  $("#imp-status").textContent = demo ? "Pré-visualização: o Supabase ainda não foi configurado (config.js)." : "";
 }
-
-function mostrarLogin(){
-  const demo = modoDemo();
-  $("#login").style.display = !demo && !imp.token ? "flex" : "none";
-  $("#logado").style.display = imp.token ? "flex" : "none";
-  $("#logado-email").textContent = imp.email || "";
-  $("#passo-arquivo").textContent = !demo ? "2 · Escolher o arquivo" : "Escolher o arquivo";
-  atualizarBotaoEnviar();
-}
-
-function restaurarSessao(){
-  try {
-    const s = JSON.parse(sessionStorage.getItem("auditoria-sessao") || "null");
-    if (s && s.expira > Date.now()) { imp.token = s.token; imp.email = s.email; }
-  } catch {}
-}
-
-async function entrar(email, senha){
-  const r = await fetch(CFG.SUPABASE_URL.replace(/\/$/,"") + "/auth/v1/token?grant_type=password", {
-    method:"POST", headers:{apikey:CFG.SUPABASE_ANON_KEY, "Content-Type":"application/json"}, body: JSON.stringify({email, password:senha})});
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.error_description || j.msg || "e-mail ou senha incorretos");
-  imp.token = j.access_token; imp.email = j.user?.email || email;
-  try { sessionStorage.setItem("auditoria-sessao", JSON.stringify({token:imp.token, email:imp.email, expira: Date.now() + (j.expires_in||3600)*1000 - 60000})); } catch {}
-}
-
-function sair(){ imp.token = imp.email = null; try { sessionStorage.removeItem("auditoria-sessao"); } catch {} mostrarLogin(); }
 
 async function enviarBase(){
   const url = CFG.SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/auditorias?on_conflict=resposta_id";
@@ -681,10 +647,8 @@ async function enviarBase(){
   try {
     for (let i = 0; i < imp.linhas.length; i += 500) {
       $("#imp-status").textContent = `Enviando ${Math.min(i+500, imp.linhas.length)} de ${imp.linhas.length}…`;
-      const r = await fetch(url, {method:"POST", headers:{apikey:CFG.SUPABASE_ANON_KEY, Authorization:"Bearer "+imp.token,
+      const r = await fetch(url, {method:"POST", headers:{apikey:CFG.SUPABASE_ANON_KEY,
         "Content-Type":"application/json", Prefer:"resolution=merge-duplicates,return=minimal"}, body: JSON.stringify(imp.linhas.slice(i, i+500))});
-      if (r.status === 401) { sair(); throw new Error("sua sessão expirou, entre de novo"); }
-      if (r.status === 403 || /row-level security/.test(await r.clone().text())) throw new Error("seu e-mail não está na lista de administradores do painel");
       if (!r.ok) throw new Error(`o Supabase respondeu ${r.status}: ${await r.text()}`);
     }
     const total = imp.linhas.length;
@@ -698,15 +662,9 @@ async function enviarBase(){
   }
 }
 
-$("#abrir-importar").onclick = () => { mostrarLogin(); $("#importar").showModal(); };
+$("#abrir-importar").onclick = () => { atualizarBotaoEnviar(); $("#importar").showModal(); };
 $("#fechar-imp").onclick = () => $("#importar").close();
 $("#importar").addEventListener("click", e => { if (e.target.id === "importar") e.target.close(); });
-$("#login").addEventListener("submit", async e => {
-  e.preventDefault(); $("#login-msg").textContent = "";
-  try { await entrar($("#login-email").value.trim(), $("#login-senha").value); $("#login-senha").value = ""; mostrarLogin(); }
-  catch (err) { $("#login-msg").textContent = err.message; }
-});
-$("#sair").onclick = sair;
 const soltar = $("#soltar");
 soltar.onclick = () => $("#arquivo").click();
 soltar.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#arquivo").click(); } };
@@ -757,7 +715,6 @@ document.addEventListener("mousemove", e => {
   $("#hoje").textContent = new Date().toLocaleDateString("pt-BR",{weekday:"long", day:"numeric", month:"long", year:"numeric"});
   lerUrl(); $("#f-de").value = estado.filtros.de; $("#f-ate").value = estado.filtros.ate;
   const demo = modoDemo();
-  restaurarSessao();
   const fonte = $("#fonte");
   try {
     Object.assign(estado, demo ? carregarDemo() : await carregarSupabase());

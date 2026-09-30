@@ -25,6 +25,7 @@ CAMPOS = {
     "hora de conclusao": "conclusao",
     "email": "email",
     "nome": "nome",
+    "auditor_nome": "auditor_nome",
     "planta": "planta",
     "area": "area",
     "equipamento": "equipamento",
@@ -83,6 +84,8 @@ def normalizar(resposta):
     linha, textos = {}, {}
     for titulo, valor in resposta.items():
         campo = CAMPOS.get(chave(titulo))
+        if not campo and "auditor" in chave(titulo):
+            campo = "auditor_nome"  # ex.: "Nome do auditor"
         if not campo:
             continue
         if campo.startswith("q"):
