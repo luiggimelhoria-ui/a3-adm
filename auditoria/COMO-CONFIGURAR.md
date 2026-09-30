@@ -11,7 +11,8 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 
 | Arquivo | Para que serve |
 |---|---|
-| `supabase/migrations/20260930120000_auditoria_dec.sql` | Tabelas, segurança e **regra de aprovação** (view `auditorias_resultado`) |
+| `supabase/migrations/20260930174847_auditoria_dec.sql` | Tabelas, segurança e **regra de aprovação** (view `auditorias_resultado`) |
+| `supabase/migrations/20260930174913_eh_admin_privado.sql` | Tira a checagem de administrador da API pública (recomendação do Security Advisor) |
 | `supabase/config.toml` | Configuração mínima para a integração Supabase ↔ GitHub |
 | `.github/workflows/ingerir-auditoria.yml` | Recebe a issue do Power Automate e grava no Supabase |
 | `scripts/auditoria.py` | Converte a resposta do Forms e grava; também importa o Excel |
