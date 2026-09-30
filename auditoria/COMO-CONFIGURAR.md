@@ -167,8 +167,9 @@ estiver vazio, o painel mostra dados de demonstração.
   para o melhor. Clicar numa planta abre as áreas; numa área, os equipamentos.
 - **Temas prioritários**: radar com a nota média de cada pergunta (0 no centro,
   4 na borda, então a distância é proporcional à nota; pontos vermelhos = média abaixo de 3) e, com filtro ativo, a média geral
-  para comparar. Ao lado, "Onde agir primeiro": só as perguntas com média abaixo de 3
-  (nota 3 já passa), críticas primeiro; a marca nas barras é a nota 3.
+  para comparar. Ao lado, "Onde agir primeiro": só as **críticas** com média abaixo de 3
+  (nota 3 já passa). As demais (não críticas e críticas com 3 ou mais) ficam em
+  "Demais perguntas", da menor para a maior média; a marca nas barras é a nota 3.
 - **Auditorias**: reprovadas ou todas; clicar numa linha abre as 13 respostas.
 - Logos ADM e Performance Excellence em `auditoria/img/`.
 
