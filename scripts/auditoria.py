@@ -39,13 +39,10 @@ PERGUNTAS = [
     "Donos do equipamento",
     "Mapa de contaminação",
     "Tratamento das fontes de contaminação",
-    "Grande Limpeza e restauração",
-    "Evidências Antes x Depois",
+    "Grande Limpeza e restauração com registros antes e depois",
     "Abertura de etiquetas no MAXIMO",
     "Monitoramento de etiquetas abertas x fechadas",
-    "Checklist de Limpeza",
-    "Checklist de Inspeção",
-    "Limpeza como momento de inspeção",
+    "Checklist de Limpeza e Inspeção",
     "Checklist de Lubrificação",
 ]
 
@@ -131,7 +128,7 @@ def resumo(resposta_id):
     """Markdown com o resultado calculado pelo banco (usado no comentário da issue)."""
     [r] = supabase(
         "GET",
-        "auditorias_resultado?select=planta,area,equipamento,tag,auditor,pontos,"
+        "auditorias_resultado?select=planta,area,equipamento,tag,auditor,pontos,pontos_max,"
         "percentual,aprovado,motivo_reprovacao&resposta_id=eq."
         + urllib.parse.quote(resposta_id),
     )
@@ -141,7 +138,7 @@ def resumo(resposta_id):
         f"| Planta | Área | Equipamento | Tag | Auditor | Pontos | % |\n"
         f"|---|---|---|---|---|---|---|\n"
         f"| {r['planta']} | {r['area']} | {r['equipamento']} | {r['tag'] or '—'} "
-        f"| {r['auditor']} | {r['pontos']}/52 | {r['percentual']}% |\n"
+        f"| {r['auditor']} | {r['pontos']}/{r['pontos_max']} | {r['percentual']}% |\n"
     )
 
 

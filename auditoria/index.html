@@ -226,7 +226,7 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
     </nav>
     <div class="regra">
       <h4>Regra de aprovação</h4>
-      <p>Pontuação ≥ <b>85%</b> (45 de 52)</p>
+      <p>Pontuação ≥ <b>85%</b> (<span id="regra-pontos">34 de 40</span>)</p>
       <p><b>e</b> <span id="regra-criticas">perguntas críticas</span> com nota ≥ <b>3</b></p>
     </div>
   </aside>
@@ -363,12 +363,12 @@ async function carregarSupabase(){
 
 // Dados fictícios só para visualizar o painel antes de ligar o Supabase.
 // A regra oficial de aprovação está no banco (supabase/migrations/20260930174847_auditoria_dec.sql).
-const TITULOS = ["Treinamento da operação","Recursos da estação","Donos do equipamento","Mapa de contaminação","Tratamento das fontes de contaminação","Grande Limpeza e restauração","Evidências Antes x Depois","Abertura de etiquetas no MAXIMO","Monitoramento de etiquetas abertas x fechadas","Checklist de Limpeza","Checklist de Inspeção","Limpeza como momento de inspeção","Checklist de Lubrificação"];
+const TITULOS = ["Treinamento da operação","Recursos da estação","Donos do equipamento","Mapa de contaminação","Tratamento das fontes de contaminação","Grande Limpeza e restauração com registros antes e depois","Abertura de etiquetas no MAXIMO","Monitoramento de etiquetas abertas x fechadas","Checklist de Limpeza e Inspeção","Checklist de Lubrificação"];
 
 function carregarDemo(){
   const titulos = TITULOS;
-  const vies = [0.3,0.2,0.1,-0.4,-0.6,0,-0.7,0.1,-0.2,0.2,-0.1,-0.3,0];   // temas mais fracos que outros
-  const perguntas = titulos.map((t,i)=>({numero:i+1, numero_forms:i+6, titulo:t, critica:i>=7&&i<=10}));
+  const vies = [0.3,0.2,0.1,-0.4,-0.6,-0.3,0.1,-0.2,0,0];   // temas mais fracos que outros
+  const perguntas = titulos.map((t,i)=>({numero:i+1, numero_forms:i+6, titulo:t, critica:i>=6&&i<=8}));
   const mapa = {
     "Campo Grande":{"Extração":["Laminador","Expander","Extrator"],"Preparação":["Quebrador","Condicionador"],"Ensaque":["Ensacadeira 1","Ensacadeira 2"]},
     "Rondonópolis":{"Extração":["Laminador","Extrator"],"Refinaria":["Clarificador","Desodorizador"]},
@@ -383,8 +383,9 @@ function carregarDemo(){
       r.conclusao = new Date(2026, 3 + k, 1 + Math.floor(rnd()*27), 8 + Math.floor(rnd()*9)).toISOString();
       let pts = 0;
       titulos.forEach((_,i)=>{ const n = Math.max(1, Math.min(4, Math.round(nivel + vies[i] + k*0.1 + (rnd()-.5)*1.4))); r[qcol(i+1)] = n; pts += n; });
-      r.pontos = pts; r.pontos_max = 52; r.percentual = Math.round(pts*1000/52)/10;
-      r.criterio_pontos_ok = pts*100 >= 85*52; r.criterio_criticos_ok = perguntas.filter(p=>p.critica).every(p => r[qcol(p.numero)] >= 3);
+      const max = titulos.length*4;
+      r.pontos = pts; r.pontos_max = max; r.percentual = Math.round(pts*1000/max)/10;
+      r.criterio_pontos_ok = pts*100 >= 85*max; r.criterio_criticos_ok = perguntas.filter(p=>p.critica).every(p => r[qcol(p.numero)] >= 3);
       r.aprovado = r.criterio_pontos_ok && r.criterio_criticos_ok;
       r.motivo_reprovacao = r.aprovado ? null : !r.criterio_pontos_ok && !r.criterio_criticos_ok ? "Pontuação abaixo de 85% e item crítico abaixo de 3" : !r.criterio_pontos_ok ? "Pontuação abaixo de 85%" : "Item crítico abaixo de 3";
       dados.push(r);
@@ -551,6 +552,8 @@ function render(){
 
   // textos da regra (as críticas vêm da tabela perguntas)
   $("#regra-criticas").textContent = listaP(estado.perguntas.filter(p=>p.critica));
+  const maxPts = estado.perguntas.length * 4;
+  $("#regra-pontos").textContent = `${Math.ceil(maxPts * 0.85)} de ${maxPts}`;
 
   // tabela
   document.querySelectorAll("#modo-lista button").forEach(b => b.setAttribute("aria-selected", b.dataset.modo === estado.modo));
@@ -561,7 +564,7 @@ function render(){
     <tbody>${tab.slice(0,estado.limite).map(r=>`
       <tr data-id="${r.id}">
         <td>${fmtData(r.conclusao)}</td><td>${esc(r.planta)}</td><td>${esc(r.area)}</td><td><b>${esc(r.equipamento)}</b></td><td>${esc(r.tag||"—")}</td><td>${esc(r.auditor)}</td>
-        <td class="num" data-dica="${r.pontos} de 52 pontos">${fmt1(r.percentual)}%</td>
+        <td class="num" data-dica="${r.pontos} de ${r.pontos_max} pontos">${fmt1(r.percentual)}%</td>
         <td><span class="pto ${r.aprovado?"ok":"bad"}">${r.aprovado?"Aprovada":"Reprovada"}</span>${r.aprovado ? "" : `<span class="motivo">${!r.criterio_pontos_ok && !r.criterio_criticos_ok ? "pontuação e item crítico" : !r.criterio_pontos_ok ? "pontuação < 85%" : "item crítico < 3"}</span>`}</td>
       </tr>`).join("")}</tbody>` + (tab.length > estado.limite ? `<tfoot><tr><td colspan="8" style="text-align:center"><button class="btn" id="mais">Mostrar mais</button></td></tr></tfoot>` : "") : `<tbody><tr><td class="vazio">Nenhuma auditoria ${estado.modo==="reprovadas"?"reprovada ":""}com esses filtros</td></tr></tbody>`;
 }
@@ -574,7 +577,7 @@ function abrirDetalhe(id){
       <h3>${esc(r.equipamento)} ${r.tag?"· "+esc(r.tag):""}</h3>
       <p>${esc(r.planta)} › ${esc(r.area)} · ${esc(r.auditor)} · ${fmtData(r.conclusao)}</p>
       <p style="margin-top:8px"><span class="pill ${r.aprovado?"ok":"bad"}">${r.aprovado?"✔ Aprovada":"✖ Reprovada — "+esc(r.motivo_reprovacao)}</span>
-        &nbsp;<b style="color:var(--ink)">${r.pontos}/52</b> (${fmt1(r.percentual)}%)</p>
+        &nbsp;<b style="color:var(--ink)">${r.pontos}/${r.pontos_max}</b> (${fmt1(r.percentual)}%)</p>
     </div><button class="btn" id="fechar">Fechar</button></div>
     <div class="dlg-corpo">${estado.perguntas.map(p=>{
       const n = r[qcol(p.numero)], txt = (r.respostas_texto||{})[qcol(p.numero)] || "";
