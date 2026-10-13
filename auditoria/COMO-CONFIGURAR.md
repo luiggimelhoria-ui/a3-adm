@@ -17,6 +17,7 @@ Forms ──▶ Power Automate ──▶ issue ──▶ GitHub Action ──▶
 | `supabase/migrations/20260930190239_criticas_configuraveis.sql` | Críticas P13–P16; a regra passa a ler as críticas da tabela `perguntas` |
 | `supabase/migrations/20260930210558_substituir_e_limpar_base.sql` | Substituir toda a base / apagar tudo, com cópia de segurança em `auditorias_backup` |
 | `supabase/migrations/20260930211306_modelo_10_itens.sql` | Modelo de 10 perguntas / 40 pontos; regra genérica a partir da tabela `perguntas` |
+| `supabase/migrations/20261013125809_titulo_recursos_estacao.sql` | Título da pergunta 2 igual ao do Forms ("Recursos da estação de trabalho") |
 | `supabase/config.toml` | Configuração mínima para a integração Supabase ↔ GitHub |
 | `.github/workflows/ingerir-auditoria.yml` | Recebe a issue do Power Automate e grava no Supabase |
 | `scripts/auditoria.py` | Converte a resposta do Forms e grava; também importa o Excel |
@@ -103,6 +104,12 @@ backup, peça pelo SQL Editor / Claude.
 
 Com o botão, o Power Automate (passo 5) passa a ser opcional: use-o só se quiser
 que cada resposta entre sozinha, sem exportar o Excel.
+
+> **Se mudar o título de uma pergunta no Forms:** a importação reconhece a coluna
+> quando o título novo começa com o antigo (ou vice-versa), ex.: "Recursos da estação"
+> → "Recursos da estação de trabalho". Se o título mudar mais que isso, a prévia avisa
+> "Colunas não encontradas" e o envio pede confirmação — nesse caso, peça o ajuste do
+> nome da pergunta antes de enviar, senão a nota fica em branco e conta 0 ponto.
 
 ## 4. Microsoft Forms
 

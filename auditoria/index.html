@@ -363,7 +363,7 @@ async function carregarSupabase(){
 
 // Dados fictícios só para visualizar o painel antes de ligar o Supabase.
 // A regra oficial de aprovação está no banco (supabase/migrations/20260930174847_auditoria_dec.sql).
-const TITULOS = ["Treinamento da operação","Recursos da estação","Donos do equipamento","Mapa de contaminação","Tratamento das fontes de contaminação","Grande Limpeza e restauração com registros antes e depois","Abertura de etiquetas no MAXIMO","Monitoramento de etiquetas abertas x fechadas","Checklist de Limpeza e Inspeção","Checklist de Lubrificação"];
+const TITULOS = ["Treinamento da operação","Recursos da estação de trabalho","Donos do equipamento","Mapa de contaminação","Tratamento das fontes de contaminação","Grande Limpeza e restauração com registros antes e depois","Abertura de etiquetas no MAXIMO","Monitoramento de etiquetas abertas x fechadas","Checklist de Limpeza e Inspeção","Checklist de Lubrificação"];
 
 function carregarDemo(){
   const titulos = TITULOS;
@@ -595,7 +595,22 @@ const chave = t => String(t ?? "").normalize("NFD").replace(/[̀-ͯ]/g,"").repla
 const CAMPOS = {"id":"resposta_id","hora de inicio":"inicio","hora de conclusao":"conclusao","email":"email","nome":"nome",
   "auditor_nome":"auditor_nome","planta":"planta","area":"area","equipamento":"equipamento","equipamento2":"equipamento","informe a tag do equipamento":"tag","tag":"tag"};
 TITULOS.forEach((t,i) => { CAMPOS[chave(t)] = qcol(i+1); CAMPOS[qcol(i+1)] = qcol(i+1); });
-const imp = {linhas:[]};
+const imp = {linhas:[], faltam:[]};
+
+// Reconhece a coluna mesmo se o título mudar um pouco no Forms: primeiro o título
+// exato; depois, uma pergunta cujo título começa a coluna (ou vice-versa), ex.:
+// "Recursos da estação de trabalho" → "Recursos da estação".
+function campoDaColuna(titulo){
+  const k = chave(titulo);
+  if (CAMPOS[k]) return CAMPOS[k];
+  let melhor = null, tam = 0;
+  TITULOS.forEach((t,i) => {
+    const tk = chave(t);
+    if (Math.min(k.length, tk.length) >= 10 && (k.startsWith(tk) || tk.startsWith(k)) && tk.length > tam) { melhor = qcol(i+1); tam = tk.length; }
+  });
+  if (melhor) return melhor;
+  return k.includes("auditor") ? "auditor_nome" : null;
+}
 
 const doisDig = n => String(n).padStart(2,"0");
 function dataLocal(v){   // mantém a hora "de parede" do Excel, igual ao script Python
@@ -609,7 +624,7 @@ function normalizarLinha(resposta){
   const linha = {}, textos = {}, reconhecidas = new Set();
   for (const [titulo, valor] of Object.entries(resposta)) {
     // qualquer coluna com "auditor" no título (ex.: "Nome do auditor") vira o nome do auditor
-    const campo = CAMPOS[chave(titulo)] ?? (chave(titulo).includes("auditor") ? "auditor_nome" : null);
+    const campo = campoDaColuna(titulo);
     if (!campo) continue;
     reconhecidas.add(campo);
     if (campo.startsWith("q")) {
@@ -655,6 +670,7 @@ async function prepararArquivo(arquivo){
   });
   imp.linhas = [...vistas.values()];
   const faltam = TITULOS.map((t,i)=>colunas.has(qcol(i+1)) ? null : t).filter(Boolean);
+  imp.faltam = imp.linhas.length ? faltam : [];
   const existentes = new Set(estado.dados.map(r => String(r.resposta_id)));
   const novas = imp.linhas.filter(l => !existentes.has(String(l.resposta_id))).length;
 
@@ -665,7 +681,7 @@ async function prepararArquivo(arquivo){
       <div><b style="color:${erros.length?"var(--bad)":"inherit"}">${erros.length}</b><span>com erro (serão ignoradas)</span></div>
     </div>
     <div id="aviso-substituir"></div>
-    ${faltam.length && imp.linhas.length ? `<div class="msg warn">Colunas não encontradas no arquivo: ${faltam.map(esc).join(", ")}. Essas notas ficarão em branco e contam 0 ponto.</div>` : ""}
+    ${faltam.length && imp.linhas.length ? `<div class="msg warn">Colunas não encontradas no arquivo: ${faltam.map(esc).join(", ")}. Essas notas ficarão em branco e contam 0 ponto. Confira se o título da pergunta mudou no Forms.</div>` : ""}
     ${erros.length ? `<div class="erros-imp">${erros.slice(0,50).map(e=>`<span>${esc(e)}</span>`).join("")}${erros.length>50?`<span>… e mais ${erros.length-50}</span>`:""}</div>` : ""}
     ${!imp.linhas.length ? `<div class="msg bad">Nenhuma resposta válida encontrada. Confira se é o Excel exportado do Forms.</div>` : ""}`;
   atualizarBotaoEnviar();
@@ -693,6 +709,7 @@ async function substituirBase(linhas){   // lista vazia = apagar tudo
 
 async function enviarBase(){
   const subst = modoImp() === "substituir", total = imp.linhas.length;
+  if (imp.faltam.length && !confirm(`Atenção: o arquivo não tem a(s) pergunta(s):\n\n• ${imp.faltam.join("\n• ")}\n\nElas ficarão em branco e contam 0 ponto. Enviar mesmo assim?`)) return;
   if (subst && !confirm(`Substituir toda a base?\n\nAs ${estado.dados.length} auditoria(s) atuais serão removidas (com cópia de segurança) e ficarão só as ${total} deste arquivo.`)) return;
   const btn = $("#enviar"); btn.disabled = true;
   try {
