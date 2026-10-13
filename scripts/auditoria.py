@@ -35,7 +35,7 @@ CAMPOS = {
 }
 PERGUNTAS = [
     "Treinamento da operação",
-    "Recursos da estação",
+    "Recursos da estação de trabalho",
     "Donos do equipamento",
     "Mapa de contaminação",
     "Tratamento das fontes de contaminação",
@@ -56,6 +56,23 @@ def chave(texto):
 for _i, _titulo in enumerate(PERGUNTAS, 1):
     CAMPOS[chave(_titulo)] = f"q{_i:02d}"
     CAMPOS[f"q{_i:02d}"] = f"q{_i:02d}"
+
+
+def campo_da_coluna(titulo):
+    """Título da coluna -> campo. Aceita pequenas mudanças no Forms: uma pergunta
+    cujo título começa a coluna (ou vice-versa), ex.: "Recursos da estação de
+    trabalho" -> "Recursos da estação"."""
+    k = chave(titulo)
+    if k in CAMPOS:
+        return CAMPOS[k]
+    candidatos = [
+        (len(chave(t)), f"q{i:02d}")
+        for i, t in enumerate(PERGUNTAS, 1)
+        if min(len(k), len(chave(t))) >= 10 and (k.startswith(chave(t)) or chave(t).startswith(k))
+    ]
+    if candidatos:
+        return max(candidatos)[1]
+    return "auditor_nome" if "auditor" in k else None  # ex.: "Nome do auditor"
 
 
 def nota(valor):
@@ -80,9 +97,7 @@ def normalizar(resposta):
     """Dicionário com títulos do Forms (ou chaves do banco) -> linha da tabela."""
     linha, textos = {}, {}
     for titulo, valor in resposta.items():
-        campo = CAMPOS.get(chave(titulo))
-        if not campo and "auditor" in chave(titulo):
-            campo = "auditor_nome"  # ex.: "Nome do auditor"
+        campo = campo_da_coluna(titulo)
         if not campo:
             continue
         if campo.startswith("q"):
