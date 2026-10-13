@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Falha Zero — 5 Porquês</title>
+<!-- Caminhos absolutos: a página abre tanto em /cinco-porques quanto em /cinco-porques/ -->
+<link rel="icon" href="/cinco-porques/img/adm.png">
+<style>
+:root{
+  --bg:#f5f6f9;--surface:#fff;--surface-2:#f7f8fb;--ink:#1d2433;--ink-2:#4b5568;--muted:#8a93a6;--line:#e7eaf0;
+  --navy:#212c65;--green:#85c440;--on-navy:#fff;
+  --bar:#3a63d6;--bar-soft:#c9d4f2;--track:#e9ebf0;--ref:#9aa3b5;
+  --ok:#139f5b;--ok-bg:#e4f6ec;--warn:#d98a06;--warn-bg:#fdf1dc;--bad:#d9362b;--bad-bg:#fde7e5;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1320;--surface:#161d2e;--surface-2:#1b2337;--ink:#e8ecf5;--ink-2:#b3bdd1;--muted:#7d889e;--line:#273047;
+  --navy:#8fa0e8;--on-navy:#0e1320;--bar:#6d92f0;--bar-soft:#2c3c63;--track:#27304a;--ref:#6b7690;
+  --ok:#43c686;--ok-bg:#12301f;--warn:#f0a93a;--warn-bg:#3a2a0e;--bad:#f07167;--bad-bg:#3a1917;
+}}
+:root[data-theme="dark"]{
+  --bg:#0e1320;--surface:#161d2e;--surface-2:#1b2337;--ink:#e8ecf5;--ink-2:#b3bdd1;--muted:#7d889e;--line:#273047;
+  --navy:#8fa0e8;--on-navy:#0e1320;--bar:#6d92f0;--bar-soft:#2c3c63;--track:#27304a;--ref:#6b7690;
+  --ok:#43c686;--ok-bg:#12301f;--warn:#f0a93a;--warn-bg:#3a2a0e;--bad:#f07167;--bad-bg:#3a1917;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.4}
+button{font:inherit;cursor:pointer;color:inherit}
+.app{display:flex;min-height:100vh}
+
+/* ---------- menu lateral ---------- */
+.lateral{width:200px;flex:none;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;padding:20px 12px}
+.placa-logo{background:#fff;border-radius:10px;padding:8px;display:flex;justify-content:center}
+.placa-logo img{display:block;height:auto}
+.lateral .placa-logo img{width:72px}
+.menu{display:flex;flex-direction:column;gap:2px}
+.menu button{display:flex;align-items:center;gap:10px;border:none;background:none;border-radius:8px;padding:9px 12px;font-size:13px;color:var(--ink-2);text-align:left}
+.menu button:hover{background:var(--surface-2);color:var(--ink)}
+.menu button.ativo{background:var(--navy);color:var(--on-navy);font-weight:600}
+.menu svg{width:16px;height:16px;flex:none}
+.regra{margin-top:auto;border-top:1px solid var(--line);padding:14px 6px 0;font-size:12px;color:var(--ink-2)}
+.regra h4{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+.regra ol{padding-left:16px;display:flex;flex-direction:column;gap:5px}
+.regra b{color:var(--ink)}
+
+/* ---------- topo ---------- */
+.conteudo{flex:1;min-width:0}
+.topo{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 28px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.topo h1{font-size:18px;font-weight:700}
+.topo p{font-size:12px;color:var(--muted);margin-top:2px}
+.topo-dir{display:flex;align-items:center;gap:14px}
+.topo .placa-logo{padding:4px 8px}
+.topo .placa-logo img{height:40px;width:auto}
+.fonte{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--ok-bg);color:var(--ok);white-space:nowrap}
+.fonte.demo{background:var(--warn-bg);color:var(--warn)}
+.fonte.erro{background:var(--bad-bg);color:var(--bad)}
+main{padding:18px 28px 40px;display:flex;flex-direction:column;gap:16px;max-width:1400px}
+
+/* ---------- filtros ---------- */
+.filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filtros select,.filtros input{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;height:34px}
+.filtros select{min-width:140px}
+.filtros .periodo{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.link{border:none;background:none;color:var(--bar);font-size:13px;font-weight:600;padding:6px 4px}
+.trilha{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.trilha:empty{display:none}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:2px 4px 2px 10px;color:var(--ink-2)}
+.chip b{color:var(--ink)}
+.chip button{border:none;background:none;color:var(--muted);font-size:15px;line-height:1;padding:0 5px}
+.btn{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--surface)}
+.btn:hover{border-color:var(--muted)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- indicadores ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:left}
+button.kpi:hover{border-color:var(--bar)}
+.kpi .l{font-size:12px;color:var(--muted);font-weight:600}
+.kpi .v{font-size:28px;font-weight:800;line-height:1.15;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:13px;font-weight:600;color:var(--muted)}
+.kpi .s{font-size:12px;color:var(--ink-2);margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.kpi .v.ok{color:var(--ok)}.kpi .v.warn{color:var(--warn)}.kpi .v.bad{color:var(--bad)}
+.meta{position:relative;height:6px;background:var(--track);border-radius:3px;margin-top:10px}
+.meta span{position:absolute;inset:0 auto 0 0;border-radius:3px}
+.seta{font-weight:700}.seta.bom{color:var(--ok)}.seta.ruim{color:var(--bad)}
+
+/* ---------- cartões ---------- */
+.card{background:var(--surface);border-radius:12px;border:1px solid var(--line);padding:16px 18px;min-width:0}
+.card h2{font-size:15px;font-weight:700}
+.card .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.card-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.abas{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px;flex-wrap:wrap}
+.abas button{border:none;background:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted)}
+.abas button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(20,30,60,.08)}
+.grade2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
+
+/* pauta da reunião */
+.pauta{display:flex;flex-direction:column}
+.pauta-item{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
+.pauta-item:last-child{border-bottom:none}
+.pauta-item:hover{background:var(--surface-2)}
+.pauta-item .d{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pauta-item .t b{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pauta-item .t span{display:block;font-size:12px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pauta-item .t span.tag,.tag{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px;white-space:nowrap}
+.tag.rei{color:var(--bad);border:1px solid currentColor}
+.tag.atr{background:var(--bad-bg);color:var(--bad)}
+
+/* barras horizontais (KPIs impactados) */
+.hbar{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 34px;gap:10px;align-items:center;padding:7px 0;font-size:12px;border-bottom:1px solid var(--line);cursor:pointer}
+.hbar:last-child{border-bottom:none}
+.hbar .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.hbar .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.pilha{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--track)}
+.pilha span{height:100%}
+.legenda{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:10px}
+.legenda span{display:inline-flex;align-items:center;gap:6px}
+.legenda i{display:inline-block;width:12px;height:12px;border-radius:3px}
+.legenda i.linha{height:0;width:16px;border-top:2px solid;border-radius:0}
+
+/* pareto */
+.pareto svg{width:100%;height:auto;display:block;overflow:visible}
+.pareto .rot{font-size:11px;fill:var(--ink-2)}
+.pareto .eixo{font-size:10px;fill:var(--muted)}
+.pareto .barra{cursor:pointer}
+.pareto .barra:hover rect{opacity:.8}
+
+/* progresso por grupo */
+.progresso{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+.grupo{flex:0 0 210px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface);text-align:left}
+.grupo:hover{border-color:var(--bar)}
+.grupo .l1{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.grupo .nome{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grupo .pct{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+.grupo .pct.ok{color:var(--ok)}.grupo .pct.warn{color:var(--warn)}.grupo .pct.bad{color:var(--bad)}
+.grupo .meta span.ok{background:var(--ok)}.grupo .meta span.warn{background:var(--warn)}.grupo .meta span.bad{background:var(--bad)}
+.grupo .l3{font-size:11px;color:var(--muted);margin-top:8px}
+
+/* tabela */
+.tabela-rolagem{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-size:11px;color:var(--muted);font-weight:600;text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 8px;border-bottom:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+td b{color:var(--ink);font-weight:600}
+td.corte{max-width:240px;overflow:hidden;text-overflow:ellipsis}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+.pto{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.pto::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.st-nova{color:var(--bar)}.st-analise{color:var(--warn)}.st-andamento{color:var(--warn)}.st-concluida{color:var(--ok)}
+.cond-fora{color:var(--bad);font-weight:600}.cond-ok{color:var(--ok)}
+.vazio{padding:28px;text-align:center;color:var(--muted)}
+
+/* detalhe + dica */
+#dica{position:fixed;pointer-events:none;background:#1b2250;color:#fff;font-size:12px;padding:6px 10px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.2);display:none;z-index:200;max-width:320px}
+dialog{margin:auto;border:none;border-radius:14px;padding:0;max-width:820px;width:calc(100% - 32px);background:var(--surface);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(10,14,35,.55)}
+.dlg-cab{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.dlg-cab h3{font-size:16px}
+.dlg-cab p{font-size:12px;color:var(--muted);margin-top:3px}
+.dlg-nav{display:flex;gap:6px;align-items:center;flex:none}
+.dlg-nav small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-right:4px}
+.dlg-corpo{padding:14px 22px 22px;max-height:72vh;overflow:auto;display:flex;flex-direction:column;gap:16px}
+.bloco h4{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.bloco p{font-size:13px}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cadeia{display:flex;flex-direction:column}
+.porque{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:6px 0;position:relative}
+.porque .n{width:26px;height:26px;border-radius:50%;background:var(--navy);color:var(--on-navy);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;z-index:1}
+.porque:not(:last-child)::before{content:"";position:absolute;left:12px;top:30px;bottom:-6px;width:2px;background:var(--line)}
+.porque.vazio-p .n{background:var(--track);color:var(--muted)}
+.porque.vazio-p .t{color:var(--muted);font-style:italic}
+.porque .t{font-size:13px;padding-top:4px}
+.porque .t small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.causa-box{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--bad);border-radius:8px;padding:10px 12px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.pill{font-size:12px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap;background:var(--bad-bg);color:var(--bad)}
+.clareza{display:inline-flex;gap:3px;vertical-align:middle;margin-left:6px}
+.clareza i{width:10px;height:10px;border-radius:50%;background:var(--track)}
+.clareza i.on{background:var(--bar)}
+.avaliacao{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface-2)}
+.avaliacao h4{font-size:13px;text-transform:none;letter-spacing:0;color:var(--ink);margin-bottom:10px}
+.form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--ink-2)}
+.form .larga{grid-column:1/-1}
+.form input,.form select,.form textarea{font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:100%}
+.form textarea{min-height:56px;resize:vertical}
+.form-rod{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.btn-prim{background:var(--navy);color:var(--on-navy);border-color:var(--navy);display:inline-flex;align-items:center;gap:6px}
+.btn-prim:hover{opacity:.9}
+.imp{padding:18px 22px 22px;display:flex;flex-direction:column;gap:14px;font-size:13px}
+.soltar{border:2px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--ink-2);cursor:pointer}
+.soltar:hover,.soltar.sobre{border-color:var(--bar);background:var(--surface-2)}
+.soltar b{color:var(--bar)}
+.modo-imp{display:flex;flex-direction:column;gap:6px}
+.modo-imp label{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;color:var(--ink)}
+.modo-imp label:has(input:checked){border-color:var(--bar);background:var(--surface-2)}
+.modo-imp input{margin-top:3px}
+.modo-imp small{display:block;color:var(--muted);font-size:12px}
+.perigo{border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.perigo small{display:block;color:var(--muted);font-size:12px}
+.btn-perigo{color:var(--bad);border-color:var(--bad);background:var(--surface)}
+.btn-perigo:hover{background:var(--bad-bg)}
+.resumo-imp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.resumo-imp div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.resumo-imp b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.resumo-imp span{font-size:12px;color:var(--muted)}
+.msg{padding:10px 12px;border-radius:8px;font-size:13px}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}.msg.bad{background:var(--bad-bg);color:var(--bad)}.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.erros-imp{max-height:150px;overflow:auto;font-size:12px;color:var(--bad);display:flex;flex-direction:column;gap:2px}
+.imp-rod{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.aviso{background:var(--bad-bg);color:var(--bad);padding:12px 16px;border-radius:10px;display:none}
+
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grade2{grid-template-columns:1fr}
+}
+@media (max-width:820px){
+  .app{flex-direction:column}
+  .lateral{position:static;width:auto;height:auto;flex-direction:row;align-items:center;gap:10px;padding:10px 16px;border-right:none;border-bottom:1px solid var(--line);overflow-x:auto}
+  .lateral .placa-logo img{width:40px}
+  .regra{display:none}
+  .menu{flex-direction:row}
+  .menu button{white-space:nowrap;padding:7px 10px}
+  .topo{position:static;padding:12px 16px;flex-wrap:wrap}
+  .topo h1{font-size:16px}
+  .topo .placa-logo img{height:30px}
+  .topo-dir{flex-wrap:wrap}
+  main{padding:14px 16px}
+  .kpis{gap:10px}
+  .kpi .v{font-size:22px}
+  .filtros select,.filtros .periodo{flex:1 1 140px}
+  .filtros .periodo input{flex:1;min-width:0}
+  .pauta-item{grid-template-columns:78px minmax(0,1fr)}
+  .pareto{overflow-x:auto}
+  .pareto svg{min-width:640px}
+  .pauta-item .pto{grid-column:2}
+  .hbar{grid-template-columns:minmax(0,100px) minmax(0,1fr) 30px}
+  .duas,.form{grid-template-columns:1fr}
+  .dlg-cab{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="lateral">
+    <div class="placa-logo"><img src="/cinco-porques/img/adm.png" alt="ADM" width="137" height="102"></div>
+    <nav class="menu" id="menu">
+      <button data-ir="painel" class="ativo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</button>
+      <button data-ir="pauta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5h11M9 12h11M9 19h11"/><path d="M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/></svg>Pauta</button>
+      <button data-ir="pareto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V8M9 20v-8M14 20v-5M19 20v-3"/><path d="M4 6l5 0 5 3 5 6"/></svg>Pareto</button>
+      <button data-ir="planta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V9l6 4V9l6 4V5h6v16z"/></svg>Plantas</button>
+      <button data-ir="area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>Áreas</button>
+      <button data-ir="equipamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Equipamentos</button>
+      <button data-ir="autor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Autores</button>
+      <button data-ir="registros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a1 1 0 00-1 1v16a1 1 0 001 1h12a1 1 0 001-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Registros</button>
+    </nav>
+    <div class="regra">
+      <h4>Roteiro da reunião</h4>
+      <ol>
+        <li><b>Pauta:</b> avaliar as anomalias novas e o KPI impactado</li>
+        <li><b>Pareto:</b> atacar as causas que somam 80%</li>
+        <li><b>Ações:</b> cobrar as abertas e as atrasadas</li>
+      </ol>
+    </div>
+  </aside>
+
+  <div class="conteudo">
+    <header class="topo">
+      <div><h1>Falha Zero — 5 Porquês</h1><p id="hoje"></p></div>
+      <div class="topo-dir">
+        <span id="fonte" class="fonte">carregando…</span>
+        <button class="btn btn-prim" id="abrir-importar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>Atualizar base</button>
+        <div class="placa-logo"><img src="/cinco-porques/img/performance-excellence.png" alt="Performance Excellence" width="345" height="127"></div>
+      </div>
+    </header>
+
+    <main id="painel">
+      <div class="aviso" id="aviso"></div>
+
+      <div class="filtros">
+        <select id="f-planta" aria-label="Planta"></select>
+        <select id="f-area" aria-label="Área"></select>
+        <select id="f-equipamento" aria-label="Equipamento"></select>
+        <select id="f-autor" aria-label="Autor"></select>
+        <select id="f-turno" aria-label="Turno"></select>
+        <label class="periodo">de <input type="date" id="f-de"></label>
+        <label class="periodo">até <input type="date" id="f-ate"></label>
+        <button class="link" id="limpar">Limpar</button>
+      </div>
+      <div class="trilha" id="trilha"></div>
+
+      <section class="kpis" id="kpis"></section>
+
+      <div class="grade2">
+        <section class="card" id="sec-pauta">
+          <div class="card-cab">
+            <div><h2>Pauta da reunião</h2><div class="sub" id="sub-pauta"></div></div>
+            <div class="abas" id="modo-pauta">
+              <button data-pauta="novas" aria-selected="true">A avaliar</button>
+              <button data-pauta="abertas">Ações em aberto</button>
+            </div>
+          </div>
+          <div class="pauta" id="pauta"></div>
+        </section>
+        <section class="card" id="sec-kpis">
+          <div class="card-cab"><div><h2>KPIs impactados</h2><div class="sub">Avaliados na reunião · clique para filtrar</div></div></div>
+          <div id="kpi-impacto"></div>
+          <div class="legenda">
+            <span><i style="background:var(--bad)"></i>Fora da tolerância</span>
+            <span><i style="background:var(--ok)"></i>Dentro da tolerância</span>
+            <span><i style="background:var(--ref)"></i>Sem impacto</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="card" id="sec-pareto">
+        <div class="card-cab">
+          <div><h2>Pareto das anomalias</h2><div class="sub" id="sub-pareto"></div></div>
+          <div class="abas" id="abas-pareto">
+            <button data-par="causa">Causa raiz</button>
+            <button data-par="falha">Tipo de falha</button>
+            <button data-par="equipamento">Equipamento</button>
+            <button data-par="kpi">KPI impactado</button>
+          </div>
+        </div>
+        <div class="pareto" id="pareto"></div>
+        <div class="legenda" id="pareto-leg"></div>
+      </section>
+
+      <section class="card" id="sec-progresso">
+        <div class="card-cab">
+          <div><h2 id="tit-progresso">Por planta</h2><div class="sub">Anomalias relatadas · da mais para a menos · clique para detalhar</div></div>
+          <div class="abas" role="tablist" id="abas">
+            <button role="tab" data-dim="planta">Planta</button>
+            <button role="tab" data-dim="area">Área</button>
+            <button role="tab" data-dim="equipamento">Equipamento</button>
+            <button role="tab" data-dim="autor">Autor</button>
+          </div>
+        </div>
+        <div class="progresso" id="progresso"></div>
+      </section>
+
+      <section class="card" id="sec-registros">
+        <div class="card-cab">
+          <div><h2>Registros de anomalias</h2><div class="sub" id="sub-lista"></div></div>
+          <div class="abas" id="modo-lista">
+            <button data-modo="abertas" aria-selected="true">Não concluídas</button>
+            <button data-modo="todas">Todas</button>
+          </div>
+        </div>
+        <div class="tabela-rolagem"><table id="tab-lista"></table></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<dialog id="detalhe"></dialog>
+<dialog id="importar">
+  <div class="dlg-cab"><div><h3>Atualizar base de anomalias</h3><p>Envie o Excel exportado do Microsoft Forms (Falha Zero — 5 Porquês). Respostas que já existem são atualizadas, não duplicadas. As avaliações feitas na reunião são mantidas.</p></div><button class="btn" id="fechar-imp">Fechar</button></div>
+  <div class="imp">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="soltar" id="soltar" tabindex="0">Arraste o Excel aqui ou <b>clique para escolher</b><br><small style="color:var(--muted)">.xlsx exportado do Forms (“Abrir no Excel”)</small></div>
+      <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" hidden>
+      <div class="modo-imp" id="modo-imp">
+        <label><input type="radio" name="modo-imp" value="somar" checked><span><b>Adicionar e atualizar</b><small>Mantém o que já está na base; respostas com o mesmo ID são atualizadas.</small></span></label>
+        <label><input type="radio" name="modo-imp" value="substituir"><span><b>Substituir toda a base por este arquivo</b><small>Apaga as anomalias que estão na base e deixa só as do arquivo. As avaliações da reunião ficam guardadas pelo ID.</small></span></label>
+      </div>
+      <div id="previa"></div>
+      <div class="imp-rod"><span id="imp-status" style="font-size:12px;color:var(--muted)"></span><button class="btn btn-prim" id="enviar" disabled>Enviar para a base</button></div>
+    </div>
+    <div class="perigo">
+      <div><b>Apagar todas as anomalias</b><small>A base e as avaliações ficam vazias. Uma cópia de segurança é guardada no banco.</small></div>
+      <button class="btn btn-perigo" id="apagar-tudo">Apagar tudo…</button>
+    </div>
+  </div>
+</dialog>
+<datalist id="lista-kpis"></datalist>
+<div id="dica"></div>
+
+<script src="/cinco-porques/config.js"></script>
+<script>
+const CFG = window.PAINEL_CONFIG || {};
+const DIMS = {planta:"Planta", area:"Área", equipamento:"Equipamento", autor:"Autor", turno:"Turno"};
+const EXTRAS = {causa:"Causa raiz", falha:"Tipo de falha", kpi:"KPI", status:"Status"};   // filtros que vêm de clique (Pareto, KPIs, indicadores)
+const TITULO_DIM = {planta:"Por planta", area:"Por área", equipamento:"Por equipamento", autor:"Por autor"};
+const PROXIMA = {planta:"area", area:"equipamento", equipamento:"equipamento", autor:"autor"};
+const PARETO = {causa:"causa raiz", falha:"tipo de falha", equipamento:"equipamento", kpi:"KPI impactado"};
+const STATUS = ["Nova","Em análise","Ação em andamento","Concluída"];
+const ST_CLASSE = {"Nova":"st-nova","Em análise":"st-analise","Ação em andamento":"st-andamento","Concluída":"st-concluida"};
+const ST_ROTULO = {"Nova":"A avaliar","Em análise":"Em análise","Ação em andamento":"Ação em andamento","Concluída":"Concluída"};
+const CONDICOES = ["Acima da tolerância","Abaixo da tolerância","Dentro da tolerância","Sem impacto em KPI"];
+const FORA = new Set(["Acima da tolerância","Abaixo da tolerância"]);
+const KPIS_SUGERIDOS = ["Umidade","Proteína","Rendimento","Produtividade / OEE","Disponibilidade do equipamento","Qualidade — não conformidade","Perda / descarte","Consumo de energia","Segurança","Meio ambiente"];
+const estado = {dados:[], filtros:{planta:"",area:"",equipamento:"",autor:"",turno:"",causa:"",falha:"",kpi:"",status:"",de:"",ate:""}, dim:"planta", par:"causa", pauta:"novas", modo:"abertas", limite:15, nav:[]};
+
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtN = (n, d=1) => n == null || isNaN(n) ? "—" : Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtData = d => d ? d.slice(8,10) + "/" + d.slice(5,7) + "/" + d.slice(0,4) : "—";   // AAAA-MM-DD, sem fuso
+const hojeISO = () => { const d = new Date(); return `${d.getFullYear()}-${doisDig(d.getMonth()+1)}-${doisDig(d.getDate())}`; };
+const doisDig = n => String(n).padStart(2,"0");
+const chave = t => String(t ?? "").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ").trim().toLowerCase();
+const modoDemo = () => !CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY || new URLSearchParams(location.search).has("demo");
+const temFiltro = () => Object.values(estado.filtros).some(Boolean);
+const vazio = v => v == null || !String(v).trim() || /^n\/?a$/i.test(String(v).trim());
+const atrasada = r => r.prazo && r.status !== "Concluída" && r.prazo < hojeISO();
+const aberta = r => r.status === "Em análise" || r.status === "Ação em andamento";
+const ehFora = r => FORA.has(r.condicao);
+
+// ---------- carga ----------
+const api = () => CFG.SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/";
+async function rpc(nome, corpo){
+  const r = await fetch(api() + "rpc/" + nome, {method:"POST", headers:{apikey:CFG.SUPABASE_ANON_KEY, "Content-Type":"application/json"}, body: JSON.stringify(corpo)});
+  if (!r.ok) throw new Error(`o Supabase respondeu ${r.status}: ${await r.text()}`);
+  return r.status === 204 ? null : r.json();
+}
+async function carregarSupabase(){
+  const dados = [];
+  for (let i = 0; ; i += 1000) {             // o Supabase entrega no máximo 1000 linhas por vez
+    const r = await fetch(api() + "anomalias_painel?select=*&order=data_ref.desc.nullslast,id.desc",
+      {headers:{apikey:CFG.SUPABASE_ANON_KEY, Range:`${i}-${i+999}`}});   // só apikey: vale para a chave "anon" e a "publishable"
+    if (!r.ok) throw new Error(`Supabase respondeu ${r.status}: ${await r.text()}`);
+    const lote = await r.json();
+    dados.push(...lote);
+    if (lote.length < 1000) break;
+  }
+  return {dados: preparar(dados)};
+}
+
+// Campos derivados no navegador: reincidência e rótulos de agrupamento.
+// "Reincidente" = mesmo equipamento com o mesmo tipo de falha mais de uma vez na base.
+function preparar(dados){
+  const cont = {};
+  for (const r of dados) {
+    r.falha = vazio(r.tipo_falha) ? "Não informado" : String(r.tipo_falha).trim();
+    r.falha_k = chave(r.falha);
+    r.causas = (r.causas && r.causas.length) ? r.causas : ["Não informada"];
+    r.turno = vazio(r.turno) ? "Não informado" : r.turno;
+    const k = chave(r.equipamento) + "|" + r.falha_k;
+    (cont[k] ||= []).push(r);
+  }
+  for (const lista of Object.values(cont)) {
+    lista.sort((a,b)=> (a.data_ref||"").localeCompare(b.data_ref||"") || a.id - b.id);
+    lista.forEach((r,i)=>{ r.ocorrencia = i+1; r.reincidente = lista.length > 1; r.total_rei = lista.length; });
+  }
+  return dados;
+}
+
+// Dados fictícios só para ver o painel antes de ligar o Supabase (ou com ?demo).
+function carregarDemo(){
+  const mapa = {
+    "Uberlândia 365":{"Envase":["SOPRADORA - 5800SOP01","ENCHEDORA - 5800ENC01","ROTULADORA - 5800ROT02"],"Secagem":["SPRAY DRYER - 4100SPD01","CICLONE - 4100CIC02"],"Utilidades":["CALDEIRA - 9000CAL01","COMPRESSOR - 9000CMP03"]},
+    "Campo Grande":{"Extração":["EXPANDER - 2200EXP01","EXTRATOR - 2200EXT01"],"Preparação":["QUEBRADOR - 2100QBR02","CONDICIONADOR - 2100CON01"],"Ensaque":["ENSACADEIRA - 3300ENS01"]},
+  };
+  const falhas = {
+    "SOPRADORA":["Falha de sopro","Garrafa deformada"],"ENCHEDORA":["Vazamento na válvula","Nível de enchimento fora"],"ROTULADORA":["Rótulo desalinhado"],
+    "SPRAY DRYER":["Umidade alta no pó","Entupimento do bico"],"CICLONE":["Perda de produto no exaustor"],"CALDEIRA":["Queda de pressão de vapor"],"COMPRESSOR":["Superaquecimento"],
+    "EXPANDER":["Travamento por sobrecarga","Umidade alta na massa"],"EXTRATOR":["Solvente residual alto"],"QUEBRADOR":["Desgaste de rolo"],"CONDICIONADOR":["Temperatura fora do padrão"],"ENSACADEIRA":["Má selagem","Peso fora da tolerância"],
+  };
+  const kpiDe = {"Umidade alta no pó":"Umidade","Umidade alta na massa":"Umidade","Solvente residual alto":"Qualidade — não conformidade","Peso fora da tolerância":"Perda / descarte","Má selagem":"Qualidade — não conformidade","Garrafa deformada":"Perda / descarte","Queda de pressão de vapor":"Consumo de energia","Entupimento do bico":"Produtividade / OEE","Temperatura fora do padrão":"Umidade"};
+  const causas = [["Procedimento inexistente ou inadequado",5],["Condição básica não atendida (limpeza, lubrificação, aperto)",4],["Deterioração não detectada na inspeção",3],["Falta de conhecimento ou habilidade",2],["Condição de operação não respeitada",2],["Falha de projeto do equipamento",1],["Outra causa",1]];
+  const pesoTotal = causas.reduce((s,c)=>s+c[1],0);
+  const autores = ["Gabriel","Ana Souza","Bruno Lima","Carla Dias","Diego Rocha"];
+  const turnos = ["Manhã","Tarde","Noite"];
+  const pq = ["Produto fora de especificação na saída","Porque o parâmetro de processo variou além do limite","Porque o componente não estava na condição adequada","Porque o desgaste não foi identificado na inspeção de rotina","Porque o padrão de inspeção não define critério para esse item"];
+  let s = 11; const rnd = () => (s = (s*16807) % 2147483647) / 2147483647;
+  const escolhe = a => a[Math.floor(rnd()*a.length)];
+  const dados = []; let id = 0;
+  const hoje = new Date();
+  for (const [planta, areas] of Object.entries(mapa)) for (const [area, eqs] of Object.entries(areas)) for (const eq of eqs) {
+    const n = 1 + Math.floor(rnd()*6);
+    for (let k = 0; k < n; k++) {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - Math.floor(rnd()*120));
+      const data = `${d.getFullYear()}-${doisDig(d.getMonth()+1)}-${doisDig(d.getDate())}`;
+      const falha = rnd() < .45 ? escolhe(falhas[eq.split(" - ")[0]]) : escolhe(["Vibração excessiva","Vazamento de óleo","Falha elétrica no motor","Sensor com leitura errada","Correia rompida","Rolamento travado","Parada por sobrecarga","Ruído anormal"]);
+      let x = rnd()*pesoTotal, causa = causas[0][0]; for (const [c,p] of causas) { if ((x -= p) < 0) { causa = c; break; } }
+      const nPq = 3 + Math.floor(rnd()*3);
+      const idade = (hoje - d) / 864e5;
+      const status = idade > 60 ? escolhe(["Concluída","Concluída","Ação em andamento"]) : idade > 14 ? escolhe(["Em análise","Ação em andamento","Concluída"]) : escolhe(["Nova","Nova","Em análise"]);
+      const prazo = status === "Nova" ? null : (() => { const p = new Date(status === "Concluída" ? d : hoje); p.setDate(p.getDate() + (status === "Concluída" ? 15 : Math.floor(rnd()*40) - 8)); return `${p.getFullYear()}-${doisDig(p.getMonth()+1)}-${doisDig(p.getDate())}`; })();
+      const kpi = status === "Nova" ? null : (kpiDe[falha] || escolhe(["Disponibilidade do equipamento","Produtividade / OEE"]));
+      dados.push({
+        id:++id, resposta_id:String(id), planta, area, equipamento:eq, turno:escolhe(turnos), data_evento:data, data_ref:data,
+        autor:escolhe(autores), tipo_falha:falha, acao_imediata:"Ajuste do parâmetro e liberação da linha",
+        porque1:pq[0], porque2:pq[1], porque3:pq[2], porque4:nPq>3?pq[3]:null, porque5:nPq>4?pq[4]:null, porques:nPq,
+        clareza: Math.min(5, nPq - 1 + Math.floor(rnd()*2)),
+        causas:[causa], causa_raiz:causa, causa_outra: causa==="Outra causa" ? "Fornecedor entregou peça fora de especificação" : null,
+        comentario_causa:"O padrão não definia critérios claros para verificar esse ponto.",
+        acoes_sugeridas:"Incluir o item no checklist de inspeção do equipamento",
+        kpi, condicao: kpi ? (rnd() < .65 ? escolhe(["Acima da tolerância","Abaixo da tolerância"]) : "Dentro da tolerância") : null,
+        status, responsavel: status === "Nova" ? null : escolhe(autores), prazo, observacao:null,
+      });
+    }
+  }
+  dados.sort((a,b)=>b.data_ref.localeCompare(a.data_ref));
+  return {dados: preparar(dados)};
+}
+
+// ---------- filtros ----------
+function passa(r, f, ignorar){
+  return Object.keys(DIMS).every(d => d === ignorar || !f[d] || r[d] === f[d]) &&
+    (!f.causa || r.causas.includes(f.causa)) &&
+    (!f.falha || r.falha_k === chave(f.falha)) &&
+    (!f.kpi || (f.kpi === "Não avaliado" ? !r.kpi : r.kpi === f.kpi)) &&
+    (!f.status || (f.status === "abertas" ? aberta(r) : f.status === "atrasadas" ? atrasada(r) : f.status === "reincidentes" ? r.reincidente : r.status === f.status)) &&
+    (!f.de  || (r.data_ref && r.data_ref >= f.de)) &&
+    (!f.ate || (r.data_ref && r.data_ref <= f.ate));
+}
+const filtrar = ignorar => estado.dados.filter(r => passa(r, estado.filtros, ignorar));
+
+function preencherSelects(){
+  const todos = {planta:"Todas as plantas", area:"Todas as áreas", equipamento:"Todos os equipamentos", autor:"Todos os autores", turno:"Todos os turnos"};
+  for (const d of Object.keys(DIMS)) {
+    const opcoes = [...new Set(filtrar(d).map(r => r[d]))].sort((a,b)=>String(a).localeCompare(String(b),"pt-BR"));
+    const atual = estado.filtros[d];
+    if (atual && !opcoes.includes(atual)) opcoes.unshift(atual);
+    $("#f-"+d).innerHTML = `<option value="">${todos[d]}</option>` + opcoes.map(o=>`<option ${o===atual?"selected":""}>${esc(o)}</option>`).join("");
+  }
+}
+
+function definirFiltro(d, v){ estado.filtros[d] = v; estado.limite = 15; salvarUrl(); render(); }
+
+function salvarUrl(){
+  const p = new URLSearchParams();
+  for (const [k,v] of Object.entries(estado.filtros)) if (v) p.set(k,v);
+  if (estado.dim !== "planta") p.set("ver", estado.dim);
+  if (estado.par !== "causa") p.set("pareto", estado.par);
+  if (new URLSearchParams(location.search).has("demo")) p.set("demo","");
+  history.replaceState(null, "", location.pathname + (p.toString() ? "?"+p : ""));
+}
+function lerUrl(){
+  const p = new URLSearchParams(location.search);
+  for (const k of Object.keys(estado.filtros)) estado.filtros[k] = p.get(k) || "";
+  if (TITULO_DIM[p.get("ver")]) estado.dim = p.get("ver");
+  if (PARETO[p.get("pareto")]) estado.par = p.get("pareto");
+}
+
+// ---------- agregações ----------
+function tendencia(linhas){   // mês mais recente x anterior
+  const m = {};
+  for (const r of linhas) if (r.data_ref) m[r.data_ref.slice(0,7)] = (m[r.data_ref.slice(0,7)] || 0) + 1;
+  const ks = Object.keys(m).sort();
+  if (ks.length < 2) return null;
+  return {atual: m[ks.at(-1)], anterior: m[ks.at(-2)], mes: ks.at(-1)};
+}
+function seta(a, b, maiorMelhor){
+  if (a == null || b == null || a === b) return "";
+  const sobe = a > b;
+  return `<span class="seta ${sobe === maiorMelhor ? "bom" : "ruim"}" data-dica="${a} no último mês contra ${b} no anterior">${sobe ? "↑" : "↓"}</span>`;
+}
+
+// agrupa para o Pareto; cada anomalia conta 1 vez por categoria (causa pode ter mais de uma)
+function contarPareto(linhas, tipo){
+  const g = new Map();
+  const somar = (k, rot) => { const e = g.get(k) || {k, rot, n:0}; e.n++; g.set(k, e); };
+  for (const r of linhas) {
+    if (tipo === "causa") r.causas.forEach(c => somar(c, c));
+    else if (tipo === "falha") somar(r.falha_k, r.falha);
+    else if (tipo === "equipamento") somar(r.equipamento, r.equipamento);
+    else somar(r.kpi || "Não avaliado", r.kpi || "Não avaliado");
+  }
+  return [...g.values()].sort((a,b)=>b.n-a.n || a.rot.localeCompare(b.rot,"pt-BR"));
+}
+
+// ---------- Pareto (SVG) ----------
+function svgPareto(itens){
+  const MAX = 10;
+  let barras = itens.slice(0, MAX);
+  if (itens.length > MAX) barras.push({k:"", rot:`Demais (${itens.length-MAX})`, n: itens.slice(MAX).reduce((s,i)=>s+i.n,0), demais:true});
+  const total = itens.reduce((s,i)=>s+i.n,0);
+  const W = 860, H = 330, L = 44, R = 46, T = 16, B = 86;
+  const larg = (W-L-R)/barras.length, maxN = Math.max(...barras.map(b=>b.n));
+  const topo = Math.max(4, Math.ceil(maxN/4)*4);   // múltiplo de 4: as 5 linhas da grade caem em números inteiros
+  const y = n => T + (H-T-B) * (1 - n/topo), yp = p => T + (H-T-B) * (1 - p/100);
+  let g = "", acum = 0, pts = [];
+  // grade e eixos
+  for (let i = 0; i <= 4; i++) {
+    const v = topo*i/4, yy = y(v);
+    g += `<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="var(--line)"/>`;
+    g += `<text x="${L-6}" y="${yy+3}" text-anchor="end" class="eixo">${v}</text>`;
+    g += `<text x="${W-R+6}" y="${yp(i*25)+3}" class="eixo">${i*25}%</text>`;
+  }
+  g += `<line x1="${L}" x2="${W-R}" y1="${yp(80)}" y2="${yp(80)}" stroke="var(--bad)" stroke-dasharray="5 4" opacity=".7"/>`;
+  g += `<text x="${W-R-4}" y="${yp(80)-5}" text-anchor="end" class="eixo" style="fill:var(--bad)">80%</text>`;
+  barras.forEach((b,i) => {
+    const antes = acum; acum += b.n;
+    const pct = acum*100/total, vital = antes*100/total < 80 && !b.demais;
+    const x = L + i*larg + larg*.14, w = larg*.72;
+    pts.push([L + i*larg + larg/2, yp(pct), pct, b]);
+    const rot = b.rot.length > 18 ? b.rot.slice(0,17) + "…" : b.rot;
+    const dica = `${b.rot}: ${b.n} anomalia(s) · ${fmtN(b.n*100/total,0)}% do total · acumulado ${fmtN(pct,0)}%${b.demais ? "" : " · clique para filtrar"}`;
+    g += `<g class="barra" ${b.demais ? "" : `data-par-k="${esc(b.k)}" data-par-rot="${esc(b.rot)}"`} data-dica="${esc(dica)}">
+      <rect x="${x}" y="${y(b.n)}" width="${w}" height="${H-B-y(b.n)}" rx="3" fill="${vital ? "var(--navy)" : "var(--bar-soft)"}"/>
+      <rect x="${L+i*larg}" y="${T}" width="${larg}" height="${H-T-B}" fill="transparent"/>
+      <text x="${x+w/2}" y="${y(b.n)-5}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--ink)">${b.n}</text>
+      <text transform="translate(${x+w/2},${H-B+12}) rotate(-35)" text-anchor="end" class="rot">${esc(rot)}</text></g>`;
+  });
+  g += `<polyline points="${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="var(--bad)" stroke-width="2" stroke-linejoin="round"/>`;
+  pts.forEach(p => g += `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--bad)" stroke="var(--surface)" stroke-width="1.5"/>`);
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pareto das anomalias">${g}</svg>`;
+}
+
+// ---------- render ----------
+function render(){
+  preencherSelects();
+  const linhas = filtrar();
+  const f = estado.filtros;
+  const rotStatus = {abertas:"Ações em aberto", atrasadas:"Ações atrasadas", reincidentes:"Reincidentes"};
+
+  $("#trilha").innerHTML = [...Object.keys(DIMS), ...Object.keys(EXTRAS)].filter(d=>f[d]).map(d =>
+    `<span class="chip">${DIMS[d] || EXTRAS[d]}: <b>${esc(d === "status" ? (rotStatus[f[d]] || ST_ROTULO[f[d]] || f[d]) : f[d])}</b><button aria-label="Remover filtro ${DIMS[d] || EXTRAS[d]}" data-rm="${d}">×</button></span>`).join("");
+
+  // indicadores
+  const t = tendencia(linhas);
+  const novas = linhas.filter(r=>r.status==="Nova"), abertas = linhas.filter(aberta), atras = linhas.filter(atrasada);
+  const rei = linhas.filter(r=>r.reincidente), combRei = new Set(rei.map(r=>chave(r.equipamento)+"|"+r.falha_k)).size;
+  const fora = linhas.filter(ehFora).length;
+  $("#kpis").innerHTML = `
+    <div class="kpi"><div class="l">Anomalias relatadas</div><div class="v">${linhas.length}</div>
+      <div class="s">${t ? `${t.atual} no último mês ${seta(t.atual, t.anterior, false)}` : "&nbsp;"}</div></div>
+    <button class="kpi" data-st="Nova" data-dica="Filtrar as que ainda não passaram pela reunião"><div class="l">A avaliar na reunião</div><div class="v ${novas.length?"warn":"ok"}">${novas.length}</div>
+      <div class="s">${fora} anomalia(s) com KPI fora da tolerância</div></button>
+    <button class="kpi" data-st="abertas" data-dica="Filtrar as ações em análise ou em andamento"><div class="l">Ações em aberto</div><div class="v">${abertas.length}</div>
+      <div class="s">${atras.length ? `<span class="tag atr" style="margin:0">${atras.length} atrasada(s)</span>` : "nenhuma atrasada"}</div></button>
+    <button class="kpi" data-st="reincidentes" data-dica="Mesmo equipamento com o mesmo tipo de falha mais de uma vez"><div class="l">Reincidentes</div><div class="v ${rei.length?"bad":"ok"}">${rei.length}</div>
+      <div class="s">${combRei} equipamento(s) × falha repetida</div></button>`;
+
+  // pauta da reunião
+  document.querySelectorAll("#modo-pauta button").forEach(b => b.setAttribute("aria-selected", b.dataset.pauta === estado.pauta));
+  const pauta = estado.pauta === "novas"
+    ? [...novas].sort((a,b)=>(b.reincidente-a.reincidente) || (a.data_ref||"").localeCompare(b.data_ref||""))
+    : [...abertas].sort((a,b)=>(atrasada(b)-atrasada(a)) || (a.prazo||"9").localeCompare(b.prazo||"9"));
+  $("#sub-pauta").textContent = estado.pauta === "novas"
+    ? `${pauta.length} anomalia(s) ainda não avaliada(s) · reincidentes primeiro, depois as mais antigas`
+    : `${pauta.length} ação(ões) em aberto · atrasadas primeiro, depois por prazo`;
+  estado.navPauta = pauta.map(r=>r.id);
+  $("#pauta").innerHTML = pauta.length ? pauta.slice(0, 8).map(r => `
+    <div class="pauta-item" data-id="${r.id}" data-lista="pauta">
+      <span class="d">${fmtData(r.data_ref)}<br>${esc(r.turno)}</span>
+      <span class="t"><b>${esc(r.falha)}${r.reincidente ? `<span class="tag rei" data-dica="${r.ocorrencia}ª de ${r.total_rei} ocorrências deste equipamento com esta falha">↻ ${r.ocorrencia}ª vez</span>` : ""}</b>
+        <span>${esc(r.equipamento)} · ${esc(r.area)} · ${esc(r.planta)}</span></span>
+      ${estado.pauta === "novas"
+        ? `<span class="pto st-nova" style="font-size:12px">Avaliar</span>`
+        : `<span style="font-size:12px;text-align:right">${esc(r.responsavel || "sem responsável")}<br>${r.prazo ? `<span class="${atrasada(r)?"cond-fora":""}">prazo ${fmtData(r.prazo)}</span>` : "sem prazo"}</span>`}
+    </div>`).join("") + (pauta.length > 8 ? `<button class="link" id="pauta-todas" style="margin-top:6px">Ver as ${pauta.length} na lista de registros</button>` : "")
+    : `<div class="msg ok">✔ ${estado.pauta === "novas" ? "Nenhuma anomalia aguardando avaliação." : "Nenhuma ação em aberto."}</div>`;
+
+  // KPIs impactados
+  const porKpi = {};
+  for (const r of linhas) { const k = r.kpi || "Não avaliado"; (porKpi[k] ||= {fora:0, dentro:0, sem:0, n:0}); const e = porKpi[k]; e.n++;
+    if (ehFora(r)) e.fora++; else if (r.condicao === "Dentro da tolerância") e.dentro++; else e.sem++; }
+  const kpiLista = Object.entries(porKpi).sort((a,b)=> (a[0]==="Não avaliado") - (b[0]==="Não avaliado") || b[1].fora-a[1].fora || b[1].n-a[1].n);
+  const maxK = Math.max(1, ...kpiLista.map(e=>e[1].n));
+  $("#kpi-impacto").innerHTML = kpiLista.length ? kpiLista.map(([k,e]) => `
+    <div class="hbar" data-kpi="${esc(k)}" data-dica="${esc(k)}: ${e.n} anomalia(s) · ${e.fora} fora da tolerância · ${e.dentro} dentro · ${e.sem} sem impacto/sem avaliação">
+      <span class="n" style="${k==="Não avaliado"?"color:var(--muted);font-weight:400;font-style:italic":""}">${esc(k)}</span>
+      <div class="pilha" style="width:${Math.max(4, e.n/maxK*100)}%"><span style="width:${e.fora/e.n*100}%;background:var(--bad)"></span><span style="width:${e.dentro/e.n*100}%;background:var(--ok)"></span><span style="width:${e.sem/e.n*100}%;background:var(--ref)"></span></div>
+      <span class="v">${e.n}</span></div>`).join("") : `<div class="vazio">Nenhuma anomalia com esses filtros</div>`;
+
+  // Pareto
+  document.querySelectorAll("#abas-pareto button").forEach(b => b.setAttribute("aria-selected", b.dataset.par === estado.par));
+  const par = contarPareto(linhas, estado.par);
+  const totalPar = par.reduce((s,i)=>s+i.n,0);
+  let acc = 0; const vitais = par.filter(i => { const ok = acc*100/totalPar < 80; acc += i.n; return ok; });
+  $("#sub-pareto").textContent = par.length
+    ? `Por ${PARETO[estado.par]} · ${vitais.length} de ${par.length} categoria(s) somam 80% das anomalias${estado.par === "causa" ? " (uma anomalia pode ter mais de uma causa)" : ""} · clique numa barra para filtrar`
+    : "";
+  $("#pareto").innerHTML = par.length ? svgPareto(par) : `<div class="vazio">Nenhuma anomalia com esses filtros</div>`;
+  $("#pareto-leg").innerHTML = par.length ? `
+    <span><i style="background:var(--navy)"></i>Poucas e vitais (até 80%)</span>
+    <span><i style="background:var(--bar-soft)"></i>Demais</span>
+    <span><i class="linha" style="border-color:var(--bad)"></i>% acumulado</span>` : "";
+
+  // por dimensão
+  document.querySelectorAll("#abas button").forEach(b => b.setAttribute("aria-selected", b.dataset.dim === estado.dim));
+  $("#tit-progresso").textContent = TITULO_DIM[estado.dim];
+  const grupos = {};
+  for (const r of linhas) (grupos[r[estado.dim]] ||= []).push(r);
+  const lista = Object.entries(grupos).map(([nome, rs]) => ({nome, n:rs.length, rei:rs.filter(r=>r.reincidente).length,
+    atr:rs.filter(atrasada).length, novas:rs.filter(r=>r.status==="Nova").length, fora:rs.filter(ehFora).length,
+    clar: rs.filter(r=>r.clareza).length ? rs.reduce((s,r)=>s+(r.clareza||0),0)/rs.filter(r=>r.clareza).length : null}))
+    .sort((a,b)=>b.n-a.n || b.rei-a.rei);
+  const maxG = Math.max(1, ...lista.map(g=>g.n));
+  $("#progresso").innerHTML = lista.length ? lista.map(g => {
+    const c = g.atr || g.fora ? "bad" : g.rei || g.novas ? "warn" : "ok";
+    return `<button class="grupo" data-grupo="${esc(g.nome)}" data-dica="${esc(g.nome)}: ${g.n} anomalia(s) · ${g.rei} reincidente(s) · ${g.novas} a avaliar · ${g.atr} ação(ões) atrasada(s) · clareza média ${fmtN(g.clar)} de 5">
+      <div class="l1"><span class="nome">${esc(g.nome)}</span><span class="pct ${c}">${g.n}</span></div>
+      <div class="meta"><span class="${c}" style="width:${g.n/maxG*100}%"></span></div>
+      <div class="l3">${g.rei} reincidente(s) · ${g.novas} a avaliar · clareza ${fmtN(g.clar)}/5</div></button>`;
+  }).join("") : `<div class="vazio">Nenhuma anomalia com esses filtros</div>`;
+
+  // tabela
+  document.querySelectorAll("#modo-lista button").forEach(b => b.setAttribute("aria-selected", b.dataset.modo === estado.modo));
+  const tab = estado.modo === "abertas" ? linhas.filter(r=>r.status!=="Concluída") : linhas;
+  estado.navLista = tab.map(r=>r.id);
+  $("#sub-lista").textContent = `${tab.length} anomalia(s)` + (tab.length > estado.limite ? ` · mostrando as ${estado.limite} mais recentes` : "") + " · clique numa linha para ver os 5 porquês e avaliar";
+  $("#tab-lista").innerHTML = tab.length ? `
+    <thead><tr><th>Data</th><th>Turno</th><th>Planta</th><th>Área</th><th>Equipamento</th><th>Tipo de falha</th><th>Causa raiz</th><th class="num">Porquês</th><th>KPI impactado</th><th>Status</th><th>Autor</th></tr></thead>
+    <tbody>${tab.slice(0,estado.limite).map(r=>`
+      <tr data-id="${r.id}" data-lista="lista">
+        <td>${fmtData(r.data_ref)}</td><td>${esc(r.turno)}</td><td>${esc(r.planta)}</td><td>${esc(r.area)}</td><td><b>${esc(r.equipamento)}</b></td>
+        <td class="corte" title="${esc(r.falha)}">${esc(r.falha)}${r.reincidente ? `<span class="tag rei">↻ ${r.ocorrencia}ª</span>` : ""}</td>
+        <td class="corte" title="${esc(r.causas.join("; "))}">${esc(r.causas.join("; "))}</td>
+        <td class="num" data-dica="${r.porques} de 5 porquês preenchidos · clareza ${r.clareza ?? "—"}/5">${r.porques}/5</td>
+        <td>${r.kpi ? `<span class="${ehFora(r)?"cond-fora":r.condicao==="Dentro da tolerância"?"cond-ok":""}" data-dica="${esc(r.condicao || "condição não informada")}">${esc(r.kpi)}${ehFora(r) ? (r.condicao.startsWith("Acima") ? " ▲" : " ▼") : ""}</span>` : `<span style="color:var(--muted)">—</span>`}</td>
+        <td><span class="pto ${ST_CLASSE[r.status]}">${ST_ROTULO[r.status]}</span>${atrasada(r) ? `<span class="tag atr">atrasada</span>` : ""}</td>
+        <td>${esc(r.autor)}</td>
+      </tr>`).join("")}</tbody>` + (tab.length > estado.limite ? `<tfoot><tr><td colspan="11" style="text-align:center"><button class="btn" id="mais">Mostrar mais</button></td></tr></tfoot>` : "")
+    : `<tbody><tr><td class="vazio">Nenhuma anomalia ${estado.modo==="abertas"?"não concluída ":""}com esses filtros</td></tr></tbody>`;
+
+  $("#lista-kpis").innerHTML = [...new Set([...KPIS_SUGERIDOS, ...estado.dados.map(r=>r.kpi).filter(Boolean)])].map(k=>`<option value="${esc(k)}">`).join("");
+}
+
+// ---------- detalhe + avaliação da reunião ----------
+function abrirDetalhe(id, lista){
+  const r = estado.dados.find(x=>String(x.id)===String(id)); if (!r) return;
+  if (lista) estado.nav = lista;
+  const pos = estado.nav.findIndex(x=>String(x)===String(id));
+  const dlg = $("#detalhe");
+  const porques = [r.porque1, r.porque2, r.porque3, r.porque4, r.porque5];
+  const outra = !vazio(r.causa_outra) ? r.causa_outra : null;
+  const ordem = ["Primeiro","Segundo","Terceiro","Quarto","Quinto"];
+  dlg.innerHTML = `
+    <div class="dlg-cab"><div>
+      <h3>${esc(r.falha)}${r.reincidente ? `<span class="tag rei">↻ ${r.ocorrencia}ª de ${r.total_rei} ocorrências</span>` : ""}</h3>
+      <p><b style="color:var(--ink)">${esc(r.equipamento)}</b> · ${esc(r.planta)} › ${esc(r.area)}</p>
+      <p>${fmtData(r.data_ref)} · turno ${esc(r.turno)} · relatado por ${esc(r.autor)}</p>
+    </div>
+    <div class="dlg-nav">${pos >= 0 && estado.nav.length > 1 ? `<small>${pos+1} de ${estado.nav.length}</small>
+      <button class="btn" id="ant" ${pos<=0?"disabled":""} aria-label="Anterior">‹</button><button class="btn" id="prox" ${pos>=estado.nav.length-1?"disabled":""} aria-label="Próxima">›</button>` : ""}
+      <button class="btn" id="fechar">Fechar</button></div></div>
+    <div class="dlg-corpo">
+      <div class="duas">
+        <div class="bloco"><h4>Falha observada</h4><p>${esc(r.falha)}</p></div>
+        <div class="bloco"><h4>O que foi feito para resolver</h4><p>${vazio(r.acao_imediata) ? "—" : esc(r.acao_imediata)}</p></div>
+      </div>
+      <div class="bloco"><h4>5 porquês · clareza da investigação ${r.clareza ?? "—"}/5 <span class="clareza" aria-hidden="true">${[1,2,3,4,5].map(i=>`<i class="${i <= (r.clareza||0) ? "on" : ""}"></i>`).join("")}</span></h4>
+        <div class="cadeia">${porques.map((p,i)=> vazio(p)
+          ? `<div class="porque vazio-p"><span class="n">${i+1}</span><span class="t">${ordem[i]} porquê não preenchido</span></div>`
+          : `<div class="porque"><span class="n">${i+1}</span><span class="t"><small>${ordem[i]} porquê</small>${esc(p)}</span></div>`).join("")}</div></div>
+      <div class="causa-box">
+        <div class="pills">${r.causas.map(c=>`<span class="pill">${esc(c)}</span>`).join("")}</div>
+        ${outra ? `<p style="font-size:13px"><b>Outra causa:</b> ${esc(outra)}</p>` : ""}
+        ${vazio(r.comentario_causa) ? "" : `<p style="font-size:13px;color:var(--ink-2);margin-top:4px">${esc(r.comentario_causa)}</p>`}
+      </div>
+      <div class="bloco"><h4>Ações sugeridas</h4><p>${vazio(r.acoes_sugeridas) ? "—" : esc(r.acoes_sugeridas)}</p></div>
+      <form class="avaliacao" id="form-av">
+        <h4>Avaliação na reunião operacional</h4>
+        <div class="form">
+          <label>KPI impactado<input name="kpi" list="lista-kpis" maxlength="120" placeholder="ex.: Umidade" value="${esc(r.kpi || "")}"></label>
+          <label>Condição do KPI<select name="condicao"><option value="">—</option>${CONDICOES.map(c=>`<option ${c===r.condicao?"selected":""}>${c}</option>`).join("")}</select></label>
+          <label>Status<select name="status">${STATUS.map(s=>`<option value="${s}" ${s===r.status?"selected":""}>${ST_ROTULO[s]}</option>`).join("")}</select></label>
+          <label>Responsável pela ação<input name="responsavel" maxlength="120" value="${esc(r.responsavel || "")}"></label>
+          <label>Prazo<input type="date" name="prazo" value="${esc(r.prazo || "")}"></label>
+          <label>&nbsp;<span style="font-weight:400;color:var(--muted);font-size:12px">${r.avaliado_em ? "Última avaliação em " + new Date(r.avaliado_em).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}) : "Ainda não avaliada"}</span></label>
+          <label class="larga">Observações da reunião<textarea name="observacao" maxlength="2000" placeholder="ex.: umidade 0,8 p.p. acima da tolerância no lote 1234; validar troca das lâmpadas">${esc(r.observacao || "")}</textarea></label>
+        </div>
+        <div class="form-rod"><span id="av-status" style="font-size:12px"></span><button class="btn btn-prim" type="submit">Salvar avaliação</button></div>
+      </form>
+    </div>`;
+  if (!dlg.open) dlg.showModal();
+  $("#fechar").onclick = () => dlg.close();
+  if ($("#ant")) { $("#ant").onclick = () => abrirDetalhe(estado.nav[pos-1]); $("#prox").onclick = () => abrirDetalhe(estado.nav[pos+1]); }
+  const form = $("#form-av");
+  form.status.addEventListener("change", () => { if (form.status.value !== "Nova" && !form.kpi.value && !form.condicao.value) form.kpi.focus(); });
+  form.onsubmit = async e => {
+    e.preventDefault();
+    const av = {kpi:form.kpi.value.trim() || null, condicao:form.condicao.value || null, status:form.status.value,
+      responsavel:form.responsavel.value.trim() || null, prazo:form.prazo.value || null, observacao:form.observacao.value.trim() || null};
+    if (av.status === "Nova" && (av.kpi || av.condicao || av.responsavel)) av.status = "Em análise";   // avaliada na reunião deixa de ser "a avaliar"
+    const msg = $("#av-status"), btn = form.querySelector("button[type=submit]"); btn.disabled = true;
+    try {
+      if (!modoDemo()) await rpc("avaliar_anomalia", {p_resposta_id:r.resposta_id, p_kpi:av.kpi, p_condicao:av.condicao, p_status:av.status,
+        p_responsavel:av.responsavel, p_prazo:av.prazo, p_observacao:av.observacao});
+      Object.assign(r, av, {avaliado_em: new Date().toISOString()});
+      render();
+      abrirDetalhe(r.id);
+      $("#av-status").innerHTML = `<span style="color:var(--ok)">✔ ${modoDemo() ? "Salvo só nesta tela (dados de demonstração)." : "Avaliação salva."}</span>`;
+    } catch (err) {
+      msg.innerHTML = `<span style="color:var(--bad)">Não foi possível salvar: ${esc(err.message)}</span>`; btn.disabled = false;
+    }
+  };
+}
+
+// ---------- atualizar base (Excel do Forms) ----------
+// Títulos das colunas do Forms → campos da tabela anomalias. A comparação é sem
+// acento, em minúsculas e com espaços normalizados.
+const COLUNAS = [
+  ["ID","resposta_id"], ["Hora de início","inicio"], ["Hora de conclusão","conclusao"], ["Email","email"], ["Nome","nome"],
+  ["Hora da última modificação","modificado_em"], ["Planta","planta"], ["Área","area"], ["Equipamento + TAG","equipamento"],
+  ["Turno","turno"], ["Data do evento","data_evento"], ["Executante","executante"], ["Tipo de falha observada","tipo_falha"],
+  ["O que foi feito para resolver","acao_imediata"], ["Primeiro Porquê","porque1"], ["Segundo Porquê","porque2"],
+  ["Terceiro Porquê","porque3"], ["Quarto Porquê","porque4"], ["Quinto Porquê","porque5"],
+  ["Nível de clareza da investigação (1 a 5)","clareza"], ["Causa raiz encontrada","causa_raiz"],
+  ["Informe a causa, caso marque na reposta anterior \"Outra causa\"","causa_outra"],
+  ["Comentário da causa raiz encontrada","comentario_causa"], ["Ações Sugeridas","acoes_sugeridas"], ["KPI impactado","kpi_forms"],
+];
+const OPCIONAIS = new Set(["email","nome","modificado_em","inicio","kpi_forms"]);
+const CAMPOS = Object.fromEntries(COLUNAS.map(([t,c]) => [chave(t), c]));
+const imp = {linhas:[], faltam:[]};
+
+// Reconhece a coluna mesmo se o título mudar um pouco no Forms: primeiro o título
+// exato; depois, um título esperado que começa a coluna (ou vice-versa), ex.:
+// "Equipamento + TAG" → "Equipamento". Títulos curtos (ID, Área…) só valem exatos.
+function campoDaColuna(titulo){
+  const k = chave(titulo);
+  if (CAMPOS[k]) return CAMPOS[k];
+  let melhor = null, tam = 0;
+  for (const [t,c] of COLUNAS) {
+    const tk = chave(t);
+    if (Math.min(k.length, tk.length) >= 10 && (k.startsWith(tk) || tk.startsWith(k)) && tk.length > tam) { melhor = c; tam = tk.length; }
+  }
+  if (melhor) return melhor;
+  if (k.startsWith("equipamento")) return "equipamento";
+  if (k.includes("kpi")) return "kpi_forms";
+  if (k.startsWith("informe a causa")) return "causa_outra";
+  return null;
+}
+
+function dataLocal(v, soData){   // mantém a hora "de parede" do Excel
+  if (v == null || v === "") return null;
+  if (v instanceof Date) {
+    v = new Date(Math.round(v.getTime()/1000)*1000);   // Excel guarda a hora com imprecisão de milissegundos
+    const d = `${v.getFullYear()}-${doisDig(v.getMonth()+1)}-${doisDig(v.getDate())}`;
+    return soData ? d : `${d}T${doisDig(v.getHours())}:${doisDig(v.getMinutes())}:${doisDig(v.getSeconds())}`;
+  }
+  const s = String(v).trim(), br = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(.*)$/);   // 13/10/2026 [09:33]
+  if (br) return `${br[3]}-${doisDig(br[2])}-${doisDig(br[1])}` + (soData ? "" : (br[4].trim() ? "T" + br[4].trim() : ""));
+  return soData ? s.slice(0,10) : s;
+}
+
+function normalizarLinha(resposta){
+  const linha = {}, reconhecidas = new Set();
+  for (const [titulo, valor] of Object.entries(resposta)) {
+    const campo = campoDaColuna(titulo);
+    if (!campo || reconhecidas.has(campo) && linha[campo] != null) continue;
+    reconhecidas.add(campo);
+    if (campo === "inicio" || campo === "conclusao" || campo === "modificado_em") linha[campo] = dataLocal(valor);
+    else if (campo === "data_evento") linha[campo] = dataLocal(valor, true);
+    else if (campo === "clareza") {
+      if (valor == null || valor === "") { linha[campo] = null; continue; }
+      const m = String(valor).match(/^\s*([1-5])\b/);
+      if (!m) throw new Error(`nível de clareza fora de 1 a 5: ${String(valor).slice(0,40)}`);
+      linha[campo] = +m[1];
+    } else if (campo === "causa_raiz") {
+      linha[campo] = valor == null ? null : String(valor).split(";").map(s=>s.trim()).filter(Boolean).join(";") || null;
+    } else linha[campo] = valor == null || String(valor).trim() === "" ? null : String(valor).trim();
+  }
+  for (const c of ["resposta_id","planta","area","equipamento"]) if (!linha[c]) throw new Error(`campo obrigatório vazio: ${({resposta_id:"ID", area:"Área", equipamento:"Equipamento + TAG", planta:"Planta"})[c]}`);
+  if (linha.data_evento && !/^\d{4}-\d{2}-\d{2}$/.test(linha.data_evento)) throw new Error(`data do evento inválida: ${linha.data_evento}`);
+  return {linha, reconhecidas};
+}
+
+function carregarScript(src){
+  return new Promise((ok, erro) => {
+    if (document.querySelector(`script[src="${src}"]`)) return ok();
+    const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => erro(new Error("não foi possível carregar o leitor de Excel"));
+    document.head.appendChild(s);
+  });
+}
+
+async function lerArquivo(arquivo){
+  await carregarScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+  const livro = XLSX.read(await arquivo.arrayBuffer(), {cellDates:true});
+  const aba = livro.Sheets[livro.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(aba, {defval:null, raw:true});
+}
+
+async function prepararArquivo(arquivo){
+  const previa = $("#previa");
+  imp.linhas = []; $("#enviar").disabled = true; $("#imp-status").textContent = "";
+  previa.innerHTML = `<div class="msg warn">Lendo ${esc(arquivo.name)}…</div>`;
+  let brutas;
+  try { brutas = (await lerArquivo(arquivo)).filter(r => Object.values(r).some(v => v != null && v !== "")); }
+  catch (e) { previa.innerHTML = `<div class="msg bad">Não consegui ler o arquivo: ${esc(e.message)}</div>`; return; }
+
+  const erros = [], vistas = new Map(), colunas = new Set();
+  brutas.forEach((r, i) => {
+    try { const {linha, reconhecidas} = normalizarLinha(r); reconhecidas.forEach(c=>colunas.add(c)); vistas.set(linha.resposta_id, linha); }
+    catch (e) { erros.push(`Linha ${i+2}: ${e.message}`); }
+  });
+  imp.linhas = [...vistas.values()];
+  if (brutas[0]) for (const t of Object.keys(brutas[0])) { const c = campoDaColuna(t); if (c) colunas.add(c); }
+  const faltam = COLUNAS.filter(([,c]) => !OPCIONAIS.has(c) && !colunas.has(c)).map(([t])=>t);
+  imp.faltam = imp.linhas.length ? faltam : [];
+  const existentes = new Set(estado.dados.map(r => String(r.resposta_id)));
+  const novas = imp.linhas.filter(l => !existentes.has(String(l.resposta_id))).length;
+
+  previa.innerHTML = `
+    <div class="resumo-imp">
+      <div><b>${novas}</b><span>novas</span></div>
+      <div><b>${imp.linhas.length - novas}</b><span>já na base (serão atualizadas)</span></div>
+      <div><b style="color:${erros.length?"var(--bad)":"inherit"}">${erros.length}</b><span>com erro (serão ignoradas)</span></div>
+    </div>
+    <div id="aviso-substituir"></div>
+    ${faltam.length && imp.linhas.length ? `<div class="msg warn">Colunas não encontradas no arquivo: ${faltam.map(esc).join(", ")}. Esses campos ficarão em branco. Confira se o título mudou no Forms.</div>` : ""}
+    ${!colunas.has("kpi_forms") && imp.linhas.length ? `<div class="msg" style="background:var(--surface-2);color:var(--ink-2)">Dica: o Forms ainda não tem a pergunta “KPI impactado”. Tudo bem: o KPI é preenchido na reunião, ao abrir cada anomalia.</div>` : ""}
+    ${erros.length ? `<div class="erros-imp">${erros.slice(0,50).map(e=>`<span>${esc(e)}</span>`).join("")}${erros.length>50?`<span>… e mais ${erros.length-50}</span>`:""}</div>` : ""}
+    ${!imp.linhas.length ? `<div class="msg bad">Nenhuma resposta válida encontrada. Confira se é o Excel exportado do Forms.</div>` : ""}`;
+  atualizarBotaoEnviar();
+}
+
+const modoImp = () => document.querySelector('input[name="modo-imp"]:checked').value;
+
+function atualizarBotaoEnviar(){
+  const demo = modoDemo(), subst = modoImp() === "substituir";
+  $("#enviar").disabled = !imp.linhas.length || demo;
+  $("#enviar").textContent = subst ? "Substituir a base" : "Enviar para a base";
+  $("#enviar").classList.toggle("btn-perigo", subst); $("#enviar").classList.toggle("btn-prim", !subst);
+  $("#apagar-tudo").disabled = demo || !estado.dados.length;
+  const aviso = $("#aviso-substituir");
+  if (aviso) aviso.innerHTML = subst && imp.linhas.length
+    ? `<div class="msg warn">As <b>${estado.dados.length}</b> anomalia(s) que estão hoje na base serão removidas (com cópia de segurança) e substituídas pelas <b>${imp.linhas.length}</b> deste arquivo.</div>` : "";
+  $("#imp-status").textContent = demo ? "Pré-visualização: com dados de demonstração nada é enviado." : "";
+}
+
+async function enviarBase(){
+  const subst = modoImp() === "substituir", total = imp.linhas.length;
+  if (imp.faltam.length && !confirm(`Atenção: o arquivo não tem a(s) coluna(s):\n\n• ${imp.faltam.join("\n• ")}\n\nEsses campos ficarão em branco. Enviar mesmo assim?`)) return;
+  if (subst && !confirm(`Substituir toda a base?\n\nAs ${estado.dados.length} anomalia(s) atuais serão removidas (com cópia de segurança) e ficarão só as ${total} deste arquivo.`)) return;
+  const btn = $("#enviar"); btn.disabled = true;
+  try {
+    if (subst) {
+      $("#imp-status").textContent = `Substituindo a base (${total} anomalias)…`;
+      await rpc("substituir_anomalias", {linhas: imp.linhas});
+    } else {
+      for (let i = 0; i < total; i += 500) {
+        $("#imp-status").textContent = `Enviando ${Math.min(i+500, total)} de ${total}…`;
+        await rpc("gravar_anomalias", {linhas: imp.linhas.slice(i, i+500)});
+      }
+    }
+    Object.assign(estado, await carregarSupabase()); render();
+    imp.linhas = []; $("#arquivo").value = "";
+    $("#previa").innerHTML = `<div class="msg ok">✔ ${subst ? `Base substituída: agora tem ${total} anomalia(s).` : `${total} anomalia(s) gravada(s).`} O painel já está atualizado.</div>`;
+    $("#imp-status").textContent = ""; atualizarBotaoEnviar();
+  } catch (e) {
+    $("#previa").insertAdjacentHTML("beforeend", `<div class="msg bad" style="margin-top:10px">Não foi possível enviar: ${esc(e.message)}${subst ? " A base não foi alterada." : ""}</div>`);
+    $("#imp-status").textContent = ""; btn.disabled = false;
+  }
+}
+
+async function apagarTudo(){
+  const n = estado.dados.length;
+  const resp = prompt(`Isso apaga as ${n} anomalia(s) e as avaliações da reunião (fica uma cópia de segurança no banco).\n\nPara confirmar, digite APAGAR:`);
+  if (resp == null) return;
+  if (resp.trim().toUpperCase() !== "APAGAR") { alert("Nada foi apagado: a confirmação não confere."); return; }
+  const btn = $("#apagar-tudo"); btn.disabled = true;
+  try {
+    await rpc("substituir_anomalias", {linhas: []});
+    Object.assign(estado, await carregarSupabase()); render();
+    $("#previa").innerHTML = `<div class="msg ok">✔ ${n} anomalia(s) apagada(s). A base está vazia.</div>`;
+  } catch (e) {
+    $("#previa").innerHTML = `<div class="msg bad">Não foi possível apagar: ${esc(e.message)}</div>`;
+  }
+  atualizarBotaoEnviar();
+}
+
+$("#abrir-importar").onclick = () => { atualizarBotaoEnviar(); $("#importar").showModal(); };
+$("#fechar-imp").onclick = () => $("#importar").close();
+$("#importar").addEventListener("click", e => { if (e.target.id === "importar") e.target.close(); });
+const soltar = $("#soltar");
+soltar.onclick = () => $("#arquivo").click();
+soltar.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#arquivo").click(); } };
+soltar.ondragover = e => { e.preventDefault(); soltar.classList.add("sobre"); };
+soltar.ondragleave = () => soltar.classList.remove("sobre");
+soltar.ondrop = e => { e.preventDefault(); soltar.classList.remove("sobre"); if (e.dataTransfer.files[0]) prepararArquivo(e.dataTransfer.files[0]); };
+$("#arquivo").onchange = e => { if (e.target.files[0]) prepararArquivo(e.target.files[0]); };
+$("#enviar").onclick = enviarBase;
+$("#apagar-tudo").onclick = apagarTudo;
+$("#modo-imp").addEventListener("change", atualizarBotaoEnviar);
+
+// ---------- eventos ----------
+for (const d of Object.keys(DIMS)) $("#f-"+d).addEventListener("change", e => definirFiltro(d, e.target.value));
+$("#f-de").addEventListener("change", e => definirFiltro("de", e.target.value));
+$("#f-ate").addEventListener("change", e => definirFiltro("ate", e.target.value));
+$("#limpar").onclick = () => { for (const k in estado.filtros) estado.filtros[k] = ""; $("#f-de").value = $("#f-ate").value = ""; salvarUrl(); render(); };
+$("#trilha").addEventListener("click", e => { const d = e.target.dataset.rm; if (d) { definirFiltro(d, ""); if (d === "de" || d === "ate") $("#f-"+d).value = ""; } });
+$("#kpis").addEventListener("click", e => { const s = e.target.closest("[data-st]")?.dataset.st; if (s) { definirFiltro("status", estado.filtros.status === s ? "" : s); $("#sec-registros").scrollIntoView(); } });
+$("#abas").addEventListener("click", e => { const d = e.target.closest("[data-dim]")?.dataset.dim; if (d) { estado.dim = d; salvarUrl(); render(); } });
+$("#abas-pareto").addEventListener("click", e => { const p = e.target.closest("[data-par]")?.dataset.par; if (p) { estado.par = p; salvarUrl(); render(); } });
+$("#modo-pauta").addEventListener("click", e => { const p = e.target.closest("[data-pauta]")?.dataset.pauta; if (p) { estado.pauta = p; render(); } });
+$("#modo-lista").addEventListener("click", e => { const m = e.target.closest("[data-modo]")?.dataset.modo; if (m) { estado.modo = m; estado.limite = 15; render(); } });
+$("#pareto").addEventListener("click", e => {
+  const b = e.target.closest("[data-par-k]"); if (!b) return;
+  const alvo = {causa:"causa", falha:"falha", equipamento:"equipamento", kpi:"kpi"}[estado.par];
+  definirFiltro(alvo, b.dataset.parRot);
+});
+$("#kpi-impacto").addEventListener("click", e => { const k = e.target.closest("[data-kpi]")?.dataset.kpi; if (k) definirFiltro("kpi", estado.filtros.kpi === k ? "" : k); });
+$("#pauta").addEventListener("click", e => {
+  if (e.target.id === "pauta-todas") { definirFiltro("status", estado.pauta === "novas" ? "Nova" : "abertas"); $("#sec-registros").scrollIntoView(); return; }
+  const it = e.target.closest("[data-id]"); if (it) abrirDetalhe(it.dataset.id, estado.navPauta);
+});
+$("#progresso").addEventListener("click", e => {
+  const b = e.target.closest("[data-grupo]"); if (!b) return;
+  estado.filtros[estado.dim] = b.dataset.grupo;
+  estado.dim = PROXIMA[estado.dim];
+  salvarUrl(); render();
+});
+$("#menu").addEventListener("click", e => {
+  const ir = e.target.closest("[data-ir]")?.dataset.ir; if (!ir) return;
+  document.querySelectorAll("#menu button").forEach(b => b.classList.toggle("ativo", b.dataset.ir === ir));
+  if (TITULO_DIM[ir]) { estado.dim = ir; salvarUrl(); render(); $("#sec-progresso").scrollIntoView(); }
+  else if (ir === "painel") window.scrollTo(0,0);
+  else $("#sec-"+ir).scrollIntoView();
+});
+$("#tab-lista").addEventListener("click", e => {
+  if (e.target.id === "mais") { estado.limite += 50; render(); return; }
+  const tr = e.target.closest("tr[data-id]"); if (tr) abrirDetalhe(tr.dataset.id, estado.navLista);
+});
+$("#detalhe").addEventListener("click", e => { if (e.target.id === "detalhe") e.target.close(); });
+document.addEventListener("keydown", e => {   // setas do teclado passam as anomalias na reunião
+  if (!$("#detalhe").open || /INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName)) return;
+  if (e.key === "ArrowRight") $("#prox")?.click(); else if (e.key === "ArrowLeft") $("#ant")?.click();
+});
+
+const dica = $("#dica");
+document.addEventListener("mousemove", e => {
+  const alvo = e.target.closest("[data-dica]");
+  if (!alvo) { dica.style.display = "none"; return; }
+  dica.textContent = alvo.dataset.dica; dica.style.display = "block";
+  dica.style.left = Math.min(e.clientX + 14, innerWidth - dica.offsetWidth - 8) + "px";
+  dica.style.top = (e.clientY + 16) + "px";
+});
+
+(async () => {
+  $("#hoje").textContent = new Date().toLocaleDateString("pt-BR",{weekday:"long", day:"numeric", month:"long", year:"numeric"});
+  lerUrl(); $("#f-de").value = estado.filtros.de; $("#f-ate").value = estado.filtros.ate;
+  const demo = modoDemo();
+  const fonte = $("#fonte");
+  try {
+    Object.assign(estado, demo ? carregarDemo() : await carregarSupabase());
+    fonte.textContent = demo ? "Dados de demonstração" : `Atualizado às ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`;
+    fonte.classList.toggle("demo", demo);
+  } catch (err) {
+    $("#aviso").style.display = "block";
+    $("#aviso").textContent = "Não foi possível carregar as anomalias. " + err.message;
+    fonte.textContent = "Erro ao carregar"; fonte.classList.add("erro");
+  }
+  render();
+})();
+</script>
+</body>
+</html>
