@@ -93,7 +93,6 @@ button.kpi:hover{border-color:var(--bar)}
 .abas{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px;flex-wrap:wrap}
 .abas button{border:none;background:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted)}
 .abas button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(20,30,60,.08)}
-.grade2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
 
 /* pauta da reunião */
 .pauta{display:flex;flex-direction:column}
@@ -107,13 +106,6 @@ button.kpi:hover{border-color:var(--bar)}
 .tag.rei{color:var(--bad);border:1px solid currentColor}
 .tag.atr{background:var(--bad-bg);color:var(--bad)}
 
-/* barras horizontais (KPIs impactados) */
-.hbar{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 34px;gap:10px;align-items:center;padding:7px 0;font-size:12px;border-bottom:1px solid var(--line);cursor:pointer}
-.hbar:last-child{border-bottom:none}
-.hbar .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
-.hbar .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
-.pilha{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--track)}
-.pilha span{height:100%}
 .legenda{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:10px}
 .legenda span{display:inline-flex;align-items:center;gap:6px}
 .legenda i{display:inline-block;width:12px;height:12px;border-radius:3px}
@@ -149,8 +141,11 @@ tbody tr{cursor:pointer}
 tbody tr:hover{background:var(--surface-2)}
 .pto{display:inline-flex;align-items:center;gap:6px;font-weight:600}
 .pto::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
-.st-nova{color:var(--bar)}.st-analise{color:var(--warn)}.st-andamento{color:var(--warn)}.st-concluida{color:var(--ok)}
-.cond-fora{color:var(--bad);font-weight:600}.cond-ok{color:var(--ok)}
+.st-avaliar{color:var(--bar)}.st-lancar{color:var(--warn)}.st-ok{color:var(--ok)}.st-sem{color:var(--muted)}
+.prio{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 7px}
+.prio.Alta{background:var(--bad-bg);color:var(--bad)}.prio.Média{background:var(--warn-bg);color:var(--warn)}.prio.Baixa{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+.form .check{flex-direction:row;align-items:center;gap:8px;font-weight:600;padding-top:20px}
+.form .check input{width:auto}
 .vazio{padding:28px;text-align:center;color:var(--muted)}
 
 /* detalhe + dica */
@@ -215,7 +210,6 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
 
 @media (max-width:1100px){
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .grade2{grid-template-columns:1fr}
 }
 @media (max-width:820px){
   .app{flex-direction:column}
@@ -237,7 +231,6 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
   .pareto{overflow-x:auto}
   .pareto svg{min-width:640px}
   .pauta-item .pto{grid-column:2}
-  .hbar{grid-template-columns:minmax(0,100px) minmax(0,1fr) 30px}
   .duas,.form{grid-template-columns:1fr}
   .dlg-cab{flex-wrap:wrap}
 }
@@ -260,9 +253,9 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
     <div class="regra">
       <h4>Roteiro da reunião</h4>
       <ol>
-        <li><b>Pauta:</b> avaliar as anomalias novas e o KPI impactado</li>
+        <li><b>Pauta:</b> discutir as anomalias novas e os 5 porquês</li>
+        <li><b>Priorizar</b> as ações sugeridas e lançar no controle de ações da área</li>
         <li><b>Pareto:</b> atacar as causas que somam 80%</li>
-        <li><b>Ações:</b> cobrar as abertas e as atrasadas</li>
       </ol>
     </div>
   </aside>
@@ -294,27 +287,16 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
 
       <section class="kpis" id="kpis"></section>
 
-      <div class="grade2">
-        <section class="card" id="sec-pauta">
-          <div class="card-cab">
-            <div><h2>Pauta da reunião</h2><div class="sub" id="sub-pauta"></div></div>
-            <div class="abas" id="modo-pauta">
-              <button data-pauta="novas" aria-selected="true">A avaliar</button>
-              <button data-pauta="abertas">Ações em aberto</button>
-            </div>
+      <section class="card" id="sec-pauta">
+        <div class="card-cab">
+          <div><h2>Pauta da reunião</h2><div class="sub" id="sub-pauta"></div></div>
+          <div class="abas" id="modo-pauta">
+            <button data-pauta="avaliar" aria-selected="true">A discutir</button>
+            <button data-pauta="lancar">Ações a lançar no controle</button>
           </div>
-          <div class="pauta" id="pauta"></div>
-        </section>
-        <section class="card" id="sec-kpis">
-          <div class="card-cab"><div><h2>KPIs impactados</h2><div class="sub">Avaliados na reunião · clique para filtrar</div></div></div>
-          <div id="kpi-impacto"></div>
-          <div class="legenda">
-            <span><i style="background:var(--bad)"></i>Fora da tolerância</span>
-            <span><i style="background:var(--ok)"></i>Dentro da tolerância</span>
-            <span><i style="background:var(--ref)"></i>Sem impacto</span>
-          </div>
-        </section>
-      </div>
+        </div>
+        <div class="pauta" id="pauta"></div>
+      </section>
 
       <section class="card" id="sec-pareto">
         <div class="card-cab">
@@ -323,7 +305,6 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
             <button data-par="causa">Causa raiz</button>
             <button data-par="falha">Tipo de falha</button>
             <button data-par="equipamento">Equipamento</button>
-            <button data-par="kpi">KPI impactado</button>
           </div>
         </div>
         <div class="pareto" id="pareto"></div>
@@ -347,8 +328,8 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
         <div class="card-cab">
           <div><h2>Registros de anomalias</h2><div class="sub" id="sub-lista"></div></div>
           <div class="abas" id="modo-lista">
-            <button data-modo="abertas" aria-selected="true">Não concluídas</button>
-            <button data-modo="todas">Todas</button>
+            <button data-modo="todas" aria-selected="true">Todas</button>
+            <button data-modo="avaliar">A discutir</button>
           </div>
         </div>
         <div class="tabela-rolagem"><table id="tab-lista"></table></div>
@@ -359,56 +340,53 @@ dialog::backdrop{background:rgba(10,14,35,.55)}
 
 <dialog id="detalhe"></dialog>
 <dialog id="importar">
-  <div class="dlg-cab"><div><h3>Atualizar base de anomalias</h3><p>Envie o Excel exportado do Microsoft Forms (Falha Zero — 5 Porquês). Respostas que já existem são atualizadas, não duplicadas. As avaliações feitas na reunião são mantidas.</p></div><button class="btn" id="fechar-imp">Fechar</button></div>
+  <div class="dlg-cab"><div><h3>Atualizar base de anomalias</h3><p>Envie o Excel exportado do Microsoft Forms (Falha Zero — 5 Porquês). Respostas que já existem são atualizadas, não duplicadas. O que foi registrado na reunião é mantido.</p></div><button class="btn" id="fechar-imp">Fechar</button></div>
   <div class="imp">
     <div style="display:flex;flex-direction:column;gap:12px">
       <div class="soltar" id="soltar" tabindex="0">Arraste o Excel aqui ou <b>clique para escolher</b><br><small style="color:var(--muted)">.xlsx exportado do Forms (“Abrir no Excel”)</small></div>
       <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" hidden>
       <div class="modo-imp" id="modo-imp">
         <label><input type="radio" name="modo-imp" value="somar" checked><span><b>Adicionar e atualizar</b><small>Mantém o que já está na base; respostas com o mesmo ID são atualizadas.</small></span></label>
-        <label><input type="radio" name="modo-imp" value="substituir"><span><b>Substituir toda a base por este arquivo</b><small>Apaga as anomalias que estão na base e deixa só as do arquivo. As avaliações da reunião ficam guardadas pelo ID.</small></span></label>
+        <label><input type="radio" name="modo-imp" value="substituir"><span><b>Substituir toda a base por este arquivo</b><small>Apaga as anomalias que estão na base e deixa só as do arquivo. O que foi registrado na reunião fica guardado pelo ID.</small></span></label>
       </div>
       <div id="previa"></div>
       <div class="imp-rod"><span id="imp-status" style="font-size:12px;color:var(--muted)"></span><button class="btn btn-prim" id="enviar" disabled>Enviar para a base</button></div>
     </div>
     <div class="perigo">
-      <div><b>Apagar todas as anomalias</b><small>A base e as avaliações ficam vazias. Uma cópia de segurança é guardada no banco.</small></div>
+      <div><b>Apagar todas as anomalias</b><small>A base e os registros da reunião ficam vazios. Uma cópia de segurança é guardada no banco.</small></div>
       <button class="btn btn-perigo" id="apagar-tudo">Apagar tudo…</button>
     </div>
   </div>
 </dialog>
-<datalist id="lista-kpis"></datalist>
 <div id="dica"></div>
 
 <script src="/cinco-porques/config.js"></script>
 <script>
 const CFG = window.PAINEL_CONFIG || {};
 const DIMS = {planta:"Planta", area:"Área", equipamento:"Equipamento", autor:"Autor", turno:"Turno"};
-const EXTRAS = {causa:"Causa raiz", falha:"Tipo de falha", kpi:"KPI", status:"Status"};   // filtros que vêm de clique (Pareto, KPIs, indicadores)
+const EXTRAS = {causa:"Causa raiz", falha:"Tipo de falha", situacao:"Situação"};   // filtros que vêm de clique (Pareto e indicadores)
 const TITULO_DIM = {planta:"Por planta", area:"Por área", equipamento:"Por equipamento", autor:"Por autor"};
 const PROXIMA = {planta:"area", area:"equipamento", equipamento:"equipamento", autor:"autor"};
-const PARETO = {causa:"causa raiz", falha:"tipo de falha", equipamento:"equipamento", kpi:"KPI impactado"};
-const STATUS = ["Nova","Em análise","Ação em andamento","Concluída"];
-const ST_CLASSE = {"Nova":"st-nova","Em análise":"st-analise","Ação em andamento":"st-andamento","Concluída":"st-concluida"};
-const ST_ROTULO = {"Nova":"A avaliar","Em análise":"Em análise","Ação em andamento":"Ação em andamento","Concluída":"Concluída"};
-const CONDICOES = ["Acima da tolerância","Abaixo da tolerância","Dentro da tolerância","Sem impacto em KPI"];
-const FORA = new Set(["Acima da tolerância","Abaixo da tolerância"]);
-const KPIS_SUGERIDOS = ["Umidade","Proteína","Rendimento","Produtividade / OEE","Disponibilidade do equipamento","Qualidade — não conformidade","Perda / descarte","Consumo de energia","Segurança","Meio ambiente"];
-const estado = {dados:[], filtros:{planta:"",area:"",equipamento:"",autor:"",turno:"",causa:"",falha:"",kpi:"",status:"",de:"",ate:""}, dim:"planta", par:"causa", pauta:"novas", modo:"abertas", limite:15, nav:[]};
+const PARETO = {causa:"causa raiz", falha:"tipo de falha", equipamento:"equipamento"};
+const PRIORIDADES = ["Alta","Média","Baixa"];
+const SITUACAO = {avaliar:"A discutir", lancar:"Ação a lançar no controle", reincidentes:"Reincidentes", alta:"Prioridade alta"};
+const estado = {dados:[], filtros:{planta:"",area:"",equipamento:"",autor:"",turno:"",causa:"",falha:"",situacao:"",de:"",ate:""}, dim:"planta", par:"causa", pauta:"avaliar", modo:"todas", limite:15, nav:[]};
 
 const $ = s => document.querySelector(s);
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmtN = (n, d=1) => n == null || isNaN(n) ? "—" : Number(n).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
 const fmtData = d => d ? d.slice(8,10) + "/" + d.slice(5,7) + "/" + d.slice(0,4) : "—";   // AAAA-MM-DD, sem fuso
-const hojeISO = () => { const d = new Date(); return `${d.getFullYear()}-${doisDig(d.getMonth()+1)}-${doisDig(d.getDate())}`; };
 const doisDig = n => String(n).padStart(2,"0");
 const chave = t => String(t ?? "").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ").trim().toLowerCase();
 const modoDemo = () => !CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY || new URLSearchParams(location.search).has("demo");
-const temFiltro = () => Object.values(estado.filtros).some(Boolean);
 const vazio = v => v == null || !String(v).trim() || /^n\/?a$/i.test(String(v).trim());
-const atrasada = r => r.prazo && r.status !== "Concluída" && r.prazo < hojeISO();
-const aberta = r => r.status === "Em análise" || r.status === "Ação em andamento";
-const ehFora = r => FORA.has(r.condicao);
+// O painel é um banco de informações: a reunião só discute a anomalia, prioriza a
+// ação sugerida e marca se ela já foi lançada no controle de ações da área.
+// O acompanhamento das ações (responsável, prazo, status) fica nesse controle.
+const discutida = r => !!r.avaliado_em;
+const temAcao = r => !vazio(r.acoes_sugeridas);
+const aLancar = r => discutida(r) && temAcao(r) && !r.enviada_controle;
+const ORDEM_PRIO = {Alta:0, "Média":1, Baixa:2};
 
 // ---------- carga ----------
 const api = () => CFG.SUPABASE_URL.replace(/\/$/,"") + "/rest/v1/";
@@ -460,8 +438,8 @@ function carregarDemo(){
     "SPRAY DRYER":["Umidade alta no pó","Entupimento do bico"],"CICLONE":["Perda de produto no exaustor"],"CALDEIRA":["Queda de pressão de vapor"],"COMPRESSOR":["Superaquecimento"],
     "EXPANDER":["Travamento por sobrecarga","Umidade alta na massa"],"EXTRATOR":["Solvente residual alto"],"QUEBRADOR":["Desgaste de rolo"],"CONDICIONADOR":["Temperatura fora do padrão"],"ENSACADEIRA":["Má selagem","Peso fora da tolerância"],
   };
-  const kpiDe = {"Umidade alta no pó":"Umidade","Umidade alta na massa":"Umidade","Solvente residual alto":"Qualidade — não conformidade","Peso fora da tolerância":"Perda / descarte","Má selagem":"Qualidade — não conformidade","Garrafa deformada":"Perda / descarte","Queda de pressão de vapor":"Consumo de energia","Entupimento do bico":"Produtividade / OEE","Temperatura fora do padrão":"Umidade"};
   const causas = [["Procedimento inexistente ou inadequado",5],["Condição básica não atendida (limpeza, lubrificação, aperto)",4],["Deterioração não detectada na inspeção",3],["Falta de conhecimento ou habilidade",2],["Condição de operação não respeitada",2],["Falha de projeto do equipamento",1],["Outra causa",1]];
+  const acoes = ["Incluir o item no checklist de inspeção do equipamento","Revisar o POP de partida e treinar os operadores","Definir critério de troca preventiva do componente","Incluir o ponto no plano de lubrificação","Instalar indicação visual da faixa de operação"];
   const pesoTotal = causas.reduce((s,c)=>s+c[1],0);
   const autores = ["Gabriel","Ana Souza","Bruno Lima","Carla Dias","Diego Rocha"];
   const turnos = ["Manhã","Tarde","Noite"];
@@ -479,9 +457,8 @@ function carregarDemo(){
       let x = rnd()*pesoTotal, causa = causas[0][0]; for (const [c,p] of causas) { if ((x -= p) < 0) { causa = c; break; } }
       const nPq = 3 + Math.floor(rnd()*3);
       const idade = (hoje - d) / 864e5;
-      const status = idade > 60 ? escolhe(["Concluída","Concluída","Ação em andamento"]) : idade > 14 ? escolhe(["Em análise","Ação em andamento","Concluída"]) : escolhe(["Nova","Nova","Em análise"]);
-      const prazo = status === "Nova" ? null : (() => { const p = new Date(status === "Concluída" ? d : hoje); p.setDate(p.getDate() + (status === "Concluída" ? 15 : Math.floor(rnd()*40) - 8)); return `${p.getFullYear()}-${doisDig(p.getMonth()+1)}-${doisDig(p.getDate())}`; })();
-      const kpi = status === "Nova" ? null : (kpiDe[falha] || escolhe(["Disponibilidade do equipamento","Produtividade / OEE"]));
+      const disc = idade > 10 || rnd() < .3;
+      const enviada = disc && (idade > 30 ? rnd() < .85 : rnd() < .4);
       dados.push({
         id:++id, resposta_id:String(id), planta, area, equipamento:eq, turno:escolhe(turnos), data_evento:data, data_ref:data,
         autor:escolhe(autores), tipo_falha:falha, acao_imediata:"Ajuste do parâmetro e liberação da linha",
@@ -489,9 +466,9 @@ function carregarDemo(){
         clareza: Math.min(5, nPq - 1 + Math.floor(rnd()*2)),
         causas:[causa], causa_raiz:causa, causa_outra: causa==="Outra causa" ? "Fornecedor entregou peça fora de especificação" : null,
         comentario_causa:"O padrão não definia critérios claros para verificar esse ponto.",
-        acoes_sugeridas:"Incluir o item no checklist de inspeção do equipamento",
-        kpi, condicao: kpi ? (rnd() < .65 ? escolhe(["Acima da tolerância","Abaixo da tolerância"]) : "Dentro da tolerância") : null,
-        status, responsavel: status === "Nova" ? null : escolhe(autores), prazo, observacao:null,
+        acoes_sugeridas: escolhe(acoes),
+        avaliado_em: disc ? d.toISOString() : null, prioridade: disc ? escolhe(["Alta","Média","Média","Baixa"]) : null,
+        enviada_controle: enviada, ref_controle: enviada ? "AC-" + (1000 + id) : null, observacao: null,
       });
     }
   }
@@ -504,8 +481,7 @@ function passa(r, f, ignorar){
   return Object.keys(DIMS).every(d => d === ignorar || !f[d] || r[d] === f[d]) &&
     (!f.causa || r.causas.includes(f.causa)) &&
     (!f.falha || r.falha_k === chave(f.falha)) &&
-    (!f.kpi || (f.kpi === "Não avaliado" ? !r.kpi : r.kpi === f.kpi)) &&
-    (!f.status || (f.status === "abertas" ? aberta(r) : f.status === "atrasadas" ? atrasada(r) : f.status === "reincidentes" ? r.reincidente : r.status === f.status)) &&
+    (!f.situacao || (f.situacao === "avaliar" ? !discutida(r) : f.situacao === "lancar" ? aLancar(r) : f.situacao === "alta" ? r.prioridade === "Alta" : r.reincidente)) &&
     (!f.de  || (r.data_ref && r.data_ref >= f.de)) &&
     (!f.ate || (r.data_ref && r.data_ref <= f.ate));
 }
@@ -534,6 +510,7 @@ function salvarUrl(){
 function lerUrl(){
   const p = new URLSearchParams(location.search);
   for (const k of Object.keys(estado.filtros)) estado.filtros[k] = p.get(k) || "";
+  if (!SITUACAO[estado.filtros.situacao]) estado.filtros.situacao = "";
   if (TITULO_DIM[p.get("ver")]) estado.dim = p.get("ver");
   if (PARETO[p.get("pareto")]) estado.par = p.get("pareto");
 }
@@ -559,8 +536,7 @@ function contarPareto(linhas, tipo){
   for (const r of linhas) {
     if (tipo === "causa") r.causas.forEach(c => somar(c, c));
     else if (tipo === "falha") somar(r.falha_k, r.falha);
-    else if (tipo === "equipamento") somar(r.equipamento, r.equipamento);
-    else somar(r.kpi || "Não avaliado", r.kpi || "Não avaliado");
+    else somar(r.equipamento, r.equipamento);
   }
   return [...g.values()].sort((a,b)=>b.n-a.n || a.rot.localeCompare(b.rot,"pt-BR"));
 }
@@ -576,7 +552,6 @@ function svgPareto(itens){
   const topo = Math.max(4, Math.ceil(maxN/4)*4);   // múltiplo de 4: as 5 linhas da grade caem em números inteiros
   const y = n => T + (H-T-B) * (1 - n/topo), yp = p => T + (H-T-B) * (1 - p/100);
   let g = "", acum = 0, pts = [];
-  // grade e eixos
   for (let i = 0; i <= 4; i++) {
     const v = topo*i/4, yy = y(v);
     g += `<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="var(--line)"/>`;
@@ -603,62 +578,56 @@ function svgPareto(itens){
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pareto das anomalias">${g}</svg>`;
 }
 
+// situação de uma anomalia na reunião, para a tabela
+function situacao(r){
+  if (!discutida(r)) return `<span class="pto st-avaliar">A discutir</span>`;
+  if (!temAcao(r)) return `<span class="pto st-sem">Discutida · sem ação sugerida</span>`;
+  if (r.enviada_controle) return `<span class="pto st-ok" ${r.ref_controle ? `data-dica="Controle de ações: ${esc(r.ref_controle)}"` : ""}>No controle de ações</span>`;
+  return `<span class="pto st-lancar">Lançar no controle</span>`;
+}
+const prio = r => r.prioridade ? `<span class="prio ${esc(r.prioridade)}">${esc(r.prioridade)}</span>` : `<span style="color:var(--muted)">—</span>`;
+
 // ---------- render ----------
 function render(){
   preencherSelects();
   const linhas = filtrar();
   const f = estado.filtros;
-  const rotStatus = {abertas:"Ações em aberto", atrasadas:"Ações atrasadas", reincidentes:"Reincidentes"};
 
   $("#trilha").innerHTML = [...Object.keys(DIMS), ...Object.keys(EXTRAS)].filter(d=>f[d]).map(d =>
-    `<span class="chip">${DIMS[d] || EXTRAS[d]}: <b>${esc(d === "status" ? (rotStatus[f[d]] || ST_ROTULO[f[d]] || f[d]) : f[d])}</b><button aria-label="Remover filtro ${DIMS[d] || EXTRAS[d]}" data-rm="${d}">×</button></span>`).join("");
+    `<span class="chip">${DIMS[d] || EXTRAS[d]}: <b>${esc(d === "situacao" ? SITUACAO[f[d]] : f[d])}</b><button aria-label="Remover filtro ${DIMS[d] || EXTRAS[d]}" data-rm="${d}">×</button></span>`).join("");
 
   // indicadores
   const t = tendencia(linhas);
-  const novas = linhas.filter(r=>r.status==="Nova"), abertas = linhas.filter(aberta), atras = linhas.filter(atrasada);
+  const novas = linhas.filter(r=>!discutida(r)), lancar = linhas.filter(aLancar);
+  const lancarAlta = lancar.filter(r=>r.prioridade==="Alta").length;
   const rei = linhas.filter(r=>r.reincidente), combRei = new Set(rei.map(r=>chave(r.equipamento)+"|"+r.falha_k)).size;
-  const fora = linhas.filter(ehFora).length;
   $("#kpis").innerHTML = `
     <div class="kpi"><div class="l">Anomalias relatadas</div><div class="v">${linhas.length}</div>
       <div class="s">${t ? `${t.atual} no último mês ${seta(t.atual, t.anterior, false)}` : "&nbsp;"}</div></div>
-    <button class="kpi" data-st="Nova" data-dica="Filtrar as que ainda não passaram pela reunião"><div class="l">A avaliar na reunião</div><div class="v ${novas.length?"warn":"ok"}">${novas.length}</div>
-      <div class="s">${fora} anomalia(s) com KPI fora da tolerância</div></button>
-    <button class="kpi" data-st="abertas" data-dica="Filtrar as ações em análise ou em andamento"><div class="l">Ações em aberto</div><div class="v">${abertas.length}</div>
-      <div class="s">${atras.length ? `<span class="tag atr" style="margin:0">${atras.length} atrasada(s)</span>` : "nenhuma atrasada"}</div></button>
+    <button class="kpi" data-st="avaliar" data-dica="Filtrar as que ainda não passaram pela reunião"><div class="l">A discutir na reunião</div><div class="v ${novas.length?"warn":"ok"}">${novas.length}</div>
+      <div class="s">${novas.filter(r=>r.reincidente).length} reincidente(s)</div></button>
+    <button class="kpi" data-st="lancar" data-dica="Ações sugeridas já priorizadas que ainda não foram lançadas no controle de ações da área"><div class="l">Ações a lançar no controle</div><div class="v ${lancar.length?"warn":"ok"}">${lancar.length}</div>
+      <div class="s">${lancarAlta ? `<span class="prio Alta">${lancarAlta} de prioridade alta</span>` : "nenhuma de prioridade alta"}</div></button>
     <button class="kpi" data-st="reincidentes" data-dica="Mesmo equipamento com o mesmo tipo de falha mais de uma vez"><div class="l">Reincidentes</div><div class="v ${rei.length?"bad":"ok"}">${rei.length}</div>
       <div class="s">${combRei} equipamento(s) × falha repetida</div></button>`;
 
   // pauta da reunião
   document.querySelectorAll("#modo-pauta button").forEach(b => b.setAttribute("aria-selected", b.dataset.pauta === estado.pauta));
-  const pauta = estado.pauta === "novas"
+  const pauta = estado.pauta === "avaliar"
     ? [...novas].sort((a,b)=>(b.reincidente-a.reincidente) || (a.data_ref||"").localeCompare(b.data_ref||""))
-    : [...abertas].sort((a,b)=>(atrasada(b)-atrasada(a)) || (a.prazo||"9").localeCompare(b.prazo||"9"));
-  $("#sub-pauta").textContent = estado.pauta === "novas"
-    ? `${pauta.length} anomalia(s) ainda não avaliada(s) · reincidentes primeiro, depois as mais antigas`
-    : `${pauta.length} ação(ões) em aberto · atrasadas primeiro, depois por prazo`;
+    : [...lancar].sort((a,b)=>(ORDEM_PRIO[a.prioridade] ?? 3) - (ORDEM_PRIO[b.prioridade] ?? 3) || (a.data_ref||"").localeCompare(b.data_ref||""));
+  $("#sub-pauta").textContent = estado.pauta === "avaliar"
+    ? `${pauta.length} anomalia(s) ainda não discutida(s) · reincidentes primeiro, depois as mais antigas`
+    : `${pauta.length} ação(ões) sugerida(s) já priorizada(s) e ainda fora do controle de ações · da prioridade alta para a baixa`;
   estado.navPauta = pauta.map(r=>r.id);
   $("#pauta").innerHTML = pauta.length ? pauta.slice(0, 8).map(r => `
-    <div class="pauta-item" data-id="${r.id}" data-lista="pauta">
+    <div class="pauta-item" data-id="${r.id}">
       <span class="d">${fmtData(r.data_ref)}<br>${esc(r.turno)}</span>
-      <span class="t"><b>${esc(r.falha)}${r.reincidente ? `<span class="tag rei" data-dica="${r.ocorrencia}ª de ${r.total_rei} ocorrências deste equipamento com esta falha">↻ ${r.ocorrencia}ª vez</span>` : ""}</b>
-        <span>${esc(r.equipamento)} · ${esc(r.area)} · ${esc(r.planta)}</span></span>
-      ${estado.pauta === "novas"
-        ? `<span class="pto st-nova" style="font-size:12px">Avaliar</span>`
-        : `<span style="font-size:12px;text-align:right">${esc(r.responsavel || "sem responsável")}<br>${r.prazo ? `<span class="${atrasada(r)?"cond-fora":""}">prazo ${fmtData(r.prazo)}</span>` : "sem prazo"}</span>`}
+      <span class="t"><b>${esc(estado.pauta === "avaliar" ? r.falha : r.acoes_sugeridas)}${r.reincidente ? `<span class="tag rei" data-dica="${r.ocorrencia}ª de ${r.total_rei} ocorrências deste equipamento com esta falha">↻ ${r.ocorrencia}ª vez</span>` : ""}</b>
+        <span>${estado.pauta === "avaliar" ? "" : esc(r.falha) + " · "}${esc(r.equipamento)} · ${esc(r.area)} · ${esc(r.planta)}</span></span>
+      ${estado.pauta === "avaliar" ? `<span class="pto st-avaliar" style="font-size:12px">Discutir</span>` : prio(r)}
     </div>`).join("") + (pauta.length > 8 ? `<button class="link" id="pauta-todas" style="margin-top:6px">Ver as ${pauta.length} na lista de registros</button>` : "")
-    : `<div class="msg ok">✔ ${estado.pauta === "novas" ? "Nenhuma anomalia aguardando avaliação." : "Nenhuma ação em aberto."}</div>`;
-
-  // KPIs impactados
-  const porKpi = {};
-  for (const r of linhas) { const k = r.kpi || "Não avaliado"; (porKpi[k] ||= {fora:0, dentro:0, sem:0, n:0}); const e = porKpi[k]; e.n++;
-    if (ehFora(r)) e.fora++; else if (r.condicao === "Dentro da tolerância") e.dentro++; else e.sem++; }
-  const kpiLista = Object.entries(porKpi).sort((a,b)=> (a[0]==="Não avaliado") - (b[0]==="Não avaliado") || b[1].fora-a[1].fora || b[1].n-a[1].n);
-  const maxK = Math.max(1, ...kpiLista.map(e=>e[1].n));
-  $("#kpi-impacto").innerHTML = kpiLista.length ? kpiLista.map(([k,e]) => `
-    <div class="hbar" data-kpi="${esc(k)}" data-dica="${esc(k)}: ${e.n} anomalia(s) · ${e.fora} fora da tolerância · ${e.dentro} dentro · ${e.sem} sem impacto/sem avaliação">
-      <span class="n" style="${k==="Não avaliado"?"color:var(--muted);font-weight:400;font-style:italic":""}">${esc(k)}</span>
-      <div class="pilha" style="width:${Math.max(4, e.n/maxK*100)}%"><span style="width:${e.fora/e.n*100}%;background:var(--bad)"></span><span style="width:${e.dentro/e.n*100}%;background:var(--ok)"></span><span style="width:${e.sem/e.n*100}%;background:var(--ref)"></span></div>
-      <span class="v">${e.n}</span></div>`).join("") : `<div class="vazio">Nenhuma anomalia com esses filtros</div>`;
+    : `<div class="msg ok">✔ ${estado.pauta === "avaliar" ? "Nenhuma anomalia aguardando a reunião." : "Todas as ações sugeridas priorizadas já estão no controle de ações."}</div>`;
 
   // Pareto
   document.querySelectorAll("#abas-pareto button").forEach(b => b.setAttribute("aria-selected", b.dataset.par === estado.par));
@@ -680,41 +649,40 @@ function render(){
   const grupos = {};
   for (const r of linhas) (grupos[r[estado.dim]] ||= []).push(r);
   const lista = Object.entries(grupos).map(([nome, rs]) => ({nome, n:rs.length, rei:rs.filter(r=>r.reincidente).length,
-    atr:rs.filter(atrasada).length, novas:rs.filter(r=>r.status==="Nova").length, fora:rs.filter(ehFora).length,
+    novas:rs.filter(r=>!discutida(r)).length, lancar:rs.filter(aLancar).length,
     clar: rs.filter(r=>r.clareza).length ? rs.reduce((s,r)=>s+(r.clareza||0),0)/rs.filter(r=>r.clareza).length : null}))
     .sort((a,b)=>b.n-a.n || b.rei-a.rei);
   const maxG = Math.max(1, ...lista.map(g=>g.n));
   $("#progresso").innerHTML = lista.length ? lista.map(g => {
-    const c = g.atr || g.fora ? "bad" : g.rei || g.novas ? "warn" : "ok";
-    return `<button class="grupo" data-grupo="${esc(g.nome)}" data-dica="${esc(g.nome)}: ${g.n} anomalia(s) · ${g.rei} reincidente(s) · ${g.novas} a avaliar · ${g.atr} ação(ões) atrasada(s) · clareza média ${fmtN(g.clar)} de 5">
+    const c = g.rei ? "bad" : g.novas || g.lancar ? "warn" : "ok";
+    return `<button class="grupo" data-grupo="${esc(g.nome)}" data-dica="${esc(g.nome)}: ${g.n} anomalia(s) · ${g.rei} reincidente(s) · ${g.novas} a discutir · ${g.lancar} ação(ões) a lançar no controle · clareza média ${fmtN(g.clar)} de 5">
       <div class="l1"><span class="nome">${esc(g.nome)}</span><span class="pct ${c}">${g.n}</span></div>
       <div class="meta"><span class="${c}" style="width:${g.n/maxG*100}%"></span></div>
-      <div class="l3">${g.rei} reincidente(s) · ${g.novas} a avaliar · clareza ${fmtN(g.clar)}/5</div></button>`;
+      <div class="l3">${g.rei} reincidente(s) · ${g.novas} a discutir · clareza ${fmtN(g.clar)}/5</div></button>`;
   }).join("") : `<div class="vazio">Nenhuma anomalia com esses filtros</div>`;
 
   // tabela
   document.querySelectorAll("#modo-lista button").forEach(b => b.setAttribute("aria-selected", b.dataset.modo === estado.modo));
-  const tab = estado.modo === "abertas" ? linhas.filter(r=>r.status!=="Concluída") : linhas;
+  const tab = estado.modo === "avaliar" ? linhas.filter(r=>!discutida(r)) : linhas;
   estado.navLista = tab.map(r=>r.id);
-  $("#sub-lista").textContent = `${tab.length} anomalia(s)` + (tab.length > estado.limite ? ` · mostrando as ${estado.limite} mais recentes` : "") + " · clique numa linha para ver os 5 porquês e avaliar";
+  $("#sub-lista").textContent = `${tab.length} anomalia(s)` + (tab.length > estado.limite ? ` · mostrando as ${estado.limite} mais recentes` : "") + " · clique numa linha para ver os 5 porquês";
   $("#tab-lista").innerHTML = tab.length ? `
-    <thead><tr><th>Data</th><th>Turno</th><th>Planta</th><th>Área</th><th>Equipamento</th><th>Tipo de falha</th><th>Causa raiz</th><th class="num">Porquês</th><th>KPI impactado</th><th>Status</th><th>Autor</th></tr></thead>
+    <thead><tr><th>Data</th><th>Turno</th><th>Planta</th><th>Área</th><th>Equipamento</th><th>Tipo de falha</th><th>Causa raiz</th><th class="num">Porquês</th><th>Ação sugerida</th><th>Prioridade</th><th>Situação</th><th>Autor</th></tr></thead>
     <tbody>${tab.slice(0,estado.limite).map(r=>`
-      <tr data-id="${r.id}" data-lista="lista">
+      <tr data-id="${r.id}">
         <td>${fmtData(r.data_ref)}</td><td>${esc(r.turno)}</td><td>${esc(r.planta)}</td><td>${esc(r.area)}</td><td><b>${esc(r.equipamento)}</b></td>
         <td class="corte" title="${esc(r.falha)}">${esc(r.falha)}${r.reincidente ? `<span class="tag rei">↻ ${r.ocorrencia}ª</span>` : ""}</td>
         <td class="corte" title="${esc(r.causas.join("; "))}">${esc(r.causas.join("; "))}</td>
         <td class="num" data-dica="${r.porques} de 5 porquês preenchidos · clareza ${r.clareza ?? "—"}/5">${r.porques}/5</td>
-        <td>${r.kpi ? `<span class="${ehFora(r)?"cond-fora":r.condicao==="Dentro da tolerância"?"cond-ok":""}" data-dica="${esc(r.condicao || "condição não informada")}">${esc(r.kpi)}${ehFora(r) ? (r.condicao.startsWith("Acima") ? " ▲" : " ▼") : ""}</span>` : `<span style="color:var(--muted)">—</span>`}</td>
-        <td><span class="pto ${ST_CLASSE[r.status]}">${ST_ROTULO[r.status]}</span>${atrasada(r) ? `<span class="tag atr">atrasada</span>` : ""}</td>
+        <td class="corte" title="${esc(r.acoes_sugeridas || "")}">${temAcao(r) ? esc(r.acoes_sugeridas) : `<span style="color:var(--muted)">—</span>`}</td>
+        <td>${prio(r)}</td>
+        <td>${situacao(r)}</td>
         <td>${esc(r.autor)}</td>
-      </tr>`).join("")}</tbody>` + (tab.length > estado.limite ? `<tfoot><tr><td colspan="11" style="text-align:center"><button class="btn" id="mais">Mostrar mais</button></td></tr></tfoot>` : "")
-    : `<tbody><tr><td class="vazio">Nenhuma anomalia ${estado.modo==="abertas"?"não concluída ":""}com esses filtros</td></tr></tbody>`;
-
-  $("#lista-kpis").innerHTML = [...new Set([...KPIS_SUGERIDOS, ...estado.dados.map(r=>r.kpi).filter(Boolean)])].map(k=>`<option value="${esc(k)}">`).join("");
+      </tr>`).join("")}</tbody>` + (tab.length > estado.limite ? `<tfoot><tr><td colspan="12" style="text-align:center"><button class="btn" id="mais">Mostrar mais</button></td></tr></tfoot>` : "")
+    : `<tbody><tr><td class="vazio">Nenhuma anomalia ${estado.modo==="avaliar"?"a discutir ":""}com esses filtros</td></tr></tbody>`;
 }
 
-// ---------- detalhe + avaliação da reunião ----------
+// ---------- detalhe + registro da reunião ----------
 function abrirDetalhe(id, lista){
   const r = estado.dados.find(x=>String(x.id)===String(id)); if (!r) return;
   if (lista) estado.nav = lista;
@@ -746,39 +714,35 @@ function abrirDetalhe(id, lista){
         ${outra ? `<p style="font-size:13px"><b>Outra causa:</b> ${esc(outra)}</p>` : ""}
         ${vazio(r.comentario_causa) ? "" : `<p style="font-size:13px;color:var(--ink-2);margin-top:4px">${esc(r.comentario_causa)}</p>`}
       </div>
-      <div class="bloco"><h4>Ações sugeridas</h4><p>${vazio(r.acoes_sugeridas) ? "—" : esc(r.acoes_sugeridas)}</p></div>
+      <div class="bloco"><h4>Ações sugeridas</h4><p>${temAcao(r) ? esc(r.acoes_sugeridas) : "—"}</p></div>
       <form class="avaliacao" id="form-av">
-        <h4>Avaliação na reunião operacional</h4>
+        <h4>Reunião operacional</h4>
+        <p style="font-size:12px;color:var(--muted);margin:-6px 0 10px">Priorize a ação sugerida e lance no controle de ações da área: o acompanhamento (responsável, prazo, andamento) é feito lá.</p>
         <div class="form">
-          <label>KPI impactado<input name="kpi" list="lista-kpis" maxlength="120" placeholder="ex.: Umidade" value="${esc(r.kpi || "")}"></label>
-          <label>Condição do KPI<select name="condicao"><option value="">—</option>${CONDICOES.map(c=>`<option ${c===r.condicao?"selected":""}>${c}</option>`).join("")}</select></label>
-          <label>Status<select name="status">${STATUS.map(s=>`<option value="${s}" ${s===r.status?"selected":""}>${ST_ROTULO[s]}</option>`).join("")}</select></label>
-          <label>Responsável pela ação<input name="responsavel" maxlength="120" value="${esc(r.responsavel || "")}"></label>
-          <label>Prazo<input type="date" name="prazo" value="${esc(r.prazo || "")}"></label>
-          <label>&nbsp;<span style="font-weight:400;color:var(--muted);font-size:12px">${r.avaliado_em ? "Última avaliação em " + new Date(r.avaliado_em).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}) : "Ainda não avaliada"}</span></label>
-          <label class="larga">Observações da reunião<textarea name="observacao" maxlength="2000" placeholder="ex.: umidade 0,8 p.p. acima da tolerância no lote 1234; validar troca das lâmpadas">${esc(r.observacao || "")}</textarea></label>
+          <label>Prioridade da ação sugerida<select name="prioridade" ${temAcao(r) ? "" : "disabled"}><option value="">—</option>${PRIORIDADES.map(p=>`<option ${p===r.prioridade?"selected":""}>${p}</option>`).join("")}</select></label>
+          <label class="check"><input type="checkbox" name="enviada" ${r.enviada_controle ? "checked" : ""} ${temAcao(r) ? "" : "disabled"}> Lançada no controle de ações</label>
+          <label>Nº no controle (opcional)<input name="ref" maxlength="120" value="${esc(r.ref_controle || "")}" ${temAcao(r) ? "" : "disabled"}></label>
+          <label class="larga">Observações da reunião<textarea name="observacao" maxlength="2000" placeholder="ex.: confirmar com a manutenção se o mesmo forno tem outras lâmpadas no fim da vida útil">${esc(r.observacao || "")}</textarea></label>
         </div>
-        <div class="form-rod"><span id="av-status" style="font-size:12px"></span><button class="btn btn-prim" type="submit">Salvar avaliação</button></div>
+        <div class="form-rod"><span id="av-status" style="font-size:12px;color:var(--muted)">${r.avaliado_em ? "Discutida em " + new Date(r.avaliado_em).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}) : "Ainda não discutida"}</span><button class="btn btn-prim" type="submit">${discutida(r) ? "Salvar" : "Marcar como discutida"}</button></div>
       </form>
     </div>`;
   if (!dlg.open) dlg.showModal();
   $("#fechar").onclick = () => dlg.close();
   if ($("#ant")) { $("#ant").onclick = () => abrirDetalhe(estado.nav[pos-1]); $("#prox").onclick = () => abrirDetalhe(estado.nav[pos+1]); }
   const form = $("#form-av");
-  form.status.addEventListener("change", () => { if (form.status.value !== "Nova" && !form.kpi.value && !form.condicao.value) form.kpi.focus(); });
   form.onsubmit = async e => {
     e.preventDefault();
-    const av = {kpi:form.kpi.value.trim() || null, condicao:form.condicao.value || null, status:form.status.value,
-      responsavel:form.responsavel.value.trim() || null, prazo:form.prazo.value || null, observacao:form.observacao.value.trim() || null};
-    if (av.status === "Nova" && (av.kpi || av.condicao || av.responsavel)) av.status = "Em análise";   // avaliada na reunião deixa de ser "a avaliar"
+    const av = {prioridade:form.prioridade.value || null, enviada_controle:form.enviada.checked,
+      ref_controle:form.ref.value.trim() || null, observacao:form.observacao.value.trim() || null};
     const msg = $("#av-status"), btn = form.querySelector("button[type=submit]"); btn.disabled = true;
     try {
-      if (!modoDemo()) await rpc("avaliar_anomalia", {p_resposta_id:r.resposta_id, p_kpi:av.kpi, p_condicao:av.condicao, p_status:av.status,
-        p_responsavel:av.responsavel, p_prazo:av.prazo, p_observacao:av.observacao});
+      if (!modoDemo()) await rpc("registrar_reuniao", {p_resposta_id:r.resposta_id, p_prioridade:av.prioridade,
+        p_enviada_controle:av.enviada_controle, p_ref_controle:av.ref_controle, p_observacao:av.observacao});
       Object.assign(r, av, {avaliado_em: new Date().toISOString()});
       render();
       abrirDetalhe(r.id);
-      $("#av-status").innerHTML = `<span style="color:var(--ok)">✔ ${modoDemo() ? "Salvo só nesta tela (dados de demonstração)." : "Avaliação salva."}</span>`;
+      $("#av-status").innerHTML = `<span style="color:var(--ok)">✔ ${modoDemo() ? "Salvo só nesta tela (dados de demonstração)." : "Salvo."}</span>`;
     } catch (err) {
       msg.innerHTML = `<span style="color:var(--bad)">Não foi possível salvar: ${esc(err.message)}</span>`; btn.disabled = false;
     }
@@ -796,9 +760,9 @@ const COLUNAS = [
   ["Terceiro Porquê","porque3"], ["Quarto Porquê","porque4"], ["Quinto Porquê","porque5"],
   ["Nível de clareza da investigação (1 a 5)","clareza"], ["Causa raiz encontrada","causa_raiz"],
   ["Informe a causa, caso marque na reposta anterior \"Outra causa\"","causa_outra"],
-  ["Comentário da causa raiz encontrada","comentario_causa"], ["Ações Sugeridas","acoes_sugeridas"], ["KPI impactado","kpi_forms"],
+  ["Comentário da causa raiz encontrada","comentario_causa"], ["Ações Sugeridas","acoes_sugeridas"],
 ];
-const OPCIONAIS = new Set(["email","nome","modificado_em","inicio","kpi_forms"]);
+const OPCIONAIS = new Set(["email","nome","modificado_em","inicio"]);
 const CAMPOS = Object.fromEntries(COLUNAS.map(([t,c]) => [chave(t), c]));
 const imp = {linhas:[], faltam:[]};
 
@@ -815,7 +779,6 @@ function campoDaColuna(titulo){
   }
   if (melhor) return melhor;
   if (k.startsWith("equipamento")) return "equipamento";
-  if (k.includes("kpi")) return "kpi_forms";
   if (k.startsWith("informe a causa")) return "causa_outra";
   return null;
 }
@@ -897,7 +860,6 @@ async function prepararArquivo(arquivo){
     </div>
     <div id="aviso-substituir"></div>
     ${faltam.length && imp.linhas.length ? `<div class="msg warn">Colunas não encontradas no arquivo: ${faltam.map(esc).join(", ")}. Esses campos ficarão em branco. Confira se o título mudou no Forms.</div>` : ""}
-    ${!colunas.has("kpi_forms") && imp.linhas.length ? `<div class="msg" style="background:var(--surface-2);color:var(--ink-2)">Dica: o Forms ainda não tem a pergunta “KPI impactado”. Tudo bem: o KPI é preenchido na reunião, ao abrir cada anomalia.</div>` : ""}
     ${erros.length ? `<div class="erros-imp">${erros.slice(0,50).map(e=>`<span>${esc(e)}</span>`).join("")}${erros.length>50?`<span>… e mais ${erros.length-50}</span>`:""}</div>` : ""}
     ${!imp.linhas.length ? `<div class="msg bad">Nenhuma resposta válida encontrada. Confira se é o Excel exportado do Forms.</div>` : ""}`;
   atualizarBotaoEnviar();
@@ -944,7 +906,7 @@ async function enviarBase(){
 
 async function apagarTudo(){
   const n = estado.dados.length;
-  const resp = prompt(`Isso apaga as ${n} anomalia(s) e as avaliações da reunião (fica uma cópia de segurança no banco).\n\nPara confirmar, digite APAGAR:`);
+  const resp = prompt(`Isso apaga as ${n} anomalia(s) e os registros da reunião (fica uma cópia de segurança no banco).\n\nPara confirmar, digite APAGAR:`);
   if (resp == null) return;
   if (resp.trim().toUpperCase() !== "APAGAR") { alert("Nada foi apagado: a confirmação não confere."); return; }
   const btn = $("#apagar-tudo"); btn.disabled = true;
@@ -977,20 +939,18 @@ for (const d of Object.keys(DIMS)) $("#f-"+d).addEventListener("change", e => de
 $("#f-de").addEventListener("change", e => definirFiltro("de", e.target.value));
 $("#f-ate").addEventListener("change", e => definirFiltro("ate", e.target.value));
 $("#limpar").onclick = () => { for (const k in estado.filtros) estado.filtros[k] = ""; $("#f-de").value = $("#f-ate").value = ""; salvarUrl(); render(); };
-$("#trilha").addEventListener("click", e => { const d = e.target.dataset.rm; if (d) { definirFiltro(d, ""); if (d === "de" || d === "ate") $("#f-"+d).value = ""; } });
-$("#kpis").addEventListener("click", e => { const s = e.target.closest("[data-st]")?.dataset.st; if (s) { definirFiltro("status", estado.filtros.status === s ? "" : s); $("#sec-registros").scrollIntoView(); } });
+$("#trilha").addEventListener("click", e => { const d = e.target.dataset.rm; if (d) definirFiltro(d, ""); });
+$("#kpis").addEventListener("click", e => { const s = e.target.closest("[data-st]")?.dataset.st; if (s) { definirFiltro("situacao", estado.filtros.situacao === s ? "" : s); $("#sec-registros").scrollIntoView(); } });
 $("#abas").addEventListener("click", e => { const d = e.target.closest("[data-dim]")?.dataset.dim; if (d) { estado.dim = d; salvarUrl(); render(); } });
 $("#abas-pareto").addEventListener("click", e => { const p = e.target.closest("[data-par]")?.dataset.par; if (p) { estado.par = p; salvarUrl(); render(); } });
 $("#modo-pauta").addEventListener("click", e => { const p = e.target.closest("[data-pauta]")?.dataset.pauta; if (p) { estado.pauta = p; render(); } });
 $("#modo-lista").addEventListener("click", e => { const m = e.target.closest("[data-modo]")?.dataset.modo; if (m) { estado.modo = m; estado.limite = 15; render(); } });
 $("#pareto").addEventListener("click", e => {
   const b = e.target.closest("[data-par-k]"); if (!b) return;
-  const alvo = {causa:"causa", falha:"falha", equipamento:"equipamento", kpi:"kpi"}[estado.par];
-  definirFiltro(alvo, b.dataset.parRot);
+  definirFiltro(estado.par, b.dataset.parRot);   // causa, falha ou equipamento
 });
-$("#kpi-impacto").addEventListener("click", e => { const k = e.target.closest("[data-kpi]")?.dataset.kpi; if (k) definirFiltro("kpi", estado.filtros.kpi === k ? "" : k); });
 $("#pauta").addEventListener("click", e => {
-  if (e.target.id === "pauta-todas") { definirFiltro("status", estado.pauta === "novas" ? "Nova" : "abertas"); $("#sec-registros").scrollIntoView(); return; }
+  if (e.target.id === "pauta-todas") { definirFiltro("situacao", estado.pauta); $("#sec-registros").scrollIntoView(); return; }
   const it = e.target.closest("[data-id]"); if (it) abrirDetalhe(it.dataset.id, estado.navPauta);
 });
 $("#progresso").addEventListener("click", e => {
